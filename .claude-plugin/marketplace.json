@@ -1,0 +1,24 @@
+{
+  "name": "wenhaochai",
+  "owner": {
+    "name": "Wenhao Chai",
+    "url": "https://wenhaochai.com"
+  },
+  "plugins": [
+    {
+      "name": "todo",
+      "source": "./todo",
+      "description": "Show actionable items from TODO.md with smart filtering, optional Apple Reminders sync, and today's Google Calendar events."
+    },
+    {
+      "name": "email",
+      "source": "./email",
+      "description": "Summarize recent unread Gmail messages, filtering out promotions/notifications/security alerts."
+    },
+    {
+      "name": "wrap",
+      "source": "./wrap",
+      "description": "Summarize the current conversation and append it to ./memory/YYYY-MM-DD.md so future sessions can recover context."
+    }
+  ]
+}

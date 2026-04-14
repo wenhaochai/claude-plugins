@@ -1,0 +1,5 @@
+{
+  "name": "email",
+  "version": "0.1.0",
+  "description": "Summarize recent unread Gmail messages, filtering out promotions, security alerts, and noise."
+}
