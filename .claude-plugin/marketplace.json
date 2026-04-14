@@ -6,19 +6,9 @@
   },
   "plugins": [
     {
-      "name": "todo",
-      "source": "./todo",
-      "description": "Show actionable items from TODO.md with smart filtering, optional Apple Reminders sync, and today's Google Calendar events."
-    },
-    {
-      "name": "email",
-      "source": "./email",
-      "description": "Summarize recent unread Gmail messages, filtering out promotions/notifications/security alerts."
-    },
-    {
-      "name": "wrap",
-      "source": "./wrap",
-      "description": "Summarize the current conversation and append it to ./memory/YYYY-MM-DD.md so future sessions can recover context."
+      "name": "daily",
+      "source": "./daily",
+      "description": "Personal daily tools: TODO management, Apple Reminders sync, filtered Gmail unread summary, and conversation archiving."
     }
   ]
 }

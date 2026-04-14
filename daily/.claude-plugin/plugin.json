@@ -1,0 +1,9 @@
+{
+  "name": "daily",
+  "version": "0.1.0",
+  "description": "Personal daily tools: /daily:todo (TODO.md with natural-language add/complete/delete/update), /daily:todo-sync (Apple Reminders two-way sync), /daily:email (filtered Gmail unread summary), /daily:wrap (conversation archive to memory/).",
+  "author": {
+    "name": "Wenhao Chai",
+    "url": "https://wenhaochai.com"
+  }
+}

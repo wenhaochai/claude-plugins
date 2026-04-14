@@ -1,5 +1,0 @@
-{
-  "name": "todo",
-  "version": "0.2.0",
-  "description": "Manage TODO.md via /todo (show / add / complete / delete / update in natural language) and /todo-sync (Apple Reminders two-way sync)."
-}

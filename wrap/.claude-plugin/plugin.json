@@ -1,5 +1,0 @@
-{
-  "name": "wrap",
-  "version": "0.1.0",
-  "description": "Summarize the current conversation and append it to ./memory/YYYY-MM-DD.md so future sessions can recover context."
-}
