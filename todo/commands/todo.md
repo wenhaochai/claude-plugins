@@ -1,12 +1,45 @@
-Read `./TODO.md` (project root by default) and surface the items that need attention right now. Optionally sync with Apple Reminders and show today's calendar events.
+---
+description: Manage TODO.md (show / add / complete / delete / update via natural language) and show today's calendar.
+argument-hint: [natural language description, e.g. "加一条 寄包裹" / "寄驾照完成了" / "删掉 Tesla refer"]
+---
 
-## Apple Reminders sync (only on `/todo sync`)
+Manage `./TODO.md` (project root by default). Supports read and write via a single command — the caller passes a natural-language description as `$ARGUMENTS`; branch on intent.
 
-By default `/todo` only reads the local `TODO.md` and renders it. **Only when the user explicitly runs `/todo sync`** perform the Apple Reminders two-way sync described below.
+- **No arguments** → read-only rendering (see "Read mode" below).
+- **With arguments** → infer intent (add / complete / delete / update) from the natural-language description and edit `./TODO.md` accordingly (see "Write mode" below).
 
-When syncing, only move items from `Long` → `Quick` if the blocking condition has **actually been resolved** (e.g. the user explicitly says "the package arrived"). Do not promote items based on your own judgement.
+For Apple Reminders two-way sync, use `/todo-sync` instead. That is a separate command because it is destructive.
 
-## Filter rules
+---
+
+## TODO.md format (authoritative)
+
+Every item follows this shape:
+
+```markdown
+- [ ] Item title
+  - 备注：short note
+  - 提醒：MM/DD/YYYY or 每天
+  - 完成：MM/DD/YYYY (only when completed)
+```
+
+Rules:
+
+- Dates use `MM/DD/YYYY`.
+- Keep the title short; put detail in notes.
+- On update, **append** a dated note (`- MM/DD: ...`). Do not overwrite existing notes.
+- Preserve original quoted content (emails, Slack messages, replies) using `>` blockquotes.
+- Use `- 状态：...` to mark current progress (e.g. `等待回复` / `已完成`).
+- Group items under `## <category>` headers (e.g. `财务/报销`, `工作/沟通`, `生活/杂务`, `每月固定`, `每年固定`). Pick the best fit; if none obvious, create a new one or put under a `## 杂项` section.
+- If `TODO.md` does not exist, create it with a minimal header and the relevant category.
+
+---
+
+## Read mode (no arguments)
+
+Render the actionable items right now.
+
+### Filter rules
 
 - If an item has a "提醒/Remind" date that is **more than 7 days away**, hide it.
 - If the item's notes indicate it is currently un-actionable (e.g. "waiting for reply", "blocked on X"), hide it.
@@ -14,16 +47,17 @@ When syncing, only move items from `Long` → `Quick` if the blocking condition 
 - Completed items (`[x]`) are hidden.
 - Items marked "提醒：每天" / "Remind: daily" are **always** shown.
 
-## Auto-cleanup
+### Auto-cleanup
 
 - Delete `[x]` items whose completion date is more than 7 days old (read the `- 完成：MM/DD/YYYY` / `- Done: MM/DD/YYYY` line under the item).
+- Before deleting, append the full content (notes, progress log, quoted messages) to `./memory/YYYY-MM-DD.md` (today's date). If that file already exists, append separated by `---`.
 
-## Output format
+### Output format
 
-- Group by category, skip categories with no visible items.
+- Group by category; skip categories with no visible items.
 - End with a one-liner: `X items need attention, Y hidden as not currently actionable`.
 
-## Today's calendar (optional)
+### Today's calendar (optional)
 
 If a Google Calendar MCP is connected, also show today's events:
 
@@ -34,35 +68,64 @@ If a Google Calendar MCP is connected, also show today's events:
 
 If no calendar MCP is connected, skip this section silently.
 
-## Archiving
+---
 
-When `[x]` items are auto-cleaned (or when the user manually deletes an item), append the full content (notes, progress log, original messages) to `./memory/YYYY-MM-DD.md` (today's date). If that file already exists, append separated by `---`.
+## Write mode (arguments present)
 
-## Apple Reminders two-way sync (only on `/todo sync`)
+The argument is a free-form natural-language description. Infer intent; if ambiguous, ask the user before editing.
 
-Use `osascript` against AppleScript to read Reminders and diff against `TODO.md`.
+### Intent detection
 
-### `Quick` list — actionable / requires ongoing attention
+Match against these patterns (Chinese or English):
 
-Items the user can act on now, plus recurring items (daily/weekly/monthly) that need ongoing attention.
+| Intent | Typical phrasing |
+|---|---|
+| **add** | "加一条 …", "新增 …", "记一下 …", "add …", "remember to …" |
+| **complete** | "… 做完了", "… 完成了", "搞定 …", "done with …", "finished …" |
+| **delete** | "删掉 …", "不要 … 了", "remove …", "drop …" |
+| **update** | "更新 …", "… 改成 …", "… 加个备注 …", "update …", "note on …" |
 
-- **Reminders → TODO.md**: items in `Quick` but missing in `TODO.md` → add to `TODO.md`.
-- **Reminders → TODO.md**: items completed in `Quick` but not yet `[x]` in `TODO.md` → mark `[x]`.
-- **TODO.md → Reminders**: new / completed / deleted / edited items → mirror to `Quick`.
+If the phrasing does not clearly match any, or the target item is ambiguous (multiple possible matches), ask a clarifying question instead of guessing.
 
-### `Long` list — long-term / currently blocked
+### Add
 
-Items in passive-waiting state or with reminder dates far out.
+- Generate a short title; put supplied detail in `- 备注：...`.
+- If the user gave a date ("下周一提醒我", "5/1 之前"), convert to `MM/DD/YYYY` in the user's local timezone and write `- 提醒：MM/DD/YYYY`.
+- If the user said "每天" / "daily", write `- 提醒：每天`.
+- Pick the best category header; create a new one only if no existing fits.
+- Report the insertion: path, category, title.
 
-- **Reminders → TODO.md**: items in `Long` but missing in `TODO.md` → add to `TODO.md`.
-- **TODO.md → Reminders**: new / completed / deleted / edited items → mirror to `Long`.
-- When a `Long` item becomes actionable (block resolved or reminder date close), move it to `Quick`.
+### Complete
 
-### Common rules
+- Locate the item by matching keywords against titles (and, if needed, against notes). Pick the best single match; if multiple plausible, ask.
+- Change `- [ ]` to `- [x]`.
+- Append `- 完成：MM/DD/YYYY` (today's date, user local timezone).
+- Report the match + change.
 
-- Reminder body format: leading `[Category]` followed by the full notes block from `TODO.md`.
-- **Never touch** any list other than `Quick` and `Long`.
+### Delete
 
-## Date format
+- Locate by the same matching rules as complete.
+- Before deleting, append the full item (title + all notes, unmodified) to `./memory/YYYY-MM-DD.md`, separated by `---` if the file already has content.
+- Remove the item from `TODO.md`.
+- Report what was removed and where it was archived.
 
-Use `MM/DD/YYYY` everywhere.
+### Update
+
+- Locate the item.
+- **Append** a new note line; do not edit existing notes unless the user explicitly says "改 X 为 Y".
+- New notes use the dated prefix if they are progress updates: `- MM/DD：...`.
+- If the user supplied quoted content (email excerpt, message), preserve it with `>` blockquotes.
+- Report the appended note.
+
+### General safety
+
+- Never delete a non-`[x]` item without explicit delete intent.
+- Never bulk-edit multiple items from a single natural-language instruction unless the user's phrasing clearly pluralizes ("把 X 和 Y 都删了").
+- After any write, show a compact diff (3–6 lines) so the user can verify.
+
+---
+
+## Date and timezone
+
+- All dates: `MM/DD/YYYY`.
+- "Today", "now", and relative dates resolve in the user's local timezone.

@@ -1,5 +1,5 @@
 {
   "name": "todo",
-  "version": "0.1.0",
-  "description": "Show actionable items from TODO.md, optionally sync with Apple Reminders, and surface today's calendar events."
+  "version": "0.2.0",
+  "description": "Manage TODO.md via /todo (show / add / complete / delete / update in natural language) and /todo-sync (Apple Reminders two-way sync)."
 }
