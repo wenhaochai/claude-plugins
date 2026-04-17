@@ -8,8 +8,6 @@ Manage `./TODO.md` (project root by default). Supports read and write via a sing
 - **No arguments** → read-only rendering (see "Read mode" below).
 - **With arguments** → infer intent (add / complete / delete / update) from the natural-language description and edit `./TODO.md` accordingly (see "Write mode" below).
 
-For Apple Reminders two-way sync, use `/todo-sync` instead. That is a separate command because it is destructive.
-
 ---
 
 ## TODO.md format (authoritative)
