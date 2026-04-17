@@ -35,6 +35,28 @@ Rules:
 
 ---
 
+## Project entries
+
+The `## 项目` section tracks ongoing active projects (multi-week / multi-month trackers), distinct from single-shot TODOs. Entries follow the same checkbox schema with these extra rules:
+
+### Creation
+
+- **Verify the path on the filesystem first** (Glob / Bash). Do not guess. If the path doesn't exist, don't create the entry — ask the user to clarify.
+- Peek at the project's `README.md` / main entry file (e.g. `main.tex`, `pyproject.toml`) to extract a one-line description and core stack.
+- **Required first note**: `- 路径：<path relative to TODO.md's directory>` (e.g. `../supop/`, `../neurips2026_xxx/`).
+- Remaining notes: short description + core stack. **No meta annotations** ("原 X 条目搬入", "见 Y 合并", etc.) — the entry itself is the content, not a changelog of how it was built.
+
+### Updates
+
+Same rules as regular TODOs: append dated notes (`- MM/DD：...`), never overwrite, preserve quoted content with `>` blockquotes, use `- 状态：...` for current progress.
+
+### Read-mode behavior
+
+- Project entries are **always shown** (persistent trackers, not date-bound). The "hide if blocked / >7 days away" filter does not apply to the `## 项目` section.
+- Render each as a compact one-liner: `- [ ] <name> — <状态 or next step>`.
+
+---
+
 ## Read mode (no arguments)
 
 Render the actionable items right now.
