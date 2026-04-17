@@ -50,6 +50,8 @@ The `## 项目` section tracks ongoing active projects (multi-week / multi-month
 
 Same rules as regular TODOs: append dated notes (`- MM/DD：...`), never overwrite, preserve quoted content with `>` blockquotes, use `- 状态：...` for current progress.
 
+**Refresh status from git**: when the user triggers `/daily:todo` or asks to "update project status", `cd` into each project's path and run `git log --oneline -8` + `git status --short` + `git branch --show-current`. Extract the latest progress from commit messages / branch name / uncommitted files and append as today's `- MM/DD：...` note. Do not write status from memory — the whole point of project entries is that status tracks git.
+
 ### Read-mode behavior
 
 - Project entries are **always shown** (persistent trackers, not date-bound). The "hide if blocked / >7 days away" filter does not apply to the `## 项目` section.
