@@ -24,7 +24,7 @@ Summarize the entire current conversation and persist it so future sessions can 
 
 ## Save location
 
-- Append to `./memory/YYYY-MM-DD.md` (today's date, project root).
+- Append to `~/.claude/memory/YYYY-MM-DD.md` (today's date, global — not per-project).
 - Create the directory if missing.
 - If the file already exists, append separated by `---`.
 - No frontmatter — write the content directly.
