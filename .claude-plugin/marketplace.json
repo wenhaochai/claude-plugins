@@ -9,6 +9,11 @@
       "name": "daily",
       "source": "./daily",
       "description": "Personal daily tools: TODO management, Apple Reminders sync, filtered Gmail unread summary, and conversation archiving."
+    },
+    {
+      "name": "paper",
+      "source": "./paper",
+      "description": "Auto-triggering skill for academic paper prose: 12 canonical writing rules (from agent-style, CC BY 4.0) plus 5 additions for page-capped conference papers."
     }
   ]
 }

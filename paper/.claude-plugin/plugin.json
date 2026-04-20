@@ -1,0 +1,9 @@
+{
+  "name": "paper",
+  "version": "0.1.0",
+  "description": "Style rules for English academic paper prose: 12 canonical (from agent-style, CC BY 4.0) + 5 additions for page-capped conference papers. Ships a skill that auto-triggers when writing or editing .tex files or paper drafts.",
+  "author": {
+    "name": "Wenhao Chai",
+    "url": "https://wenhaochai.com"
+  }
+}
