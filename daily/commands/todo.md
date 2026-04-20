@@ -72,7 +72,7 @@ Render the actionable items right now.
 ### Auto-cleanup
 
 - Delete `[x]` items whose completion date is more than 7 days old (read the `- 完成：MM/DD/YYYY` / `- Done: MM/DD/YYYY` line under the item).
-- Before deleting, append the full content (notes, progress log, quoted messages) to `./memory/YYYY-MM-DD.md` (today's date). If that file already exists, append separated by `---`.
+- Before deleting, append the full content (notes, progress log, quoted messages) to `~/.claude/memory/YYYY-MM-DD.md` (use the item's **completion date**, not today, so same-day completions stay in one file). If that file already exists, append separated by `---`.
 
 ### Output format
 
@@ -127,7 +127,7 @@ If the phrasing does not clearly match any, or the target item is ambiguous (mul
 ### Delete
 
 - Locate by the same matching rules as complete.
-- Before deleting, append the full item (title + all notes, unmodified) to `./memory/YYYY-MM-DD.md`, separated by `---` if the file already has content.
+- Before deleting, append the full item (title + all notes, unmodified) to `~/.claude/memory/YYYY-MM-DD.md` (today's date, global path — not per-project), separated by `---` if the file already has content.
 - Remove the item from `TODO.md`.
 - Report what was removed and where it was archived.
 
