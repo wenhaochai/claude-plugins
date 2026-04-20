@@ -1,6 +1,6 @@
 ---
 description: Manage TODO.md (show / add / complete / delete / update via natural language) and show today's calendar.
-argument-hint: [natural language description, e.g. "加一条 寄包裹" / "寄驾照完成了" / "删掉 Tesla refer"]
+argument-hint: [natural language description, e.g. "加一条 买菜" / "买菜完成了" / "删掉 健身"]
 ---
 
 Manage `./TODO.md` (project root by default). Supports read and write via a single command — the caller passes a natural-language description as `$ARGUMENTS`; branch on intent.
@@ -41,7 +41,7 @@ The `## 项目` section tracks ongoing active projects (multi-week / multi-month
 
 - **Verify the path on the filesystem first** (Glob / Bash). Do not guess. If the path doesn't exist, don't create the entry — ask the user to clarify.
 - Peek at the project's `README.md` / main entry file (e.g. `main.tex`, `pyproject.toml`) to extract a one-line description and core stack.
-- **Required first note**: `- 路径：<path relative to TODO.md's directory>` (e.g. `../supop/`, `../neurips2026_xxx/`).
+- **Required first note**: `- 路径：<path relative to TODO.md's directory>` (e.g. `../my-project/`, `../paper-repo/`).
 - Remaining notes: short description + core stack. **No meta annotations** ("原 X 条目搬入", "见 Y 合并", etc.) — the entry itself is the content, not a changelog of how it was built.
 
 ### Updates

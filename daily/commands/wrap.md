@@ -1,3 +1,7 @@
+---
+description: Summarize the current conversation and persist it to memory/ for future sessions.
+---
+
 Summarize the entire current conversation and persist it so future sessions can recover context.
 
 ## Summary requirements

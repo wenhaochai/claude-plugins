@@ -1,6 +1,6 @@
 {
   "name": "daily",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Personal daily tools: /daily:todo (TODO.md with natural-language add/complete/delete/update), /daily:email (filtered Gmail unread summary), /daily:wrap (conversation archive to memory/).",
   "author": {
     "name": "Wenhao Chai",

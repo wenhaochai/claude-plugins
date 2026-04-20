@@ -1,3 +1,7 @@
+---
+description: Summarize recent unread Gmail messages.
+---
+
 Show a summary of recent unread Gmail messages.
 
 Requires a Gmail MCP server to be connected. Operates on the user's default Gmail account. To restrict to a specific account, the user can set `"account": "you@example.com"` in `~/.claude/plugins/email/config.json`.
