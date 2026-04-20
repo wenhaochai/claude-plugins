@@ -11,9 +11,9 @@
       "description": "Personal daily tools: TODO management, Apple Reminders sync, filtered Gmail unread summary, and conversation archiving."
     },
     {
-      "name": "paper",
-      "source": "./paper",
-      "description": "Auto-triggering skill for academic paper prose: 12 canonical writing rules (from agent-style, CC BY 4.0) plus 5 additions for page-capped conference papers."
+      "name": "writing",
+      "source": "./writing",
+      "description": "Default writing standards for English prose. Auto-triggers on all writing tasks — emails, drafts, posts, paper prose. 12 canonical rules (from agent-style, CC BY 4.0) plus 5 additions for page-capped conference papers."
     }
   ]
 }

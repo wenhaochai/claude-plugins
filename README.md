@@ -13,9 +13,9 @@ Single plugin bundling the commands I use every day.
 | `/daily:email` | Summarize recent unread Gmail messages, filtering out promotions / security alerts / noise (requires a Gmail MCP) |
 | `/daily:wrap` | Summarize the current conversation and append to `./memory/YYYY-MM-DD.md` |
 
-## `paper` — academic paper writing style
+## `writing` — default writing standards
 
-Ships a skill (`paper-style`) that auto-triggers when editing `.tex` files or reviewing paper drafts. 17 rules: 12 canonical (Strunk & White / Orwell / Pinker / Gopen & Swan, sourced from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0) plus 5 additions for page-capped conference papers (no em-dashes or prose parens, no overview paragraphs, minimal `\emph`/`\textbf`, researcher voice, space economy under page caps).
+Ships a skill (`writing-style`) that auto-triggers on any writing task the user will send or publish — emails, message drafts, posts, docs, grant proposals, paper prose. 12 canonical rules (Strunk & White / Orwell / Pinker / Gopen & Swan, sourced from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0) apply everywhere. 5 additional rules (no em-dashes or prose parens, no overview paragraphs, minimal `\emph`/`\textbf`, researcher voice, space economy) apply only when the target is a page-capped conference paper.
 
 No slash command. The skill loads whenever the writing context matches.
 
@@ -24,7 +24,7 @@ No slash command. The skill loads whenever the writing context matches.
 ```
 /plugin marketplace add wenhaochai/claude-plugins
 /plugin install daily@wenhaochai
-/plugin install paper@wenhaochai
+/plugin install writing@wenhaochai
 ```
 
 ## Optional config
@@ -51,4 +51,4 @@ Both are optional.
 
 ## License
 
-MIT for plugin code. The `paper` plugin's `skills/paper-style/SKILL.md` contains rules redistributed from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; attribution is preserved in that file.
+MIT for plugin code. The `writing` plugin's `skills/writing-style/SKILL.md` contains rules redistributed from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; attribution is preserved in that file.

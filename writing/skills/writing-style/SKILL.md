@@ -1,11 +1,13 @@
 ---
-name: paper-style
-description: Use when writing, reviewing, or editing English academic prose in LaTeX .tex files or conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv preprints, grant proposals). Applies 17 writing rules at generation time, not as a post-hoc linter. Treat all rules as peer constraints.
+name: writing-style
+description: Default writing standards. Use whenever producing English prose the user will send or publish — emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 12 canonical rules everywhere; additionally apply 5 page-capped additions (RULE-P1..P5) when the target is a page-constrained paper. Treat all rules as peer constraints and apply at generation time, not as a post-hoc linter.
 ---
 
-# Paper Style
+# Writing Style
 
-17 rules for English academic prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
+Default standards for English prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
+
+**Scope.** RULE-01..12 apply to every writing task — email, message draft, post, doc, paper prose. RULE-P1..P5 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone.
 
 ## Canonical (RULE-01..12)
 
@@ -46,7 +48,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> paper-style v0.1.0 active: 17 rules (RULE-01..12 canonical + RULE-P1..P5 page-capped additions).
+> writing-style v0.2.0 active: 12 canonical rules (RULE-01..12) + 5 page-capped additions (RULE-P1..P5, paper-only).
 
 ## Credits
 
