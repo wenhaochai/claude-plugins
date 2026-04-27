@@ -81,17 +81,45 @@ Do not write status from memory — the whole point of project entries is that s
 
 ---
 
+## Activation status (active / inactive)
+
+Each item is implicitly **active** unless explicitly marked inactive. Active items render on dashboards and in read mode; inactive ones stay in `TODO.md` (history preserved) but are hidden until reactivated.
+
+### Schema
+
+- **Active** (default) — no marker.
+- **Inactive** — append `- 激活：否（<reason>）` as the last metadata line (after 备注 / 提醒 / 状态, before the blank line preceding history). Reason vocabulary:
+  - `远期` — reminder is far out (~3+ weeks) and nothing actionable now
+  - `等对方` — user side done, waiting on counterpart (reply / approval / payment); typical wait is days–weeks
+  - `已用` — recurring item already used for the current cycle (e.g. annual credit consumed)
+  - `用户标记` — explicitly set by the user, regardless of automatic logic
+
+### Decision priority (high → low)
+
+1. **User override beats everything.** "X 不激活" / "X 激活" → set as instructed, reason `用户标记`.
+2. Otherwise apply `远期` / `等对方` / `已用` in that order.
+3. Otherwise active.
+
+### Transitions
+
+- **Add** — apply decision rules at creation; write the `- 激活：` line only if inactive.
+- **Update** — if the update flips activation (counterpart replied → ball back on user; reminder approaches → actionable; far-future date → near), toggle the marker in the same edit (delete the line to activate, add it to deactivate). Don't keep stale activation state.
+- **Complete / delete** — moot; drop the `- 激活：` line if present.
+
+---
+
 ## Read mode (no arguments)
 
 Render the actionable items right now.
 
 ### Filter rules
 
+- **Items with `- 激活：否（…）` are hidden** regardless of reminder or 备注 content. Activation is the durable explicit signal; the rules below remain dynamic.
 - If an item has a `- 提醒：MM/DD/YYYY` more than 7 days away, hide it.
 - If `- 备注：` indicates currently un-actionable ("等 X 审批", "waiting for reply", "blocked on"), hide it.
 - Monthly/yearly recurring items: only show those whose next reminder is within 7 days.
 - Completed items (`[x]`) are hidden.
-- Items with `- 提醒：每天` / `Remind: daily` are **always** shown.
+- Items with `- 提醒：每天` / `Remind: daily` are **always** shown (overrides the 7-day rule, but not the inactive rule above).
 
 ### Auto-cleanup
 
@@ -101,7 +129,7 @@ Render the actionable items right now.
 ### Output format
 
 - Group by category; skip empty categories.
-- End with a one-liner: `X items need attention, Y hidden as not currently actionable`.
+- End with a one-liner: `X items need attention, Y hidden as not currently actionable, Z marked inactive`.
 
 ### Today's calendar (optional)
 
@@ -137,6 +165,7 @@ If the phrasing does not clearly match, or the target item is ambiguous (multipl
 - Write `- 备注：` as a one-liner reflecting what the user just said (current state + next action).
 - If the user gave a date or "每天", add `- 提醒：MM/DD/YYYY` or `- 提醒：每天`. Otherwise omit.
 - Pick the best existing category; create a new one only if nothing fits.
+- Apply activation rules (see "Activation status" above): if the item lands inactive (远期 / 等对方 / 已用 / explicit user override), append `- 激活：否（<reason>）` as the last metadata line.
 - Report the insertion: path, category, title.
 
 ### Complete
@@ -146,6 +175,7 @@ If the phrasing does not clearly match, or the target item is ambiguous (multipl
 - **Rewrite `- 备注：`** as the final-state one-liner (what actually got done, outcome).
 - **Remove** the `- 提醒：` line.
 - **Add** `- 完成：MM/DD/YYYY` (today, user local timezone) below 备注.
+- **Drop** the `- 激活：否（…）` line if present (moot once completed).
 - **Prepend** a `- MM/DD：...` history entry capturing how it was completed. Preserve any quoted content with `>` blockquotes.
 - Report the match + change as a 3–6 line diff.
 
@@ -164,6 +194,7 @@ The most frequent operation. Four steps every time:
 2. **Rewrite `- 备注：`** — overwrite this line so it reflects the new current state + next action in a single sentence. Don't keep the old phrasing; the old context lives in history, not in 备注.
 3. **Adjust `- 提醒：`** — if the existing reminder is still the next actionable thing, leave it. Otherwise replace it with the new next reminder, or delete the line if nothing's pending. **Never end up with more than one 提醒 line.**
 4. **Prepend a new `- MM/DD：...` history entry** right under the metadata lines, above older history, separated by a blank line. This entry captures what happened today (what the user just told you). Preserve any quoted email/message content with `>` blockquotes indented inside the entry.
+5. **Re-evaluate activation** — if the update flips the rule (counterpart replied → ball on user / reminder approaches → actionable / `远期` → 临近), toggle the `- 激活：否（…）` line accordingly. Don't leave stale activation state.
 
 If the user supplies quoted content, preserve it verbatim inside the new history entry.
 
