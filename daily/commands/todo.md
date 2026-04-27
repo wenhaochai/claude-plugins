@@ -173,6 +173,30 @@ Do not edit existing history entries unless the user explicitly says "改 MM/DD 
 
 Report the changes (备注 rewrite + 提醒 change + new history entry) as a 3–6 line diff for the user to verify.
 
+### Duplicate detection (merge prompt)
+
+Before **add** finalizes — and any time the user is reviewing existing items — scan `TODO.md` for entries that look like the same underlying task. Signals:
+
+- Titles reduce to the same object + same verb (e.g. two entries that both amount to "follow up with X on Y")
+- `- 备注：` / history of the existing item points at the same goal, counterpart, or blocking event as what's being added
+- Same `## <category>` and overlapping reminder timeframe
+
+When a likely duplicate is found, **do not silently add or edit**. Stop and ask the user, showing both candidates' titles + 备注 in 2–4 lines:
+
+> "<existing title>" 和 "<new/other title>" 看着是同一件事，要 merge 吗？
+
+If the user confirms merge:
+
+- Keep the entry with the richer history as the base.
+- Fold the other entry's unique 备注 fragments and any history entries into the base (preserve original dates on history entries).
+- Pick the more urgent / specific reminder; drop the other.
+- Remove the redundant entry.
+- Report the merge as a 3–6 line diff.
+
+If the user declines, proceed with the original intent unchanged.
+
+This check is cheap — when in doubt, ask. Two near-duplicates silently coexisting is a worse outcome than one extra confirmation.
+
 ### General safety
 
 - Never delete a non-`[x]` item without explicit delete intent.
