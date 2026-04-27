@@ -1,7 +1,7 @@
 {
   "name": "writing",
-  "version": "0.3.0",
-  "description": "Default writing standards for English prose. 12 canonical rules (from agent-style, CC BY 4.0) plus 6 additions for page-capped conference papers. Auto-triggers on all writing tasks — emails, drafts, posts, paper prose — not just .tex files.",
+  "version": "0.4.0",
+  "description": "Default writing standards for English prose. 12 canonical rules (from agent-style, CC BY 4.0) plus 7 additions for page-capped conference papers. Auto-triggers on all writing tasks — emails, drafts, posts, paper prose — not just .tex files.",
   "author": {
     "name": "Wenhao Chai",
     "url": "https://wenhaochai.com"
