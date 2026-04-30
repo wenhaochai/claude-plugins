@@ -51,36 +51,6 @@ Core rules:
 
 ---
 
-## Project entries
-
-The `## 项目` section tracks ongoing active projects (multi-week / multi-month trackers), distinct from single-shot TODOs. Same live-metadata + history-log schema, with these extras:
-
-### Creation
-
-- **Verify the path on the filesystem first** (Glob / Bash). Do not guess. If the path doesn't exist, don't create the entry — ask the user to clarify.
-- Peek at the project's `README.md` / main entry file (e.g. `main.tex`, `pyproject.toml`) to extract a short description and core stack.
-- **First line is always `- 路径：<path relative to TODO.md's directory>`** (e.g. `../my-project/`). This sits above `- 备注：`.
-- `- 备注：` holds the live one-liner: current phase + next action (not historical blurb).
-- No meta annotations ("原 X 条目搬入", "见 Y 合并") — the entry is the content.
-
-### Updates
-
-Follow the standard Update rules (see Write mode below). For projects, `- 备注：` typically captures current branch / phase / blocker in one sentence.
-
-**Refresh status from git**: when the user triggers `/daily:todo` or asks to "update project status", `cd` into each project's path and run `git log --oneline -8` + `git status --short` + `git branch --show-current`. Then:
-
-1. **Rewrite `- 备注：`** to reflect the latest state + next action (derived from commits / branch / uncommitted files).
-2. **Prepend a new `- MM/DD：...` history entry** with the concrete git-derived progress (key commits, branch name, uncommitted files).
-
-Do not write status from memory — the whole point of project entries is that status tracks git.
-
-### Read-mode behavior
-
-- Project entries are **always shown** (persistent trackers, not date-bound). The "hide if blocked / >7 days away" filter does not apply.
-- Render each as a compact one-liner: `- [ ] <name> — <备注 content>`.
-
----
-
 ## Activation status (active / inactive)
 
 Each item is implicitly **active** unless explicitly marked inactive. Active items render on dashboards and in read mode; inactive ones stay in `TODO.md` (history preserved) but are hidden until reactivated.
