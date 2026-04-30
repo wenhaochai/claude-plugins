@@ -13,7 +13,7 @@
     {
       "name": "writing",
       "source": "./writing",
-      "description": "Default writing standards for English prose. Auto-triggers on all writing tasks — emails, drafts, posts, paper prose. 12 canonical rules (from agent-style, CC BY 4.0) plus 5 additions for page-capped conference papers."
+      "description": "Publication-prep tools for academic / public-facing writing. Two skills: writing-style (13 canonical English-prose rules from agent-style under CC BY 4.0 + 6 page-cap additions, auto-triggers on every writing task) and plot (matplotlib templates for paper figures: bar / box / line / scatter, with a Palatino + Google-brand-tone setup)."
     }
   ]
 }

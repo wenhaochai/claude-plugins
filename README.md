@@ -13,11 +13,19 @@ Single plugin bundling the commands I use every day.
 | `/daily:email` | Summarize recent unread Gmail messages, filtering out promotions / security alerts / noise (requires a Gmail MCP) |
 | `/daily:wrap` | Summarize the current conversation and append to `./memory/YYYY-MM-DD.md` |
 
-## `writing` — default writing standards
+## `writing` — publication-prep tools
 
-Ships a skill (`writing-style`) that auto-triggers on any writing task the user will send or publish — emails, message drafts, posts, docs, grant proposals, paper prose. 12 canonical rules (Strunk & White / Orwell / Pinker / Gopen & Swan, sourced from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0) apply everywhere. 5 additional rules (no em-dashes or prose parens, no overview paragraphs, minimal `\emph`/`\textbf`, researcher voice, space economy) apply only when the target is a page-capped conference paper.
+Two skills bundled together. Both auto-load by context match; no slash commands.
 
-No slash command. The skill loads whenever the writing context matches.
+### `writing-style` — default English-prose standards
+
+Auto-triggers on any writing task the user will send or publish — emails, message drafts, posts, docs, grant proposals, paper prose. 13 canonical rules (Strunk & White / Orwell / Pinker / Gopen & Swan, sourced from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0) apply everywhere. 6 additional rules (no em-dashes or prose parens, no overview paragraphs, minimal `\emph`/`\textbf`, researcher voice, space economy, no blank lines inside `\paragraph{}`, equation symbol audit) apply only when the target is a page-capped conference paper.
+
+### `plot` — matplotlib templates for paper figures
+
+Drop-in templates for publication-quality figures: vertical / horizontal bar, horizontal boxplot with family gradient, multi-line on linear / broken / log-x / log-log axes, log-log power-law fit, IsoFLOPs-style scatter. Each template is one .py file producing one subplot. Shared `style.py` sets Palatino body + STIX math (matching arxiv `mathpazo`) and a Google-brand palette softened to a paper-friendly tier (`brand → medium → paper → soft → mute`, switchable in one line). Labels ship pre-genericized (`Model A`, `Metric A`, `Task A`) to keep the templates portable; replace with real names when applying.
+
+Template dir: `~/.claude/plugins/marketplaces/wenhaochai/writing/skills/plot/`. Copy the chosen template plus `style.py` to your figures directory, edit the data block, add a `fig.savefig(...)` call, run.
 
 ## Install
 
