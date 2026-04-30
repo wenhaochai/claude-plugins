@@ -45,7 +45,7 @@ Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps 
 
 - **RULE-P6** Audit every equation, display and inline, for undefined symbols. Each free variable, custom function (input/output type), index, and custom operator must be defined in prose: as setup before the equation, as unpacking after, or, for inline math, at the equation site itself where definition and use often coincide. State output types when arithmetic depends on them.
 
-- **RULE-P7** Every `\bib` entry must correspond to a real, locatable paper: title, authors, year all verified. Do not trust LLM-generated entries without checking. A fabricated reference is citation fraud and damages credibility more than any prose flaw.
+- **RULE-P7** Citation discipline. Every `\bib` entry must correspond to a real, locatable paper: title, authors, year all verified; do not trust LLM-generated entries without checking, since a fabricated reference is citation fraud and damages credibility more than any prose flaw. Use `\citet` only when the citation is a sentence component, e.g., `\citet{tong24} show that ...` renders as "Tong et al. (2024) show that ..."; use `\citep` everywhere else, e.g., "...as shown in prior work \citep{tong24}" renders as "...as shown in prior work (Tong et al., 2024)". Test by removing the citation: if the sentence is still grammatical, use `\citep`; if it breaks, use `\citet`. Order multiple citations chronologically. In `.bib` entries: prefer the published venue over arXiv when both exist; use `@inproceedings` for conferences and `@article` for journals or arXiv-only papers; use the 4-letter conference abbreviation, e.g., CVPR or ICML, not the full name; drop page, volume, and number fields; deduplicate entries. Source `.bib` from Google Scholar, since arXiv and Semantic Scholar exports use inconsistent formatting.
 
 - **RULE-P8** Use the precision the measurement supports: 81.2% over 81.23% in most cases. Pick math-mode (`$82.8$`) or text-mode (`82.8`) and hold it across the whole paper, including tables.
 
@@ -69,7 +69,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> writing-style v0.6.0 active: 15 canonical rules (RULE-01..15) + 10 page-capped additions (RULE-P1..P10, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> writing-style v0.6.1 active: 15 canonical rules (RULE-01..15) + 10 page-capped additions (RULE-P1..P10, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 
