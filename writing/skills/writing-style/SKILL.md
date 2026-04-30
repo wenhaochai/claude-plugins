@@ -1,13 +1,13 @@
 ---
 name: writing-style
-description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 15 canonical rules everywhere; 10 page-capped additions (RULE-P1..P10) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
+description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 15 canonical rules everywhere; 11 page-capped additions (RULE-P1..P11) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
 ---
 
 # Writing Style
 
 Default standards for English prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
 
-**Scope.** RULE-01..15 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P10 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
+**Scope.** RULE-01..15 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P11 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
 
 ## Canonical (RULE-01..15)
 
@@ -29,7 +29,7 @@ RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RUL
 14. **RULE-14** Do not use vocabulary that signals LLM-generated prose. Common tells: "delve", "crucially", "multifaceted", "tapestry", "navigate the complexities", "in the realm of", "leverage" where "use" suffices, "moreover"/"furthermore" chains, em-dash sandwiches. If a phrase pattern-matches GPT default, swap for a plainer equivalent.
 15. **RULE-15** Be consistent within a single piece. Define an abbreviation on first use, then never re-expand. Once you pick italic vs roman "e.g.", "GPT-5-thinking" vs "GPT-5 (thinking)", a hyphenation convention, or a math-mode policy, hold it. Inconsistency reads as careless.
 
-## Page-capped paper additions (RULE-P1..P10)
+## Page-capped paper additions (RULE-P1..P11)
 
 Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps and similar). Field-observed from paper-review workflows.
 
@@ -53,6 +53,8 @@ Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps 
 
 - **RULE-P10** The conclusion must extend, not paraphrase, the abstract. Restate key results in one or two lines, then add implication, interpretation, or forward-looking discussion. Naming it "Conclusion and Discussion" reminds you to do the second half.
 
+- **RULE-P11** Use simple present tense as the default voice, and hold it consistently within a piece. Switch tense only when meaning requires it.
+
 ## Final-pass paper audit (RULE-A1..A2)
 
 Layout and typography rules that depend on rendered output. Trigger *only* when reviewing the compiled PDF for submission, not during drafting or generation. Skip these when editing `.tex` source without a fresh build.
@@ -69,7 +71,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> writing-style v0.6.1 active: 15 canonical rules (RULE-01..15) + 10 page-capped additions (RULE-P1..P10, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> writing-style v0.6.2 active: 15 canonical rules (RULE-01..15) + 11 page-capped additions (RULE-P1..P11, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 

@@ -1,7 +1,7 @@
 {
   "name": "writing",
-  "version": "1.1.1",
-  "description": "Publication-prep tools for academic / public-facing writing. Bundles two skills: writing-style (15 canonical English-prose rules + 10 page-cap additions + 2 audit-time rules) and plot (matplotlib templates for paper figures with a Palatino + Google-brand-tone setup).",
+  "version": "1.1.2",
+  "description": "Publication-prep tools for academic / public-facing writing. Bundles two skills: writing-style (15 canonical English-prose rules + 11 page-cap additions + 2 audit-time rules) and plot (matplotlib templates for paper figures with a Palatino + Google-brand-tone setup).",
   "author": {
     "name": "Wenhao Chai",
     "url": "https://wenhaochai.com"
