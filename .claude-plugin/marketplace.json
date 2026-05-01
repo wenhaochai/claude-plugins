@@ -13,7 +13,7 @@
     {
       "name": "writing",
       "source": "./writing",
-      "description": "Publication-prep tools for academic / public-facing writing. writing-style (15 canonical English-prose rules from agent-style under CC BY 4.0 + 11 page-cap additions + 2 audit rules, auto-triggers on every writing task), plot (matplotlib templates for paper figures: bar / box / line / scatter, with a Palatino + Google-brand-tone setup), and review (slash command /writing:review for pre-submission self-review of own AI/ML paper Overleaf draft, with mechanical preflight + section-by-section interrogation + CVPR/ARR/TMLR/AAAI/COLM-derived anti-pattern filters)."
+      "description": "Publication-prep tools for academic / public-facing writing. style (15 canonical English-prose rules from agent-style under CC BY 4.0 + 11 page-cap additions + 2 audit rules, auto-triggers on every writing task), plot (matplotlib templates for paper figures: bar / box / line / scatter, with a Palatino + Google-brand-tone setup), and review (slash command /writing:review for pre-submission self-review of own AI/ML paper Overleaf draft, with mechanical preflight + section-by-section interrogation + CVPR/ARR/TMLR/AAAI/COLM-derived anti-pattern filters)."
     }
   ]
 }

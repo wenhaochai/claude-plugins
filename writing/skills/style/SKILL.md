@@ -1,5 +1,5 @@
 ---
-name: writing-style
+name: style
 description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 15 canonical rules everywhere; 11 page-capped additions (RULE-P1..P11) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
 ---
 
@@ -71,7 +71,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> writing-style v0.6.2 active: 15 canonical rules (RULE-01..15) + 11 page-capped additions (RULE-P1..P11, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> style v0.6.2 active: 15 canonical rules (RULE-01..15) + 11 page-capped additions (RULE-P1..P11, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 

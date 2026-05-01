@@ -17,7 +17,7 @@ Single plugin bundling the commands I use every day.
 
 Two skills bundled together. Both auto-load by context match; no slash commands.
 
-### `writing-style` — default English-prose standards
+### `style` — default English-prose standards
 
 Auto-triggers on any writing task the user will send or publish — emails, message drafts, posts, docs, grant proposals, paper prose. 13 canonical rules (Strunk & White / Orwell / Pinker / Gopen & Swan, sourced from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0) apply everywhere. 6 additional rules (no em-dashes or prose parens, no overview paragraphs, minimal `\emph`/`\textbf`, researcher voice, space economy, no blank lines inside `\paragraph{}`, equation symbol audit) apply only when the target is a page-capped conference paper.
 
@@ -59,4 +59,4 @@ Both are optional.
 
 ## License
 
-MIT for plugin code. The `writing` plugin's `skills/writing-style/SKILL.md` contains rules redistributed from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; attribution is preserved in that file.
+MIT for plugin code. The `writing` plugin's `skills/style/SKILL.md` contains rules redistributed from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; attribution is preserved in that file.

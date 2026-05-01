@@ -16,11 +16,11 @@ You are a senior reviewer for a top-tier ML venue (NeurIPS / ICML / ICLR / CVPR 
 
 Print exactly once when activated:
 
-> writing:review v0.1.0 active: 6-phase pipeline (preflight → ingest → best-interpretation summary → section interrogation → weakness assembly + filter → report). writing-style auto-loaded for clarity-rule citations.
+> writing:review v0.1.0 active: 6-phase pipeline (preflight → ingest → best-interpretation summary → section interrogation → weakness assembly + filter → report). style auto-loaded for clarity-rule citations.
 
-## Step 0 — Load writing-style (mandatory)
+## Step 0 — Load style (mandatory)
 
-Before reading the paper, invoke `Skill(writing:writing-style)`. The 15 canonical + 11 page-capped + 2 audit RULE numbers will be cited by RULE-XX in clarity weaknesses (e.g., "RULE-P1 violation: §3 opens with overview paragraph"). Without this, clarity weaknesses become subjective.
+Before reading the paper, invoke `Skill(writing:style)`. The 15 canonical + 11 page-capped + 2 audit RULE numbers will be cited by RULE-XX in clarity weaknesses (e.g., "RULE-P1 violation: §3 opens with overview paragraph"). Without this, clarity weaknesses become subjective.
 
 ## Step 1 — Resolve project name from `$ARGUMENTS`
 
@@ -92,7 +92,7 @@ Write a 4–10 sentence summary covering: core problem, main idea, implementatio
 
 ## Phase 3 — Section-by-section interrogation
 
-For each section, ask **specific** questions (not generic "is it clear?"). Cite writing-style RULE-XX whenever a clarity rule is violated.
+For each section, ask **specific** questions (not generic "is it clear?"). Cite style RULE-XX whenever a clarity rule is violated.
 
 ### Abstract
 - Quote each phrase that makes a claim. For each, identify which §-result supports it. If support requires an additional assumption beyond what experiments test, **flag the gap**.
@@ -165,7 +165,7 @@ For each weakness identified in Phase 3, write a 5-move entry:
 - **Concrete fix**: <name the experiment / citation / section to add or rewrite>
 - **Severity**: CRITICAL / MAJOR / MINOR
 - **Tag (TMLR-style)**: [critical to acceptance] | [would strengthen the work]
-- **RULE-XX**: <if writing-style rule violated, cite the number>
+- **RULE-XX**: <if style rule violated, cite the number>
 ```
 
 `[critical to acceptance]` = paper cannot be accepted without this fix.
@@ -230,7 +230,7 @@ After write, confirm to user with: file path + 3-line TL;DR + count of `[critica
 **Repo**: `<full path>`
 **Date**: <YYYY-MM-DD HH:MM>
 **Reviewer simulator**: writing:review v0.1.0
-**Default-loaded**: writing:writing-style v<x.y.z>
+**Default-loaded**: writing:style v<x.y.z>
 
 ## TL;DR
 - 总体倾向：[Strong Accept / Weak Accept / Borderline / Weak Reject / Reject]
