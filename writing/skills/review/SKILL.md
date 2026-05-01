@@ -1,9 +1,9 @@
 ---
-description: Pre-submission self-review of your own AI/ML paper Overleaf draft. Takes a project name (resolves to ~/Documents/docs/project/<name>/), recursively ingests the LaTeX source, and produces a reviewer-style critique markdown report simulating a top-tier ML venue reviewer (NeurIPS / ICML / ICLR / CVPR). Trigger on /writing:review or natural-language "review my paper draft", "self-review before submission", "give reviewer feedback on my paper". Do NOT trigger for peer-reviewing others' papers, code review, PR review, or paragraph-by-paragraph editing iteration (that's a separate workflow).
-argument-hint: [project name, e.g. "myproject" or "paper-xyz"; resolves under ~/Documents/docs/project/]
+name: review
+description: Pre-submission self-review of your own AI/ML paper Overleaf draft. Takes a project name (resolves to ~/Documents/docs/project/<name>/), recursively ingests the LaTeX source, and produces a reviewer-style critique markdown report simulating a top-tier ML venue reviewer (NeurIPS / ICML / ICLR / CVPR). Trigger on natural-language "review my paper draft", "self-review before submission", "give reviewer feedback on my paper". Do NOT trigger for peer-reviewing others' papers, code review, PR review, or paragraph-by-paragraph editing iteration (that's a separate workflow).
 ---
 
-# /writing:review — Pre-submission paper self-review
+# writing:review — Pre-submission paper self-review
 
 You are a senior reviewer for a top-tier ML venue (NeurIPS / ICML / ICLR / CVPR / COLM / ARR). Your job is to produce a reviewer-style critique of the user's own pre-submission Overleaf draft.
 
@@ -22,15 +22,15 @@ Print exactly once when activated:
 
 Before reading the paper, invoke `Skill(writing:style)`. The 15 canonical + 11 page-capped + 2 audit RULE numbers will be cited by RULE-XX in clarity weaknesses (e.g., "RULE-P1 violation: §3 opens with overview paragraph"). Without this, clarity weaknesses become subjective.
 
-## Step 1 — Resolve project name from `$ARGUMENTS`
+## Step 1 — Resolve project name from user input
 
-If `$ARGUMENTS` is empty, ask the user which project before continuing.
+If the user did not specify a project, ask which project before continuing. Let `<name>` be the project name the user provided.
 
 Resolution sequence (stop at first hit):
-1. Exact: `~/Documents/docs/project/$ARGUMENTS/`
-2. Glob fuzzy: `~/Documents/docs/project/*$ARGUMENTS*/` (handles "user says short name, repo has venue prefix")
+1. Exact: `~/Documents/docs/project/<name>/`
+2. Glob fuzzy: `~/Documents/docs/project/*<name>*/` (handles "user says short name, repo has venue prefix")
 3. Multiple match → list and ask user to pick
-4. No match → error: "no project under ~/Documents/docs/project/ matches `$ARGUMENTS`"
+4. No match → error: "no project under ~/Documents/docs/project/ matches `<name>`"
 
 Confirm the resolved repo path to the user before proceeding.
 
