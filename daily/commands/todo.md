@@ -60,14 +60,14 @@ Each item is implicitly **active** unless explicitly marked inactive. Active ite
 - **Active** (default) — no marker.
 - **Inactive** — append `- 激活：否（<reason>）` as the last metadata line (after 备注 / 提醒 / 状态, before the blank line preceding history). Reason vocabulary:
   - `远期` — reminder is far out (~3+ weeks) and nothing actionable now
-  - `等对方` — user side done, waiting on counterpart (reply / approval / payment); typical wait is days–weeks
+  - `等对方` — user side done, waiting on counterpart. Apply only when the user explicitly says so ("X 不激活" / "等对方就别激活了" etc.); never auto-set just because counterpart hasn't replied. Default for any "ball is on the other side" item is active.
   - `已用` — recurring item already used for the current cycle (e.g. annual credit consumed)
   - `用户标记` — explicitly set by the user, regardless of automatic logic
 
 ### Decision priority (high → low)
 
 1. **User override beats everything.** "X 不激活" / "X 激活" → set as instructed, reason `用户标记`.
-2. Otherwise apply `远期` / `等对方` / `已用` in that order.
+2. Otherwise apply `远期` / `已用` in that order. (`等对方` is never auto-applied — only via explicit user instruction.)
 3. Otherwise active.
 
 ### Transitions
