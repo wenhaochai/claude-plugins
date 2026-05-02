@@ -1,6 +1,6 @@
 {
   "name": "daily",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Personal daily tools: /daily:todo (TODO.md with natural-language add/complete/delete/update).",
   "author": {
     "name": "Wenhao Chai",
