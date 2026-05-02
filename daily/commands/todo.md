@@ -76,6 +76,22 @@ Each item is implicitly **active** unless explicitly marked inactive. Active ite
 - **Update** — if the update flips activation (counterpart replied → ball back on user; reminder approaches → actionable; far-future date → near), toggle the marker in the same edit (delete the line to activate, add it to deactivate). Don't keep stale activation state.
 - **Complete / delete** — moot; drop the `- 激活：` line if present.
 
+### Auto-activation (time-driven pre-flight)
+
+Run this scan **on every invocation**, before applying read-mode filters or write-mode edits — so newly-near items surface naturally without the user having to touch them.
+
+For each item with `- 激活：否（远期）`, look at the same item's `- 提醒：MM/DD/YYYY`. If the reminder is within 7 days of today's local date (today + 0..7), **delete the `- 激活：否（远期）` line in place**. "远期" literally means "the date is far"; once the date is near the reason no longer holds, and the item should resurface through the normal read filter.
+
+Other inactive reasons (`等对方` / `已用` / `用户标记`) are not time-driven and stay untouched. Items without a `- 提醒：` line are also untouched (no anchor to compare against).
+
+If the pre-flight flipped any items, prepend one line to the report so the user sees what just surfaced:
+
+```
+auto-activated (远期 → 临近): <title 1> (提醒 MM/DD), <title 2> (提醒 MM/DD)
+```
+
+If nothing flipped, say nothing.
+
 ---
 
 ## Read mode (no arguments)
