@@ -8,7 +8,7 @@
     {
       "name": "daily",
       "source": "./daily",
-      "description": "Personal daily tools: TODO management with Apple Reminders sync."
+      "description": "Personal daily tools: /daily:todo for natural-language TODO.md management."
     },
     {
       "name": "writing",
