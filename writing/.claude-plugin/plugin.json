@@ -1,7 +1,7 @@
 {
   "name": "writing",
-  "version": "1.4.1",
-  "description": "Publication-prep tools for academic / public-facing writing. Bundles style (17 canonical English-prose rules + 18 page-cap additions + 2 audit-time rules), plot (matplotlib templates for paper figures), and review (pre-submission self-review of own AI/ML paper Overleaf draft, simulating a top-tier ML venue reviewer; default-loads style for clarity-rule citations).",
+  "version": "1.5.0",
+  "description": "Publication-prep tools for academic / public-facing writing. Bundles style (17 canonical English-prose rules + 18 page-cap additions + 2 audit-time rules), plot (matplotlib templates for paper figures), review (pre-submission self-review of own AI/ML paper Overleaf draft, simulating a top-tier ML venue reviewer; default-loads style for clarity-rule citations), and paper-overleaf (opus subagent for Overleaf-synced LaTeX paper editing — section-level conventions, red-mark workflow, bilingual zh/en review, claim-evidence audit, and writing-taste guidance beyond syntax rules).",
   "author": {
     "name": "Wenhao Chai",
     "url": "https://wenhaochai.com"
