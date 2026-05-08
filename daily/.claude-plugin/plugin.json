@@ -1,7 +1,7 @@
 {
   "name": "daily",
-  "version": "0.1.16",
-  "description": "Personal daily tools: /daily:todo (TODO.md with natural-language add/complete/delete/update).",
+  "version": "0.1.17",
+  "description": "Personal daily tools: /daily:todo (TODO.md with natural-language add/complete/delete/update) and /daily:spawn-remote (start another remote-control Claude Code in a detached tmux session over SSH).",
   "author": {
     "name": "Wenhao Chai",
     "url": "https://wenhaochai.com"
