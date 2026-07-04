@@ -6,6 +6,11 @@
   },
   "plugins": [
     {
+      "name": "anti-autoresearch",
+      "source": "./anti-autoresearch",
+      "description": "Integrity forensics for autoresearch papers as an adversarial self-audit gate: /anti-autoresearch <paper-dir> runs a span-anchored evidence ledger + 6 auditor skills + a deterministic adjudicator (46 verdict-bearing hack-patterns across 8 families, GRIM/GRIMMER/statcheck numeric gates, 13 zero-weight AI-style impressions). Loop: draft, audit, fix every verdict-bearing finding, re-run until CLEAN_GIVEN_EVIDENCE. Vendored from wanshuiyin/Anti-Autoresearch (MIT) with paths repointed to the plugin root."
+    },
+    {
       "name": "daily",
       "source": "./daily",
       "description": "Personal daily tools: /daily:todo for natural-language TODO.md management."

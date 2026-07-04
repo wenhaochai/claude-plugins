@@ -1,0 +1,9 @@
+{
+  "fixture": "synthetic_corruptions/defensive_hedge.tex",
+  "corruption": "defensive_hedge",
+  "required_patterns": [],
+  "required_ais_patterns": ["AIS-DEFENSIVE-HEDGE"],
+  "forbidden_above_info": true,
+  "expected_verdict": "CLEAN_GIVEN_EVIDENCE",
+  "note": "Four strong defensive-hedge constructions across Introduction and Method. The deterministic AIS density screen (check_ai_style.py) fires AIS-DEFENSIVE-HEDGE — but the AIS track is a ZERO-verdict-weight writing-style impression: it is reported in its own section and the integrity verdict stays CLEAN_GIVEN_EVIDENCE (no integrity finding present, no weight-1 finding above info). This fixture is the zero-weight invariant test: a paper can be integrity-CLEAN while listing AIS impressions."
+}

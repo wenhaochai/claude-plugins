@@ -1,0 +1,9 @@
+{
+  "name": "anti-autoresearch",
+  "version": "0.5.0",
+  "description": "Reviewer-side integrity forensics for autoresearch / AI-generated papers, used here as the ADVERSARIAL SELF-AUDIT gate on my own paper output (draft → /anti-autoresearch → fix verdict-bearing findings → re-run until CLEAN_GIVEN_EVIDENCE). 61 signals: 46 integrity hack-patterns in 8 families (numeric self-consistency, method/scope drift, baseline integrity, experiment integrity, citation integrity, presentation, proof/derivation, eval design incl. leakage + LLM-judge validity) + 13 zero-verdict-weight AI writing-style impressions + 2 advisory. Span-anchored evidence ledger, auditors propose / deterministic adjudicator decides (GRIM, GRIMMER, statcheck gates). 12 skills: the /anti-autoresearch orchestrator + evidence-ledger, consistency-audit, citation-forensics, baseline-comparison-audit, experiment-forensics, eval-design-forensics, proof-derivation-forensics, presentation-signals, ai-style-impressions, adversarial-case-builder, novelty-duplication-advisory. Vendored from wanshuiyin/Anti-Autoresearch (MIT, LICENSE.upstream) with one patch: repo-root resolution ($(git rev-parse --show-toplevel)) replaced by ${CLAUDE_PLUGIN_ROOT} so the bundled tools/ + references/ resolve inside the plugin.",
+  "author": {
+    "name": "Wenhao Chai",
+    "url": "https://wenhaochai.com"
+  }
+}
