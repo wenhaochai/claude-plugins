@@ -1,5 +1,7 @@
 import matplotlib.colors as mc
 import matplotlib.pyplot as plt
+from matplotlib.patches import PathPatch
+from matplotlib.path import Path
 
 
 def apply_style():
@@ -120,6 +122,28 @@ def twotone(base, tier=DEFAULT_TIER):
     """
     dark = apply_tier(base, tier)
     return dark, lighten(dark, 0.55)
+
+
+def rounded_bar(ax, cx, top, w, r_frac=0.10, **kw):
+    """Bar with rounded TOP corners only; the base sits square on ylim[0].
+    `top` is the data value (bar apex), `w` the width in x data units,
+    `r_frac` the corner radius as a fraction of bar width. The vertical
+    radius is derived from the axes geometry so corners read as circular.
+    Call after xlim/ylim are final.
+    """
+    rx = w * r_frac
+    (x0, x1), (y0, y1) = ax.get_xlim(), ax.get_ylim()
+    pos, (fw, fh) = ax.get_position(), ax.figure.get_size_inches()
+    ry = rx * (pos.width * fw / (x1 - x0)) / (pos.height * fh / (y1 - y0))
+    ry = min(ry, (top - y0) / 2)
+    left, right = cx - w / 2, cx + w / 2
+    verts = [(left, y0), (left, top - ry), (left, top), (left + rx, top),
+             (right - rx, top), (right, top), (right, top - ry),
+             (right, y0), (left, y0)]
+    codes = [Path.MOVETO, Path.LINETO, Path.CURVE3, Path.CURVE3,
+             Path.LINETO, Path.CURVE3, Path.CURVE3, Path.LINETO,
+             Path.CLOSEPOLY]
+    ax.add_patch(PathPatch(Path(verts, codes), **kw))
 
 
 def family_4(base, tier=DEFAULT_TIER):

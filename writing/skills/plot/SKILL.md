@@ -12,7 +12,7 @@ The shared `style.py` provides:
 - **Font.** Palatino body + STIX math, matching the LaTeX `mathpazo` package used in arxiv-style templates. DejaVu Sans tail-fallback handles unicode glyphs (`❄`, `⚡`) that Palatino lacks.
 - **Palette.** Google brand colors (Blue/Red/Yellow/Green/Grey + extended Purple) softened to a paper-friendly tier by default.
 - **Tier system.** Same color, five softness levels: `brand → medium → paper (default) → soft → mute`. One knob switches the global feel.
-- **Helpers.** `family_4(base)` for ordered categorical gradients; `twotone(base)` for same-hue dark/light 2-series pairs (works for every palette color); `paper(base)` / `lighten` / `darken` for one-off color tweaks; `arrow(label, 'down'|'up')` to append `↓` / `↑` to titles.
+- **Helpers.** `family_4(base)` for ordered categorical gradients; `twotone(base)` for same-hue dark/light 2-series pairs (works for every palette color); `rounded_bar(ax, cx, top, w)` for bars with rounded top corners (base sits square on `ylim[0]`); `paper(base)` / `lighten` / `darken` for one-off color tweaks; `arrow(label, 'down'|'up')` to append `↓` / `↑` to titles.
 
 ## Templates
 
@@ -21,6 +21,7 @@ The shared `style.py` provides:
 | `00_bar_vertical.py` | Vertical bar with reference baseline | Comparing a metric across discrete methods, optionally vs. a baseline value |
 | `01_bar_horizontal.py` | Horizontal bar with value labels + dashed group separators | Component ablation rows where each row adds/removes a piece, value-labeled |
 | `02_bar_grouped_twotone.py` | Grouped 2-series bar + error bars, announcement-clean (no grid, L-spines, dot legend, same-hue dark/light pair) | Two models compared across task categories with uncertainty, blog-post look |
+| `03_bar_highlight_twotone.py` | Single-series bar, value labels on top, hero bar dark vs. light outlined rest, non-zero baseline | One model showcased against competitors on a single benchmark, release-chart look |
 | `10_box_horizontal.py` | Horizontal boxplot with 4-step family gradient | One categorical factor with ordered levels (e.g. progressively more compute) |
 | `20_line_multi.py` | Multi-line plot with markers (linear xy) | Multiple model variants tracked across a hyperparameter sweep |
 | `21_line_broken_y.py` | Multi-line with broken y-axis | Two groups of curves on disjoint y-ranges, both must stay visible |
@@ -52,6 +53,7 @@ from style import (
     apply_tier, paper,                     # softness control
     family_4,                              # 4-step gradient (idx 0=lightest, 3=darkest)
     twotone,                               # same-hue (dark, light) 2-series pair
+    rounded_bar,                           # bar with rounded top corners
     lighten, darken,                       # one-off color adjustments
     arrow,                                 # `Metric A ↓` title helper
 )

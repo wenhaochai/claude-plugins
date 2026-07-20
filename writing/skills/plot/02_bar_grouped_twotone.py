@@ -9,34 +9,11 @@ Swap `G_GREEN` for any palette color; both series recolor together.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.patches import PathPatch
-from matplotlib.path import Path
 from matplotlib.ticker import PercentFormatter
 
-from style import apply_style, G_GREEN, twotone
+from style import apply_style, G_GREEN, rounded_bar, twotone
 
 apply_style()
-
-
-def rounded_bar(ax, cx, h, w, r_frac=0.16, **kw):
-    """Bar with rounded TOP corners only (square base on the axis line).
-    `r_frac` is the corner radius as a fraction of bar width; the vertical
-    radius is derived from the axes geometry so corners read as circular.
-    Call after xlim/ylim are final.
-    """
-    rx = w * r_frac
-    (x0, x1), (y0, y1) = ax.get_xlim(), ax.get_ylim()
-    pos, (fw, fh) = ax.get_position(), ax.figure.get_size_inches()
-    ry = rx * (pos.width * fw / (x1 - x0)) / (pos.height * fh / (y1 - y0))
-    ry = min(ry, h / 2)
-    left, right = cx - w / 2, cx + w / 2
-    verts = [(left, 0), (left, h - ry), (left, h), (left + rx, h),
-             (right - rx, h), (right, h), (right, h - ry), (right, 0),
-             (left, 0)]
-    codes = [Path.MOVETO, Path.LINETO, Path.CURVE3, Path.CURVE3,
-             Path.LINETO, Path.CURVE3, Path.CURVE3, Path.LINETO,
-             Path.CLOSEPOLY]
-    ax.add_patch(PathPatch(Path(verts, codes), **kw))
 
 # --- data (illustrative — replace) ------------------------------------------
 categories = ['Task A', 'Task B', 'Task C', 'Task D', 'Task E']
