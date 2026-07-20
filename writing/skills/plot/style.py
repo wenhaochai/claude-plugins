@@ -111,6 +111,17 @@ def paper(base):
     return apply_tier(base, DEFAULT_TIER)
 
 
+def twotone(base, tier=DEFAULT_TIER):
+    """Same-hue (dark, light) pair for a 2-series chart, OpenAI-announcement
+    style: one brand hue at two lightness levels instead of two hues.
+    Dark follows the active tier; light is a pale tint of it. Works for every
+    palette color. Bars: draw the light series with `edgecolor=dark` so it
+    keeps a crisp outline on white.
+    """
+    dark = apply_tier(base, tier)
+    return dark, lighten(dark, 0.55)
+
+
 def family_4(base, tier=DEFAULT_TIER):
     """4-step gradient: lightest, light, mid (`apply_tier`), dark.
     The mid fill follows the active tier so flooded fills never read

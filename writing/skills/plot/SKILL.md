@@ -12,7 +12,7 @@ The shared `style.py` provides:
 - **Font.** Palatino body + STIX math, matching the LaTeX `mathpazo` package used in arxiv-style templates. DejaVu Sans tail-fallback handles unicode glyphs (`❄`, `⚡`) that Palatino lacks.
 - **Palette.** Google brand colors (Blue/Red/Yellow/Green/Grey + extended Purple) softened to a paper-friendly tier by default.
 - **Tier system.** Same color, five softness levels: `brand → medium → paper (default) → soft → mute`. One knob switches the global feel.
-- **Helpers.** `family_4(base)` for ordered categorical gradients; `paper(base)` / `lighten` / `darken` for one-off color tweaks; `arrow(label, 'down'|'up')` to append `↓` / `↑` to titles.
+- **Helpers.** `family_4(base)` for ordered categorical gradients; `twotone(base)` for same-hue dark/light 2-series pairs (works for every palette color); `paper(base)` / `lighten` / `darken` for one-off color tweaks; `arrow(label, 'down'|'up')` to append `↓` / `↑` to titles.
 
 ## Templates
 
@@ -20,11 +20,13 @@ The shared `style.py` provides:
 |---|---|---|
 | `00_bar_vertical.py` | Vertical bar with reference baseline | Comparing a metric across discrete methods, optionally vs. a baseline value |
 | `01_bar_horizontal.py` | Horizontal bar with value labels + dashed group separators | Component ablation rows where each row adds/removes a piece, value-labeled |
+| `02_bar_grouped_twotone.py` | Grouped 2-series bar + error bars, announcement-clean (no grid, L-spines, dot legend, same-hue dark/light pair) | Two models compared across task categories with uncertainty, blog-post look |
 | `10_box_horizontal.py` | Horizontal boxplot with 4-step family gradient | One categorical factor with ordered levels (e.g. progressively more compute) |
 | `20_line_multi.py` | Multi-line plot with markers (linear xy) | Multiple model variants tracked across a hyperparameter sweep |
 | `21_line_broken_y.py` | Multi-line with broken y-axis | Two groups of curves on disjoint y-ranges, both must stay visible |
 | `22_line_logx.py` | Single line on log-x scale | Saturation as x sweeps orders of magnitude (data fraction, token count) |
 | `23_line_loglog_compare.py` | Log-log multi-line with reference dashed line | Comparing scaling exponents across settings against a known reference |
+| `24_line_twotone.py` | 2-line sweep with round markers, announcement-clean (no grid, L-spines, dot legend, same-hue dark/light pair) | Two models tracked across an inference/compute budget sweep, blog-post look |
 | `30_scatter_powerlaw.py` | Log-log scatter + linear fit line | Clean power-law `y = a · C^b`; closed-form line + sample points |
 | `31_scatter_isoflops.py` | Multi-curve parabola scatter with fits | IsoFLOPs-style — each compute budget yields a U-shape, marker size scales with parameter count |
 
@@ -49,6 +51,7 @@ from style import (
     G_GREY, G_PURPLE,                      # Google brand constants
     apply_tier, paper,                     # softness control
     family_4,                              # 4-step gradient (idx 0=lightest, 3=darkest)
+    twotone,                               # same-hue (dark, light) 2-series pair
     lighten, darken,                       # one-off color adjustments
     arrow,                                 # `Metric A ↓` title helper
 )
