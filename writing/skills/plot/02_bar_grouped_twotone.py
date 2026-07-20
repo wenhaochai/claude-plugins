@@ -9,11 +9,34 @@ Swap `G_GREEN` for any palette color; both series recolor together.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.patches import PathPatch
+from matplotlib.path import Path
 from matplotlib.ticker import PercentFormatter
 
 from style import apply_style, G_GREEN, twotone
 
 apply_style()
+
+
+def rounded_bar(ax, cx, h, w, r_frac=0.16, **kw):
+    """Bar with rounded TOP corners only (square base on the axis line).
+    `r_frac` is the corner radius as a fraction of bar width; the vertical
+    radius is derived from the axes geometry so corners read as circular.
+    Call after xlim/ylim are final.
+    """
+    rx = w * r_frac
+    (x0, x1), (y0, y1) = ax.get_xlim(), ax.get_ylim()
+    pos, (fw, fh) = ax.get_position(), ax.figure.get_size_inches()
+    ry = rx * (pos.width * fw / (x1 - x0)) / (pos.height * fh / (y1 - y0))
+    ry = min(ry, h / 2)
+    left, right = cx - w / 2, cx + w / 2
+    verts = [(left, 0), (left, h - ry), (left, h), (left + rx, h),
+             (right - rx, h), (right, h), (right, h - ry), (right, 0),
+             (left, 0)]
+    codes = [Path.MOVETO, Path.LINETO, Path.CURVE3, Path.CURVE3,
+             Path.LINETO, Path.CURVE3, Path.CURVE3, Path.LINETO,
+             Path.CLOSEPOLY]
+    ax.add_patch(PathPatch(Path(verts, codes), **kw))
 
 # --- data (illustrative — replace) ------------------------------------------
 categories = ['Task A', 'Task B', 'Task C', 'Task D', 'Task E']
@@ -32,11 +55,17 @@ ax.grid(False)
 
 x = np.arange(len(categories))
 w = 0.34                                    # bar width; pair gap = 0.04
-err_kw = dict(elinewidth=1.0, capsize=3, capthick=1.0, ecolor=INK)
+ax.set_xlim(-0.6, len(categories) - 0.4)    # fix limits BEFORE rounded_bar
+ax.set_ylim(0, 100)
 (mean_a, err_a), (mean_b, err_b) = series.values()
-ax.bar(x - w / 2 - 0.02, mean_a, w, color=dark, yerr=err_a, error_kw=err_kw)
-ax.bar(x + w / 2 + 0.02, mean_b, w, color=light, edgecolor=dark,
-       linewidth=0.9, yerr=err_b, error_kw=err_kw)
+for cx, h in zip(x - w / 2 - 0.02, mean_a):
+    rounded_bar(ax, cx, h, w, facecolor=dark, linewidth=0)
+for cx, h in zip(x + w / 2 + 0.02, mean_b):
+    rounded_bar(ax, cx, h, w, facecolor=light, edgecolor=dark, linewidth=0.9)
+err_kw = dict(fmt='none', elinewidth=1.0, capsize=3, capthick=1.0,
+              ecolor=INK, zorder=4)
+ax.errorbar(x - w / 2 - 0.02, mean_a, yerr=err_a, **err_kw)
+ax.errorbar(x + w / 2 + 0.02, mean_b, yerr=err_b, **err_kw)
 
 # announcement-clean axes: L-shaped spines, outward ticks, no grid
 for side in ('top', 'right'):
@@ -46,7 +75,6 @@ for side in ('left', 'bottom'):
     ax.spines[side].set_linewidth(0.9)
 ax.tick_params(colors=INK)
 
-ax.set_ylim(0, 100)
 ax.set_yticks(np.arange(0, 101, 20))
 ax.yaxis.set_major_formatter(PercentFormatter(decimals=0))
 ax.set_ylabel('Metric A (%)')

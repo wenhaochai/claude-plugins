@@ -23,7 +23,7 @@ series = {
                 [34.5, 62.0, 66.5, 74.0, 74.5]),
 }
 
-dark, light = twotone(G_BLUE)
+dark, light = twotone(G_BLUE, 'brand')   # lines want full-strength color
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(4.8, 3.5))
