@@ -121,7 +121,7 @@ def twotone(base, tier=DEFAULT_TIER):
     Works for every palette color. Bars: draw the light series with
     `edgecolor=dark` so it keeps a crisp outline on white.
     """
-    dark = darken(apply_tier(base, tier), 0.15)
+    dark = darken(apply_tier(base, tier), 0.30)
     return dark, lighten(dark, 0.55)
 
 

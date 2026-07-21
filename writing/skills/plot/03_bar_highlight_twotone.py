@@ -12,7 +12,7 @@ Swap `G_BLUE` for any palette color.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from style import apply_style, G_BLUE, rounded_bar, twotone
+from style import apply_style, G_BLUE, darken, rounded_bar, twotone
 
 apply_style()
 
@@ -23,6 +23,7 @@ HERO = 0                                    # index of the highlighted bar
 YMIN, YMAX = 60, 100                        # non-zero baseline zooms the gap
 
 dark, light = twotone(G_BLUE, 'medium')    # bars want the medium tier
+edge = darken(dark, 0.25)                  # outlines sit deeper than the hero
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(4.4, 3.4))
@@ -36,18 +37,18 @@ for i, (cx, v) in enumerate(zip(x, values)):
     if i == HERO:
         rounded_bar(ax, cx, v, w, facecolor=dark, linewidth=0)
     else:
-        rounded_bar(ax, cx, v, w, facecolor=light, edgecolor=dark,
+        rounded_bar(ax, cx, v, w, facecolor=light, edgecolor=edge,
                     linewidth=0.9)
     ax.text(cx, v + (YMAX - YMIN) * 0.03, f'{v:.2f}%', ha='center',
             fontsize=11.5, color=INK)
 
-# announcement-clean axes: L-shaped spines, outward ticks, no grid
-for side in ('top', 'right'):
+# announcement-clean axes: bottom spine only, floating y labels, no grid
+for side in ('top', 'right', 'left'):
     ax.spines[side].set_visible(False)
-for side in ('left', 'bottom'):
-    ax.spines[side].set_color(INK)
-    ax.spines[side].set_linewidth(0.9)
+ax.spines['bottom'].set_color(INK)
+ax.spines['bottom'].set_linewidth(0.9)
 ax.tick_params(colors=INK)
+ax.tick_params(axis='y', length=0)
 
 ax.set_yticks(np.arange(YMIN, YMAX + 1, 10))
 ax.set_ylabel('Metric A (%)')
