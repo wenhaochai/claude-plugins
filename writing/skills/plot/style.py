@@ -116,11 +116,12 @@ def paper(base):
 def twotone(base, tier=DEFAULT_TIER):
     """Same-hue (dark, light) pair for a 2-series chart, OpenAI-announcement
     style: one brand hue at two lightness levels instead of two hues.
-    Dark follows the active tier; light is a pale tint of it. Works for every
-    palette color. Bars: draw the light series with `edgecolor=dark` so it
-    keeps a crisp outline on white.
+    Dark is the tier color deepened a further notch (announcement charts
+    want a richer dark end than paper figures); light is a pale tint of it.
+    Works for every palette color. Bars: draw the light series with
+    `edgecolor=dark` so it keeps a crisp outline on white.
     """
-    dark = apply_tier(base, tier)
+    dark = darken(apply_tier(base, tier), 0.15)
     return dark, lighten(dark, 0.55)
 
 

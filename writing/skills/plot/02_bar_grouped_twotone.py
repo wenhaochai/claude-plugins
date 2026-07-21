@@ -24,7 +24,7 @@ series = {
                 [7.5, 6.0, 7.0, 5.0, 11.5]),
 }
 
-dark, light = twotone(G_GREEN)
+dark, light = twotone(G_GREEN, 'medium')   # bars want the medium tier
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(6.0, 3.4))

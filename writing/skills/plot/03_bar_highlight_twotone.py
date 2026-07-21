@@ -22,15 +22,15 @@ values = [92.1, 90.1, 88.3, 85.0]
 HERO = 0                                    # index of the highlighted bar
 YMIN, YMAX = 60, 100                        # non-zero baseline zooms the gap
 
-dark, light = twotone(G_BLUE)
+dark, light = twotone(G_BLUE, 'medium')    # bars want the medium tier
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(4.4, 3.4))
 ax.grid(False)
 
 x = np.arange(len(models))
-w = 0.72
-ax.set_xlim(-0.6, len(models) - 0.4)        # fix limits BEFORE rounded_bar
+w = 0.84                                    # near-touching bars
+ax.set_xlim(-0.55, len(models) - 0.45)      # fix limits BEFORE rounded_bar
 ax.set_ylim(YMIN, YMAX)
 for i, (cx, v) in enumerate(zip(x, values)):
     if i == HERO:
