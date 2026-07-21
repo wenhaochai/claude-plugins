@@ -25,22 +25,22 @@ YMIN, YMAX = 60, 100                        # non-zero baseline zooms the gap
 
 dark, light = twotone(G_BLUE, 'medium')    # bars want the medium tier
 edge = darken(dark, 0.25)                  # outlines sit deeper than the hero
-dark = lighten(dark, 0.10)                 # fills sit a touch lighter; edge stays
+dark = lighten(dark, 0.20)                 # fills sit a notch lighter; edge stays
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(4.4, 3.4))
 ax.grid(False)
 
 x = np.arange(len(models))
-w = 0.84                                    # near-touching bars
-ax.set_xlim(-0.55, len(models) - 0.45)      # fix limits BEFORE rounded_bar
+w = 0.90                                    # near-touching bars
+ax.set_xlim(-0.52, len(models) - 0.48)      # fix limits BEFORE rounded_bar
 ax.set_ylim(YMIN, YMAX)
 for i, (cx, v) in enumerate(zip(x, values)):
     if i == HERO:
-        rounded_bar(ax, cx, v, w, facecolor=dark, linewidth=0)
+        rounded_bar(ax, cx, v, w, r_frac=0.07, facecolor=dark, linewidth=0)
     else:
-        rounded_bar(ax, cx, v, w, facecolor=light, edgecolor=edge,
-                    linewidth=0.9)
+        rounded_bar(ax, cx, v, w, r_frac=0.07, facecolor=light,
+                    edgecolor=edge, linewidth=0.9)
     ax.text(cx, v + (YMAX - YMIN) * 0.03, f'{v:.2f}%', ha='center',
             fontsize=11.5, color=INK)
 

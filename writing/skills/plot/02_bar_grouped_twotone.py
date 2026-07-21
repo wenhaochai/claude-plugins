@@ -26,7 +26,7 @@ series = {
 
 dark, light = twotone(G_GREEN, 'medium')   # bars want the medium tier
 edge = darken(dark, 0.25)                  # outlines sit deeper than the dark bar
-dark = lighten(dark, 0.10)                 # fills sit a touch lighter; edge stays
+dark = lighten(dark, 0.20)                 # fills sit a notch lighter; edge stays
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(6.0, 3.4))
