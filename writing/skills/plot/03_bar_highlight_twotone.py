@@ -37,7 +37,8 @@ ax.set_xlim(-0.52, len(models) - 0.48)      # fix limits BEFORE rounded_bar
 ax.set_ylim(YMIN, YMAX)
 for i, (cx, v) in enumerate(zip(x, values)):
     if i == HERO:
-        rounded_bar(ax, cx, v, w, r_frac=0.07, facecolor=dark, linewidth=0)
+        rounded_bar(ax, cx, v, w, r_frac=0.07, facecolor=dark,
+                    edgecolor=edge, linewidth=0.9)
     else:
         rounded_bar(ax, cx, v, w, r_frac=0.07, facecolor=light,
                     edgecolor=edge, linewidth=0.9)

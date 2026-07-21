@@ -38,7 +38,7 @@ ax.set_xlim(-0.6, len(categories) - 0.4)    # fix limits BEFORE rounded_bar
 ax.set_ylim(0, 100)
 (mean_a, err_a), (mean_b, err_b) = series.values()
 for cx, h in zip(x - w / 2 - 0.02, mean_a):
-    rounded_bar(ax, cx, h, w, facecolor=dark, linewidth=0)
+    rounded_bar(ax, cx, h, w, facecolor=dark, edgecolor=edge, linewidth=0.9)
 for cx, h in zip(x + w / 2 + 0.02, mean_b):
     rounded_bar(ax, cx, h, w, facecolor=light, edgecolor=edge, linewidth=0.9)
 err_kw = dict(fmt='none', elinewidth=1.0, capsize=3, capthick=1.0,
