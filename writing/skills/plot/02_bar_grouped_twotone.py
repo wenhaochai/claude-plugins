@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.ticker import PercentFormatter
 
-from style import apply_style, G_GREEN, darken, rounded_bar, twotone
+from style import apply_style, G_GREEN, darken, lighten, rounded_bar, twotone
 
 apply_style()
 
@@ -26,6 +26,7 @@ series = {
 
 dark, light = twotone(G_GREEN, 'medium')   # bars want the medium tier
 edge = darken(dark, 0.25)                  # outlines sit deeper than the dark bar
+dark = lighten(dark, 0.10)                 # fills sit a touch lighter; edge stays
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(6.0, 3.4))

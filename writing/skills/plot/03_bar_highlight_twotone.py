@@ -12,7 +12,7 @@ Swap `G_BLUE` for any palette color.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from style import apply_style, G_BLUE, darken, rounded_bar, twotone
+from style import apply_style, G_BLUE, darken, lighten, rounded_bar, twotone
 
 apply_style()
 
@@ -24,6 +24,7 @@ YMIN, YMAX = 60, 100                        # non-zero baseline zooms the gap
 
 dark, light = twotone(G_BLUE, 'medium')    # bars want the medium tier
 edge = darken(dark, 0.25)                  # outlines sit deeper than the hero
+dark = lighten(dark, 0.10)                 # fills sit a touch lighter; edge stays
 INK = '#1a1a1a'
 
 fig, ax = plt.subplots(figsize=(4.4, 3.4))
