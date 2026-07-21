@@ -10,6 +10,7 @@ Swap `G_BLUE` for any palette color.
 """
 
 import numpy as np
+import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 
 from style import apply_style, G_BLUE, darken, lighten, rounded_bar, twotone
@@ -51,7 +52,11 @@ ax.spines['bottom'].set_linewidth(0.9)
 ax.tick_params(colors=INK)
 ax.tick_params(axis='y', length=0)
 
-ax.set_yticks(np.arange(YMIN, YMAX + 1, 10))
+ax.set_yticks(np.arange(YMIN, YMAX, 10))    # top tick dropped: title sits there
 ax.set_ylabel('Metric A (%)')
 ax.set_xticks(x, models, rotation=30, ha='right', rotation_mode='anchor')
-ax.set_title('Benchmark A', loc='left', fontsize=14, pad=14)
+# fontweight='bold' is a no-op here: macOS Palatino.ttc exposes only the
+# regular face to matplotlib, so a thin same-color stroke fakes the bold.
+ax.text(0, 1.0, 'Benchmark A', transform=ax.transAxes, ha='left',
+        va='center', fontsize=14, color=INK,
+        path_effects=[pe.withStroke(linewidth=0.8, foreground=INK)])
