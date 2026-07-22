@@ -14,6 +14,10 @@ Single plugin bundling the commands I use every day.
 
 ## `writing` — publication-prep tools
 
+## `hermes-tweet` - Hermes Agent X/Twitter tools
+
+Hermes Tweet adds X/Twitter research, profile reads, post reads, and gated action tools for Hermes Agent users. Exploratory catalog access works without a key; read tools require `XQUIK_API_KEY`, and action tools also require `HERMES_TWEET_ENABLE_ACTIONS=true`.
+
 Three skills bundled together. All auto-load by context match; no slash commands.
 
 ### `style` — default English-prose standards
@@ -36,6 +40,7 @@ Auto-triggers when reviewing own Overleaf drafts for top-tier ML venue submissio
 /plugin marketplace add wenhaochai/claude-plugins
 /plugin install daily@wenhaochai
 /plugin install writing@wenhaochai
+/plugin install hermes-tweet@wenhaochai
 ```
 
 ## Optional config
