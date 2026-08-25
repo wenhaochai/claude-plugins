@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
-from style import apply_style, G_BLUE, G_RED, twotone, apply_tier
+from style import apply_style, G_BLUE, twotone, apply_tier
 
 apply_style()
 

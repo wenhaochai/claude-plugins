@@ -1,6 +1,6 @@
 ---
 name: plot
-description: Matplotlib templates for paper / blog / report figures with a Google-brand palette and Palatino body font (matches arxiv mathpazo). Use when the user asks for a chart they will save and paste into a paper, slide deck, or write-up — bar, boxplot, line, scatter variants. Templates ship pre-genericized (Model A/B, Metric A/B); replace with real names when applying. Skip for one-off exploratory plots inside notebooks where styling does not matter.
+description: Matplotlib templates for paper / blog / report figures with a Google-brand palette, Palatino body font (matches arxiv mathpazo), and an announcement-clean default frame — L-shaped ink spines, no grid, no bold, one hue per figure (multi-series = lightness steps of one brand color via hue_ramp/twotone). Use when the user asks for a chart they will save and paste into a paper, slide deck, or write-up — bar, boxplot, line, scatter variants. Templates ship pre-genericized (Model A/B, Metric A/B); replace with real names when applying. Skip for one-off exploratory plots inside notebooks where styling does not matter.
 ---
 
 # Plot
@@ -9,10 +9,12 @@ Drop-in matplotlib templates for publication-quality figures. Each template is o
 
 The shared `style.py` provides:
 
-- **Font.** Palatino body + STIX math, matching the LaTeX `mathpazo` package used in arxiv-style templates. DejaVu Sans tail-fallback handles unicode glyphs (`❄`, `⚡`) that Palatino lacks.
+- **Frame (announcement-clean, the default for every template).** L-shaped spines only (top/right hidden), near-black ink `#1a1a1a` for spines/ticks/labels, **no grid**, uniform normal weight (no bold anywhere), outward ticks. `clean_axes(ax)` re-asserts the frame on twin/secondary axes.
+- **Font.** Palatino body + STIX math, matching the LaTeX `mathpazo` package used in arxiv-style templates. DejaVu Sans tail-fallback handles unicode glyphs (`❄`, `⚡`) that Palatino lacks. Generous rc sizes (title 15 / label 14 / tick 13 / legend 12.5); dense multi-panel figures override downward locally.
 - **Palette.** Google brand colors (Blue/Red/Yellow/Green/Grey + extended Purple) softened to a paper-friendly tier by default.
+- **One hue per figure.** Multi-series figures use lightness steps of ONE brand hue via `hue_ramp(base, n)` (index 0 lightest → n-1 darkest; encode rank/order as darkness), never a second hue. Neutrals don't count as a hue: `HUMAN_DARK`/`HUMAN_SOFT` for human/reference cohorts, `REF_GREY` + `REF_DASH` for reference lines, greys for annotations.
 - **Tier system.** Same color, five softness levels: `brand → medium → paper (default) → soft → mute`. One knob switches the global feel.
-- **Helpers.** `family_4(base)` for ordered categorical gradients; `twotone(base)` for same-hue dark/light 2-series pairs (works for every palette color); `rounded_bar(ax, cx, top, w)` for bars with rounded top corners (base sits square on `ylim[0]`); `paper(base)` / `lighten` / `darken` for one-off color tweaks; `arrow(label, 'down'|'up')` to append `↓` / `↑` to titles.
+- **Helpers.** `hue_ramp(base, n)` single-hue ordered ramps; `twotone(base)` for same-hue dark/light 2-series pairs; `title_legend(ax, title, entries)` for the announcement header (left-aligned title above the axes + white-edged dot legend); `family_4(base)` for ordered categorical gradients; `rounded_bar(ax, cx, top, w)` for bars with rounded top corners (base sits square on `ylim[0]`); `paper(base)` / `lighten` / `darken` for one-off color tweaks; `arrow(label, 'down'|'up')` to append `↓` / `↑` to titles.
 
 ## Templates
 
@@ -47,12 +49,17 @@ The shared `style.py` provides:
 
 ```python
 from style import (
-    apply_style,                           # one-shot rcParams setup
+    apply_style,                           # one-shot rcParams setup (L-spines, ink, no grid)
+    clean_axes,                            # re-assert the frame on twin/secondary axes
     G_BLUE, G_RED, G_YELLOW, G_GREEN,
     G_GREY, G_PURPLE,                      # Google brand constants
+    INK, HUMAN_DARK, HUMAN_SOFT,           # near-black ink + neutral cohort greys
+    REF_GREY, REF_DASH,                    # reference-line convention (grey + one dash pattern)
     apply_tier, paper,                     # softness control
+    hue_ramp,                              # n-step single-hue ramp (idx 0=lightest)
     family_4,                              # 4-step gradient (idx 0=lightest, 3=darkest)
     twotone,                               # same-hue (dark, light) 2-series pair
+    title_legend,                          # announcement header: title + dot legend above axes
     rounded_bar,                           # bar with rounded top corners
     lighten, darken,                       # one-off color adjustments
     arrow,                                 # `Metric A ↓` title helper

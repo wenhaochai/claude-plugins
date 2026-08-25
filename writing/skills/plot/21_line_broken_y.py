@@ -7,7 +7,10 @@ sharing x; small diagonal slashes mark the break.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from style import apply_style, paper, lighten, arrow, G_BLUE, G_YELLOW
+from style import apply_style, hue_ramp, arrow, G_BLUE
+
+# One hue per figure: series identity = lightness of the figure's hue
+RAMP = hue_ramp(G_BLUE, 4)
 
 apply_style()
 
@@ -15,13 +18,13 @@ X = np.array([1, 4, 16, 32, 64])
 
 # Top group (e.g. Model A) sits around 0.50 ± a band
 TOP_SERIES = {
-    'a1': dict(y=[0.580, 0.503, 0.503, 0.502, 0.500], color=lighten(G_BLUE, 0.45), marker='s', label='Model A v1'),
-    'a2': dict(y=[0.550, 0.488, 0.483, 0.485, 0.488], color=paper(G_BLUE),         marker='o', label='Model A v2'),
+    'a1': dict(y=[0.580, 0.503, 0.503, 0.502, 0.500], color=RAMP[0], marker='s', label='Model A v1'),
+    'a2': dict(y=[0.550, 0.488, 0.483, 0.485, 0.488], color=RAMP[1], marker='o', label='Model A v2'),
 }
 # Bottom group (e.g. Model B) sits around 0.49 with a much tighter range
 BOT_SERIES = {
-    'b1': dict(y=[0.495, 0.484, 0.485, 0.483, 0.482], color=lighten(G_YELLOW, 0.32), marker='^', label='Model B v1'),
-    'b2': dict(y=[0.500, 0.491, 0.488, 0.495, 0.493], color=paper(G_YELLOW),         marker='D', label='Model B v2'),
+    'b1': dict(y=[0.495, 0.484, 0.485, 0.483, 0.482], color=RAMP[2], marker='^', label='Model B v1'),
+    'b2': dict(y=[0.500, 0.491, 0.488, 0.495, 0.493], color=RAMP[3], marker='D', label='Model B v2'),
 }
 
 LINE_KW = dict(linestyle='--', linewidth=1.4, markersize=6.5,

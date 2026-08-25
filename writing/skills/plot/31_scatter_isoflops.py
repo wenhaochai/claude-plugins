@@ -6,14 +6,15 @@ parabola fit. Marker size grows with parameter count (paper convention).
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import apply_style, paper, G_BLUE, G_GREEN, G_YELLOW, G_RED, G_PURPLE
+from style import apply_style, hue_ramp, G_BLUE
 
 apply_style()
 rng = np.random.default_rng(0)
 
 COMPUTE_LEVELS = [6e18, 6e19, 3e20, 6e20, 1e21]
 COMPUTE_LABELS = ['6e18', '6e19', '3e20', '6e20', '1e21']
-COMPUTE_COLORS = [paper(c) for c in (G_BLUE, G_GREEN, G_YELLOW, G_RED, G_PURPLE)]
+# One hue per figure: compute budget is ordered, so encode it as darkness
+COMPUTE_COLORS = hue_ramp(G_BLUE, len(COMPUTE_LEVELS))
 
 
 def isoflop_curve(N, c_level):
@@ -48,4 +49,3 @@ ax.set_xticklabels(['100M', '300M', '1B', '3B', '10B'])
 ax.set_ylim(2.65, 4.15)
 ax.set_title('IsoFLOPs: Modality A')
 ax.legend(fontsize=9, loc='upper right')
-ax.grid(linestyle='--', alpha=0.4)

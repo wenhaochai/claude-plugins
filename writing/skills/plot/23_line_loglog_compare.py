@@ -5,7 +5,10 @@ reference (e.g. Chinchilla). Two solid lines + one dashed reference.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import apply_style, paper, G_BLUE, G_RED, G_GREY
+from style import apply_style, hue_ramp, G_BLUE, REF_GREY, REF_DASH
+
+# One hue per figure: the two modalities are light/dark steps of one hue
+RAMP = hue_ramp(G_BLUE, 2)
 
 apply_style()
 
@@ -13,13 +16,13 @@ C = np.logspace(18.5, 25, 100)
 
 CURVES = {
     'a': dict(y=10 ** (np.log10(40) + 0.47 * (np.log10(C) - 18.5)),
-              color=paper(G_BLUE), linestyle='-',
+              color=RAMP[1], linestyle='-',
               label=r'Modality A: $C^{0.47}$'),
     'b': dict(y=10 ** (np.log10(80) + 0.37 * (np.log10(C) - 18.5)),
-              color=paper(G_RED),  linestyle='-',
+              color=RAMP[0], linestyle='-',
               label=r'Modality B: $C^{0.37}$'),
     'ref': dict(y=10 ** (np.log10(20) + 0.49 * (np.log10(C) - 18.5)),
-                color=G_GREY,        linestyle='--',
+                color=REF_GREY,      linestyle=REF_DASH,
                 label=r'Reference: $C^{0.49}$'),
 }
 
@@ -35,4 +38,3 @@ ax.set_xlabel('Compute (FLOPs)')
 ax.set_ylabel('Optimal Parameters (M)')
 ax.set_title(r'$N_{\mathrm{opt}}$ Comparison')
 ax.legend(loc='upper left')
-ax.grid(which='both', linestyle='--', alpha=0.4)

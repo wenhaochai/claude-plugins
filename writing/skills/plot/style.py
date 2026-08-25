@@ -1,7 +1,17 @@
 import matplotlib.colors as mc
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
 from matplotlib.path import Path
+
+# Near-black ink for spines / ticks / titles (announcement-clean look).
+INK = '#1a1a1a'
+# Human-cohort neutrals: dark = primary human series, soft = secondary.
+HUMAN_DARK = '#2b2b2b'
+HUMAN_SOFT = '#8a8a8a'
+# Reference-line convention: grey dashed, one dash pattern everywhere.
+REF_GREY = '#828589'
+REF_DASH = (0, (3, 2.2))
 
 
 def apply_style():
@@ -15,32 +25,49 @@ def apply_style():
         'mathtext.rm': 'Palatino',
         'mathtext.it': 'Palatino:italic',
         'mathtext.bf': 'Palatino:bold',
-        'axes.linewidth': 0.8,
-        'axes.edgecolor': '#333333',
-        'axes.grid': True,
-        'grid.linestyle': '--',
-        'grid.linewidth': 0.5,
-        'grid.alpha': 0.4,
-        'grid.color': '#cccccc',
-        'axes.titlesize': 13,
-        'axes.titleweight': 'bold',
-        'axes.labelsize': 12,
-        'xtick.labelsize': 11,
-        'ytick.labelsize': 11,
+        # Announcement-clean frame: L-spines only, near-black ink, no grid.
+        'axes.spines.top': False,
+        'axes.spines.right': False,
+        'axes.linewidth': 0.9,
+        'axes.edgecolor': INK,
+        'axes.labelcolor': INK,
+        'axes.titlecolor': INK,
+        'text.color': INK,
+        'axes.grid': False,
+        # Uniform weight everywhere — no bold text in figures.
+        'axes.titlesize': 15,
+        'axes.titleweight': 'normal',
+        'axes.labelsize': 14,
+        'xtick.labelsize': 13,
+        'ytick.labelsize': 13,
+        'xtick.color': INK,
+        'ytick.color': INK,
         'xtick.direction': 'out',
         'ytick.direction': 'out',
-        'xtick.major.size': 3,
-        'ytick.major.size': 3,
-        'xtick.major.width': 0.7,
-        'ytick.major.width': 0.7,
-        'legend.fontsize': 10.5,
+        'xtick.major.size': 3.5,
+        'ytick.major.size': 3.5,
+        'xtick.major.width': 0.8,
+        'ytick.major.width': 0.8,
+        'legend.fontsize': 12.5,
         'legend.frameon': False,
         'lines.linewidth': 1.6,
         'lines.markersize': 6,
-        'figure.dpi': 110,
+        'figure.dpi': 120,
         'savefig.dpi': 200,
         'savefig.bbox': 'tight',
     })
+
+
+def clean_axes(ax):
+    """Re-assert the L-spine ink frame on axes created outside apply_style's
+    reach (twinx/secondary_xaxis) or restyled by a plotting call."""
+    ax.grid(False)
+    for side in ('top', 'right'):
+        ax.spines[side].set_visible(False)
+    for side in ('left', 'bottom'):
+        ax.spines[side].set_color(INK)
+        ax.spines[side].set_linewidth(0.9)
+    ax.tick_params(colors=INK, width=0.8, length=3.5, direction='out')
 
 
 # --- Google brand colors (2015 logo, unchanged through 2026) ---
@@ -123,6 +150,40 @@ def twotone(base, tier=DEFAULT_TIER):
     """
     dark = darken(apply_tier(base, tier), 0.30)
     return dark, lighten(dark, 0.55)
+
+
+def hue_ramp(base, n, tier='medium', light=0.55, dark=0.32):
+    """Single-hue ordered ramp: n steps of ONE brand color from light to dark.
+    This is the one-primary-color-per-figure rule — multi-series figures
+    encode series identity as lightness of the figure's hue, never as a
+    second hue. Index 0 = lightest, index n-1 = darkest.
+    """
+    anchor = apply_tier(base, tier)
+    if n == 1:
+        return [anchor]
+    stops = [light - (light + dark) * i / (n - 1) for i in range(n)]
+    return [lighten(anchor, s) if s >= 0 else darken(anchor, -s) for s in stops]
+
+
+def title_legend(ax, title, entries, ncol=None, title_size=11.0,
+                 legend_size=8.5, y_title=1.15, y_legend=1.01):
+    """Announcement-style header: left-aligned title above the axes, with a
+    horizontal white-edged dot legend between title and plot. `entries` is a
+    list of (label, color) or (label, color, marker) tuples. Returns the
+    legend so callers can tweak it.
+    """
+    ax.text(-0.01, y_title, title, transform=ax.transAxes,
+            fontsize=title_size, color=INK, va='bottom', ha='left')
+    handles = []
+    for entry in entries:
+        label, color, marker = (entry if len(entry) == 3 else (*entry, 'o'))
+        handles.append(Line2D([0], [0], marker=marker, color='none',
+                              markerfacecolor=color, markeredgecolor='white',
+                              markeredgewidth=0.8, markersize=6.0, label=label))
+    return ax.legend(handles=handles, loc='lower left',
+                     bbox_to_anchor=(-0.01, y_legend), ncol=ncol or len(handles),
+                     frameon=False, fontsize=legend_size,
+                     handletextpad=0.3, columnspacing=0.9)
 
 
 def rounded_bar(ax, cx, top, w, r_frac=0.10, **kw):
