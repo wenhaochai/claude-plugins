@@ -239,7 +239,8 @@ def header_legend(ax, entries, ncol=None, legend_size=9.5, y=1.0):
                      borderpad=0.0, borderaxespad=0.0)
 
 
-def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0):
+def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0,
+                     level_all=True):
     """Measure-and-level pass for announcement headers. Call ONCE per figure,
     after every set_title / header_legend and right before savefig.
 
@@ -250,6 +251,11 @@ def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0):
     so its TOP edge hangs gap_title below the title. Title -> legend -> plot
     spacing is therefore constant across panels and independent of font
     sizes. Returns the applied pad (points).
+
+    level_all=False re-pads only axes that carry a legend, leaving
+    legend-less titles at their default pad — use it when legend-less panels
+    sit in a DIFFERENT row from the legend-carrying ones (a figure-level
+    header row carries their series identity instead).
     """
     fig.canvas.draw()
     dpi = fig.dpi
@@ -261,7 +267,7 @@ def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0):
     pad = max([min_pad] + [h + gap_title + gap_axes for h in heights.values()])
     for ax in fig.axes:
         title = ax.get_title(loc='left')
-        if title:
+        if title and (level_all or ax in heights):
             ax.set_title(title, loc='left', pad=pad)
         leg = ax.get_legend()
         if leg is not None:
