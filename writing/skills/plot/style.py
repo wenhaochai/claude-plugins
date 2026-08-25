@@ -1,25 +1,29 @@
+"""Announcement-clean matplotlib style: Google palette, Palatino/Pagella
+type, L-spine ink frame, and left-aligned bold titles with a legend row
+above the axes.
+
+Usage: apply_style() once, plot, set_title() per axes, header_legend() or
+fig_header_legend() for series identity, finalize_headers(fig) before
+savefig. Save PDF (the shipping artifact) plus a dpi=200 PNG preview.
+"""
 import matplotlib.colors as mc
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
 from matplotlib.path import Path
 
-# Near-black ink for spines / ticks / titles (announcement-clean look).
-INK = '#1a1a1a'
-# Human-cohort neutrals: dark = primary human series, soft = secondary.
-HUMAN_DARK = '#2b2b2b'
-HUMAN_SOFT = '#8a8a8a'
-# Reference-line convention: grey dashed, one dash pattern everywhere.
-REF_GREY = '#828589'
-REF_DASH = (0, (3, 2.2))
+# Ink frame + neutrals. Neutrals never count as series hues.
+INK = '#1a1a1a'          # spines / ticks / titles
+HUMAN_DARK = '#2b2b2b'   # primary human/neutral series
+HUMAN_SOFT = '#8a8a8a'   # secondary human/neutral series
+REF_GREY = '#828589'     # every reference line: this grey ...
+REF_DASH = (0, (3, 2.2))  # ... with this one dash pattern
 
 
 def _register_pagella():
-    """Register TeX Gyre Pagella (Palatino clone) from a TeX Live install.
-    macOS ships Palatino only as a .ttc, from which matplotlib registers just
-    the regular face — bold text then SILENTLY renders regular. Pagella ships
-    one .otf per face, so bold titles actually come out bold. No-op when no
-    TeX Live is present (the serif stack then falls through to Palatino).
+    """Register TeX Gyre Pagella from a TeX Live install, if present.
+    macOS exposes Palatino only as a .ttc whose bold face matplotlib cannot
+    see, so bold silently renders regular; Pagella ships one .otf per face.
     """
     import glob
     from matplotlib import font_manager
@@ -39,17 +43,17 @@ def _register_pagella():
 def apply_style():
     _register_pagella()
     plt.rcParams.update({
-        # Match arxiv_template (mathpazo): Palatino body + STIX math.
-        # Pagella first: it has a real bold face (see _register_pagella).
-        # 'DejaVu Sans' tail-fallback handles unicode glyphs (❄ etc.) that Palatino lacks.
+        # Palatino body + STIX math, matching LaTeX mathpazo. Pagella first
+        # for its real bold face; DejaVu tail catches unicode glyphs.
         'font.family': ['serif', 'DejaVu Sans'],
-        'font.serif': ['TeX Gyre Pagella', 'Palatino', 'Palatino Linotype', 'Book Antiqua',
-                       'Computer Modern Roman', 'Times', 'DejaVu Serif'],
+        'font.serif': ['TeX Gyre Pagella', 'Palatino', 'Palatino Linotype',
+                       'Book Antiqua', 'Computer Modern Roman', 'Times',
+                       'DejaVu Serif'],
         'mathtext.fontset': 'stix',
         'mathtext.rm': 'Palatino',
         'mathtext.it': 'Palatino:italic',
         'mathtext.bf': 'Palatino:bold',
-        # Announcement-clean frame: L-spines only, near-black ink, no grid.
+        # Frame: L-spines only, ink, no grid.
         'axes.spines.top': False,
         'axes.spines.right': False,
         'axes.linewidth': 0.9,
@@ -58,9 +62,7 @@ def apply_style():
         'axes.titlecolor': INK,
         'text.color': INK,
         'axes.grid': False,
-        # Announcement header: every title is left-aligned bold ink, sitting
-        # flush with the axes' left edge (the OpenAI-release / ICLR-deck look).
-        # Titles are the ONLY bold text in a figure.
+        # Titles: left-aligned bold — the only bold text in a figure.
         'axes.titlelocation': 'left',
         'axes.titlesize': 12.5,
         'axes.titleweight': 'bold',
@@ -86,8 +88,8 @@ def apply_style():
 
 
 def clean_axes(ax):
-    """Re-assert the L-spine ink frame on axes created outside apply_style's
-    reach (twinx/secondary_xaxis) or restyled by a plotting call."""
+    """Re-assert the L-spine ink frame on axes the rc cannot reach
+    (twinx / secondary_xaxis) or that a plotting call restyled."""
     ax.grid(False)
     for side in ('top', 'right'):
         ax.spines[side].set_visible(False)
@@ -97,21 +99,20 @@ def clean_axes(ax):
     ax.tick_params(colors=INK, width=0.8, length=3.5, direction='out')
 
 
-# --- Google brand colors (2015 logo, unchanged through 2026) ---
+# --- Palette: Google brand colors -------------------------------------------
 G_BLUE = '#4285F4'
 G_RED = '#DB4437'
 G_YELLOW = '#F4B400'
 G_GREEN = '#0F9D58'
-G_GREY = '#5F6368'    # Google's neutral text grey
-G_PURPLE = '#AB47BC'  # Material extended (used when 5+ distinct colors needed)
+G_GREY = '#5F6368'    # neutral text grey, used as-is
+G_PURPLE = '#AB47BC'  # Material extension for a 5th distinct hue
 
 
 def _mix(hex_color, target, amount):
-    """Linear-mix hex_color toward target by `amount` ∈ [0,1]; returns hex."""
     rgb = mc.to_rgb(hex_color)
     tgt = mc.to_rgb(target)
-    out = tuple(c * (1 - amount) + t * amount for c, t in zip(rgb, tgt))
-    return mc.to_hex(out)
+    return mc.to_hex(tuple(c * (1 - amount) + t * amount
+                           for c, t in zip(rgb, tgt)))
 
 
 def lighten(hex_color, amount):
@@ -122,14 +123,9 @@ def darken(hex_color, amount):
     return _mix(hex_color, '#000000', amount)
 
 
-# --- Softness tiers ---------------------------------------------------------
-# Each tier is (lighten, desaturate). Lighten mixes toward white; desaturate
-# mixes toward greyscale. Pick by reading context:
-#   brand   logo / hero block / dashboard            (max punch)
-#   medium  recognizable Google but slightly calmer
-#   paper   academic figure (DEFAULT)
-#   soft    slides / presentation on light bg
-#   mute    supplementary material / background fills
+# Softness tiers: (lighten, desaturate) toward white / greyscale.
+# brand = hero graphics, medium = paper series colors, paper = default
+# softened tone, soft = slides, mute = background fills.
 TIERS = {
     'brand':  (0.00, 0.00),
     'medium': (0.22, 0.06),
@@ -139,9 +135,7 @@ TIERS = {
 }
 DEFAULT_TIER = 'paper'
 
-# Pre-computed hex per tier (run `python style.py` to regenerate this table).
-# Source of truth = TIERS dict above; this block is a grep-friendly record.
-#
+# Hex per (color, tier) — regenerate with `python style.py`:
 #  color   | brand    | medium   | paper    | soft     | mute
 #  --------|----------|----------|----------|----------|----------
 #  blue    | #4285f4  | #6fa1f2  | #84adf1  | #99baf0  | #a9c4ef
@@ -149,55 +143,52 @@ DEFAULT_TIER = 'paper'
 #  yellow  | #f4b400  | #f2c33f  | #f1c95b  | #efd078  | #eed58f
 #  green   | #0f9d58  | #47af7d  | #61b88d  | #7ac09e  | #8fc6ab
 #  purple  | #ab47bc  | #bc73c9  | #c487ce  | #cc9bd4  | #d2abd9
-#  grey    | #5f6368  (neutral; not tier-shifted)
 
 
 def apply_tier(base, tier=DEFAULT_TIER):
-    """Soften a brand color by (lighten, desaturate) per the chosen tier."""
+    """Soften a brand color by the tier's (lighten, desaturate) amounts."""
     lighten_amt, desat_amt = TIERS[tier]
-    rgb = list(mc.to_rgb(base))
-    rgb = [c + (1 - c) * lighten_amt for c in rgb]
+    rgb = [c + (1 - c) * lighten_amt for c in mc.to_rgb(base)]
     grey = sum(rgb) / 3
-    rgb = [c * (1 - desat_amt) + grey * desat_amt for c in rgb]
-    return mc.to_hex(rgb)
+    return mc.to_hex([c * (1 - desat_amt) + grey * desat_amt for c in rgb])
 
 
 def paper(base):
-    """Backward-compat alias: brand color at the default tier."""
+    """Alias: brand color at the default tier."""
     return apply_tier(base, DEFAULT_TIER)
 
 
 def twotone(base, tier=DEFAULT_TIER):
-    """Same-hue (dark, light) pair for a 2-series chart, OpenAI-announcement
-    style: one brand hue at two lightness levels instead of two hues.
-    Dark is the tier color deepened a further notch (announcement charts
-    want a richer dark end than paper figures); light is a pale tint of it.
-    Works for every palette color. Bars: draw the light series with
-    `edgecolor=dark` so it keeps a crisp outline on white.
-    """
+    """(dark, light) pair of ONE hue for a 2-series chart. For bars, draw
+    the light series with edgecolor=dark to keep a crisp outline."""
     dark = darken(apply_tier(base, tier), 0.30)
     return dark, lighten(dark, 0.55)
 
 
 def hue_ramp(base, n, tier='medium', light=0.55, dark=0.32):
-    """Single-hue ordered ramp: n steps of ONE brand color from light to dark.
-    This is the one-primary-color-per-figure rule — multi-series figures
-    encode series identity as lightness of the figure's hue, never as a
-    second hue. Index 0 = lightest, index n-1 = darkest.
-    """
+    """n lightness steps of ONE hue, index 0 lightest -> n-1 darkest.
+    The single-hue rule for figures with at most 3 series; use distinct
+    Google hues once a figure has more."""
     anchor = apply_tier(base, tier)
     if n == 1:
         return [anchor]
     stops = [light - (light + dark) * i / (n - 1) for i in range(n)]
-    return [lighten(anchor, s) if s >= 0 else darken(anchor, -s) for s in stops]
+    return [lighten(anchor, s) if s >= 0 else darken(anchor, -s)
+            for s in stops]
 
+
+def family_4(base, tier=DEFAULT_TIER):
+    """4-step ordered gradient: lightest, light, tier mid, gentle dark."""
+    return [lighten(base, 0.65), lighten(base, 0.42),
+            apply_tier(base, tier), darken(base, 0.22)]
+
+
+# --- Announcement header: title + legend row above the axes -----------------
 
 def legend_handles(entries):
-    """White-edged proxy handles for the announcement legend row. `entries`
-    is a list of (label, color) or (label, color, marker) tuples. marker 'o'
-    (default) or any marker char gives a dot proxy; marker '--' gives a
-    dashed-line proxy (for reference lines); marker '-' a solid-line proxy.
-    """
+    """Proxy handles for header rows. Each entry is (label, color) for a
+    white-edged dot, or (label, color, marker) where marker is a marker
+    char, '-' for a solid-line proxy, or '--' for the reference dash."""
     handles = []
     for entry in entries:
         label, color, marker = (entry if len(entry) == 3 else (*entry, 'o'))
@@ -216,46 +207,44 @@ def legend_handles(entries):
     return handles
 
 
-def header_legend(ax, entries, ncol=None, legend_size=9.5, y=1.0):
-    """Announcement-style legend row: white-edged dot/line proxies laid out
-    horizontally, left-aligned, directly ABOVE the axes and BELOW the
-    left-aligned bold title (the rc default slot). Call after set_title, and
-    call finalize_headers(fig) once before savefig — it measures the real
-    legend heights and locks the title/legend/plot spacing. Returns the
-    legend.
-    """
+def header_legend(ax, entries, ncol=None, legend_size=9.5):
+    """Per-axes legend row between the bold left title and the plot.
+    Call after set_title; finalize_headers(fig) locks the spacing."""
     handles = legend_handles(entries)
     n = ncol or len(handles)
     rows = -(-len(handles) // n)
     title = ax.get_title(loc='left')
-    if title:
-        # rough reservation only; finalize_headers replaces it with the
-        # measured value
+    if title:  # rough reservation; finalize_headers measures the real pad
         ax.set_title(title, loc='left', pad=8 + rows * (legend_size + 4.5))
     return ax.legend(handles=handles, loc='lower left',
-                     bbox_to_anchor=(-0.01, y), ncol=n,
+                     bbox_to_anchor=(-0.01, 1.0), ncol=n,
                      frameon=False, fontsize=legend_size,
                      handletextpad=0.3, columnspacing=0.9,
                      borderpad=0.0, borderaxespad=0.0)
 
 
-def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0,
-                     level_all=True):
-    """Measure-and-level pass for announcement headers. Call ONCE per figure,
-    after every set_title / header_legend and right before savefig.
+def fig_header_legend(fig, entries, ncol=None, legend_size=9.5):
+    """Figure-level legend row above all panels, left-aligned.
+    Requires constrained_layout."""
+    return fig.legend(handles=legend_handles(entries),
+                      loc='outside upper left',
+                      ncol=ncol or len(entries), frameon=False,
+                      fontsize=legend_size, handletextpad=0.3,
+                      columnspacing=0.9)
 
-    Draws the canvas, measures each per-axes header legend's true height in
-    points, then (1) sets every left title to ONE pad — the tallest legend
-    plus gap_title above it and gap_axes below it — so sibling titles sit
-    level regardless of per-panel row counts, and (2) re-anchors each legend
-    so its TOP edge hangs gap_title below the title. Title -> legend -> plot
-    spacing is therefore constant across panels and independent of font
-    sizes. Returns the applied pad (points).
 
-    level_all=False re-pads only axes that carry a legend, leaving
-    legend-less titles at their default pad — use it when legend-less panels
-    sit in a DIFFERENT row from the legend-carrying ones (a figure-level
-    header row carries their series identity instead).
+def finalize_headers(fig, gap=6.0, min_pad=8.0, level_all=True):
+    """Measure-and-level pass; call ONCE, after all set_title /
+    header_legend calls and right before savefig.
+
+    Draws the canvas, measures each header legend's height in points, sets
+    every left title to one shared pad (tallest legend + a `gap` on each
+    side), and re-anchors each legend so its top hangs `gap` below the
+    title. Title, legend, and plot are therefore equidistant, level across
+    panels, and independent of font sizes. Returns the pad.
+
+    level_all=False pads only axes that carry a legend — for figures whose
+    legend-less panels sit in their own row under a figure-level header.
     """
     fig.canvas.draw()
     dpi = fig.dpi
@@ -264,7 +253,7 @@ def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0,
         leg = ax.get_legend()
         if leg is not None:
             heights[ax] = leg.get_window_extent().height * 72.0 / dpi
-    pad = max([min_pad] + [h + gap_title + gap_axes for h in heights.values()])
+    pad = max([min_pad] + [h + 2 * gap for h in heights.values()])
     for ax in fig.axes:
         title = ax.get_title(loc='left')
         if title and (level_all or ax in heights):
@@ -272,8 +261,8 @@ def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0,
         leg = ax.get_legend()
         if leg is not None:
             ax_h = ax.get_window_extent().height * 72.0 / dpi
-            y_top = 1.0 + (pad - gap_title) / ax_h
-            leg.set_bbox_to_anchor((-0.01, y_top), transform=ax.transAxes)
+            leg.set_bbox_to_anchor((-0.01, 1.0 + (pad - gap) / ax_h),
+                                   transform=ax.transAxes)
             if hasattr(leg, 'set_loc'):
                 leg.set_loc('upper left')
             else:
@@ -281,40 +270,11 @@ def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0,
     return pad
 
 
-def fig_header_legend(fig, entries, ncol=None, legend_size=9.5):
-    """Figure-level announcement legend row for multi-panel figures: one
-    horizontal white-edged proxy row across the top, left-aligned, above all
-    panels. Requires constrained_layout (uses loc='outside upper left').
-    """
-    handles = legend_handles(entries)
-    return fig.legend(handles=handles, loc='outside upper left',
-                      ncol=ncol or len(handles), frameon=False,
-                      fontsize=legend_size, handletextpad=0.3,
-                      columnspacing=0.9)
-
-
-def title_legend(ax, title, entries, ncol=None, title_size=12.5,
-                 legend_size=9.5, y_title=1.15, y_legend=1.01):
-    """Announcement-style header for a single-axes figure: left-aligned bold
-    title above the axes, with the horizontal white-edged legend row between
-    title and plot. Returns the legend so callers can tweak it.
-    """
-    ax.text(-0.01, y_title, title, transform=ax.transAxes,
-            fontsize=title_size, fontweight='bold', color=INK,
-            va='bottom', ha='left')
-    return ax.legend(handles=legend_handles(entries), loc='lower left',
-                     bbox_to_anchor=(-0.01, y_legend), ncol=ncol or len(entries),
-                     frameon=False, fontsize=legend_size,
-                     handletextpad=0.3, columnspacing=0.9)
-
+# --- Extras -----------------------------------------------------------------
 
 def rounded_bar(ax, cx, top, w, r_frac=0.10, **kw):
-    """Bar with rounded TOP corners only; the base sits square on ylim[0].
-    `top` is the data value (bar apex), `w` the width in x data units,
-    `r_frac` the corner radius as a fraction of bar width. The vertical
-    radius is derived from the axes geometry so corners read as circular.
-    Call after xlim/ylim are final.
-    """
+    """Bar with rounded TOP corners; the base sits square on ylim[0].
+    Call after xlim/ylim are final so the corners read as circular."""
     rx = w * r_frac
     (x0, x1), (y0, y1) = ax.get_xlim(), ax.get_ylim()
     pos, (fw, fh) = ax.get_position(), ax.figure.get_size_inches()
@@ -330,34 +290,22 @@ def rounded_bar(ax, cx, top, w, r_frac=0.10, **kw):
     ax.add_patch(PathPatch(Path(verts, codes), **kw))
 
 
-def family_4(base, tier=DEFAULT_TIER):
-    """4-step gradient: lightest, light, mid (`apply_tier`), dark.
-    The mid fill follows the active tier so flooded fills never read
-    oversaturated; dark end is gentle for low-contrast readability.
-    """
-    return [lighten(base, 0.65), lighten(base, 0.42),
-            apply_tier(base, tier), darken(base, 0.22)]
+def arrow(text, direction='down'):
+    """Append a direction arrow to a label: arrow('Loss') -> 'Loss ↓'."""
+    arr = r'$\downarrow$' if direction == 'down' else r'$\uparrow$'
+    return f'{text} {arr}'
 
 
 def all_tiers_table():
-    """Print the precomputed hex per (color, tier). Run as `python style.py`
-    to regenerate the table comment above.
-    """
-    cols = ['blue', 'red', 'yellow', 'green', 'purple']
+    """Print the hex-per-tier table (source of the comment block above)."""
+    names = ['blue', 'red', 'yellow', 'green', 'purple']
     bases = [G_BLUE, G_RED, G_YELLOW, G_GREEN, G_PURPLE]
-    tiers = list(TIERS.keys())
-    header = ' color   | ' + ' | '.join(f'{t:8s}' for t in tiers)
-    print(header)
+    tiers = list(TIERS)
+    print(' color   | ' + ' | '.join(f'{t:8s}' for t in tiers))
     print(' --------|' + '|'.join(['----------'] * len(tiers)))
-    for name, base in zip(cols, bases):
+    for name, base in zip(names, bases):
         cells = [apply_tier(base, t) for t in tiers]
         print(f' {name:7s} | ' + ' | '.join(f'{c:8s}' for c in cells))
-    print(f' grey    | {G_GREY}  (used as-is, not tier-shifted)')
-
-
-def arrow(text, direction='down'):
-    arr = r'$\downarrow$' if direction == 'down' else r'$\uparrow$'
-    return f'{text} {arr}'
 
 
 if __name__ == '__main__':

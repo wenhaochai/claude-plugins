@@ -6,11 +6,12 @@ provenance). Math label puts the exponent in the legend.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import apply_style, paper, header_legend, G_BLUE
+from style import apply_style, paper, header_legend, finalize_headers, G_BLUE
 
 apply_style()
 
 color = paper(G_BLUE)
+LABEL = r'Modality A: $C^{0.47}$'
 
 # Underlying law: log10(y) = log10(40) + 0.47 * (log10(C) - 18.5)
 C_line = np.logspace(18.5, 25, 60)
@@ -21,8 +22,7 @@ y_pts = 10 ** (np.log10(40) + 0.47 * (np.log10(C_pts) - 18.5))
 
 fig, ax = plt.subplots(figsize=(4.0, 3.0), constrained_layout=True)
 
-ax.plot(C_line, y_line, color=color, linewidth=2.0,
-        label=r'Modality A: $C^{0.47}$')
+ax.plot(C_line, y_line, color=color, linewidth=2.0)
 ax.scatter(C_pts, y_pts, s=70, color=color,
            edgecolor='white', linewidth=1.0, zorder=3)
 
@@ -31,5 +31,5 @@ ax.set_yscale('log')
 ax.set_xlabel('Compute (FLOPs)')
 ax.set_ylabel('Optimal Parameters (M)')
 ax.set_title(r'$N_{\mathrm{opt}}$: Modality A')
-# announcement header: line proxy above the axes, below the bold left title
-header_legend(ax, [(r'Modality A: $C^{0.47}$', color, '-')], legend_size=8)
+header_legend(ax, [(LABEL, color, '-')], legend_size=8)
+finalize_headers(fig)

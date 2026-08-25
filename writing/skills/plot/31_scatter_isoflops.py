@@ -6,7 +6,7 @@ parabola fit. Marker size grows with parameter count (paper convention).
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import (apply_style, apply_tier, header_legend,
+from style import (apply_style, apply_tier, header_legend, finalize_headers,
                    G_BLUE, G_GREEN, G_PURPLE, G_RED, G_YELLOW)
 
 apply_style()
@@ -36,11 +36,11 @@ n_pts = 14
 log_N_pts = np.linspace(log_n_min, log_n_max, n_pts)
 N_pts = 10 ** log_N_pts
 
-for c, color, label in zip(COMPUTE_LEVELS, COMPUTE_COLORS, COMPUTE_LABELS):
+for c, color in zip(COMPUTE_LEVELS, COMPUTE_COLORS):
     loss_pts = isoflop_curve(N_pts, c)
     sizes = 12 + 70 * (log_N_pts - log_n_min) / (log_n_max - log_n_min)
     ax.scatter(N_pts, loss_pts + rng.normal(0, 0.012, n_pts),
-               s=sizes, color=color, alpha=0.9, edgecolors='none', label=label)
+               s=sizes, color=color, alpha=0.9, edgecolors='none')
     ax.plot(N_dense, isoflop_curve(N_dense, c),
             color=color, linestyle=':', linewidth=1.1, alpha=0.85)
 
@@ -51,5 +51,5 @@ ax.set_xticks([1e8, 3e8, 1e9, 3e9, 1e10])
 ax.set_xticklabels(['100M', '300M', '1B', '3B', '10B'])
 ax.set_ylim(2.65, 4.15)
 ax.set_title('IsoFLOPs: Modality A')
-# announcement header: budget legend row above the axes
 header_legend(ax, list(zip(COMPUTE_LABELS, COMPUTE_COLORS)), ncol=5, legend_size=8)
+finalize_headers(fig)

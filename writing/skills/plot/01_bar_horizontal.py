@@ -13,7 +13,7 @@ apply_style()
 LABELS = ['Setup A', '+ Component 1', '+ Component 2', '+ Component 3', '+ Component 4', 'Setup A (2×)']
 VALUES = [1.974, 1.801, 1.657, 1.448, 1.410, 1.669]
 
-# One hue per figure: baseline + components as a lightness ramp; last row mirrors baseline
+# Single ablation ladder: one-hue lightness ramp; last row mirrors baseline
 PAL_5 = hue_ramp(G_BLUE, 5)
 COLORS = PAL_5 + [PAL_5[0]]
 

@@ -7,8 +7,8 @@ sharing x; small diagonal slashes mark the break.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from style import (apply_style, apply_tier, header_legend, arrow,
-                   G_BLUE, G_GREEN, G_RED, G_YELLOW)
+from style import (apply_style, apply_tier, header_legend, finalize_headers,
+                   arrow, G_BLUE, G_GREEN, G_RED, G_YELLOW)
 
 # More than 3 series: distinct Google hues (single-hue ramps stop reading
 # past three steps). Use hue_ramp only for figures with <= 3 series.
@@ -56,9 +56,8 @@ entries = [(s['label'], s['color'], s['marker'])
 # one header row for both stacked axes
 header_legend(ax_top, entries, ncol=2, legend_size=8)
 
-# Spine break + diagonal slashes
+# Spine break + diagonal slashes (rc already hides ax_bot's top spine)
 ax_top.spines['bottom'].set_visible(False)
-ax_bot.spines['top'].set_visible(False)
 ax_top.tick_params(bottom=False, labelbottom=False)
 d = .015
 kw = dict(color='k', clip_on=False, lw=0.7)
@@ -66,3 +65,4 @@ ax_top.plot((-d, +d), (-d, +d), transform=ax_top.transAxes, **kw)
 ax_top.plot((1 - d, 1 + d), (-d, +d), transform=ax_top.transAxes, **kw)
 ax_bot.plot((-d, +d), (1 - d, 1 + d), transform=ax_bot.transAxes, **kw)
 ax_bot.plot((1 - d, 1 + d), (1 - d, 1 + d), transform=ax_bot.transAxes, **kw)
+finalize_headers(fig)

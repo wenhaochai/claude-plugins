@@ -5,8 +5,8 @@ variants. Two model families × two variants = 4 lines, paired colors.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import (apply_style, apply_tier, header_legend, arrow,
-                   G_BLUE, G_GREEN, G_RED, G_YELLOW)
+from style import (apply_style, apply_tier, header_legend, finalize_headers,
+                   arrow, G_BLUE, G_GREEN, G_RED, G_YELLOW)
 
 # More than 3 series: distinct Google hues (single-hue ramps stop reading
 # past three steps). Use hue_ramp only for figures with <= 3 series.
@@ -35,6 +35,6 @@ ax.set_xlabel('Hyperparameter (X)')
 ax.set_ylabel(arrow('Value', 'down'))
 ax.set_title(arrow('Metric A', 'down').replace(r'$\downarrow$', r'($\downarrow$)'))
 ax.set_xticks(X)
-# announcement header: legend row above the axes, below the bold left title
 header_legend(ax, [(s['label'], s['color'], s['marker']) for s in SERIES.values()],
               ncol=2, legend_size=8)
+finalize_headers(fig)
