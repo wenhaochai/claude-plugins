@@ -14,12 +14,36 @@ REF_GREY = '#828589'
 REF_DASH = (0, (3, 2.2))
 
 
+def _register_pagella():
+    """Register TeX Gyre Pagella (Palatino clone) from a TeX Live install.
+    macOS ships Palatino only as a .ttc, from which matplotlib registers just
+    the regular face — bold text then SILENTLY renders regular. Pagella ships
+    one .otf per face, so bold titles actually come out bold. No-op when no
+    TeX Live is present (the serif stack then falls through to Palatino).
+    """
+    import glob
+    from matplotlib import font_manager
+    for pattern in (
+        '/usr/local/texlive/*/texmf-dist/fonts/opentype/public/tex-gyre/texgyrepagella-*.otf',
+        '/opt/homebrew/texlive/*/texmf-dist/fonts/opentype/public/tex-gyre/texgyrepagella-*.otf',
+        '/usr/share/texmf/fonts/opentype/public/tex-gyre/texgyrepagella-*.otf',
+        '/usr/share/texlive/texmf-dist/fonts/opentype/public/tex-gyre/texgyrepagella-*.otf',
+    ):
+        for path in glob.glob(pattern):
+            try:
+                font_manager.fontManager.addfont(path)
+            except Exception:
+                pass
+
+
 def apply_style():
+    _register_pagella()
     plt.rcParams.update({
         # Match arxiv_template (mathpazo): Palatino body + STIX math.
+        # Pagella first: it has a real bold face (see _register_pagella).
         # 'DejaVu Sans' tail-fallback handles unicode glyphs (❄ etc.) that Palatino lacks.
         'font.family': ['serif', 'DejaVu Sans'],
-        'font.serif': ['Palatino', 'TeX Gyre Pagella', 'Palatino Linotype', 'Book Antiqua',
+        'font.serif': ['TeX Gyre Pagella', 'Palatino', 'Palatino Linotype', 'Book Antiqua',
                        'Computer Modern Roman', 'Times', 'DejaVu Serif'],
         'mathtext.fontset': 'stix',
         'mathtext.rm': 'Palatino',
