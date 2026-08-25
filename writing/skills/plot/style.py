@@ -219,20 +219,60 @@ def legend_handles(entries):
 def header_legend(ax, entries, ncol=None, legend_size=9.5, y=1.0):
     """Announcement-style legend row: white-edged dot/line proxies laid out
     horizontally, left-aligned, directly ABOVE the axes and BELOW the
-    left-aligned bold title (the rc default slot). Call after set_title;
-    the title is re-padded to clear the legend rows. Returns the legend.
+    left-aligned bold title (the rc default slot). Call after set_title, and
+    call finalize_headers(fig) once before savefig — it measures the real
+    legend heights and locks the title/legend/plot spacing. Returns the
+    legend.
     """
     handles = legend_handles(entries)
     n = ncol or len(handles)
     rows = -(-len(handles) // n)
     title = ax.get_title(loc='left')
     if title:
+        # rough reservation only; finalize_headers replaces it with the
+        # measured value
         ax.set_title(title, loc='left', pad=8 + rows * (legend_size + 4.5))
     return ax.legend(handles=handles, loc='lower left',
                      bbox_to_anchor=(-0.01, y), ncol=n,
                      frameon=False, fontsize=legend_size,
                      handletextpad=0.3, columnspacing=0.9,
                      borderpad=0.0, borderaxespad=0.0)
+
+
+def finalize_headers(fig, gap_title=4.0, gap_axes=6.0, min_pad=8.0):
+    """Measure-and-level pass for announcement headers. Call ONCE per figure,
+    after every set_title / header_legend and right before savefig.
+
+    Draws the canvas, measures each per-axes header legend's true height in
+    points, then (1) sets every left title to ONE pad — the tallest legend
+    plus gap_title above it and gap_axes below it — so sibling titles sit
+    level regardless of per-panel row counts, and (2) re-anchors each legend
+    so its TOP edge hangs gap_title below the title. Title -> legend -> plot
+    spacing is therefore constant across panels and independent of font
+    sizes. Returns the applied pad (points).
+    """
+    fig.canvas.draw()
+    dpi = fig.dpi
+    heights = {}
+    for ax in fig.axes:
+        leg = ax.get_legend()
+        if leg is not None:
+            heights[ax] = leg.get_window_extent().height * 72.0 / dpi
+    pad = max([min_pad] + [h + gap_title + gap_axes for h in heights.values()])
+    for ax in fig.axes:
+        title = ax.get_title(loc='left')
+        if title:
+            ax.set_title(title, loc='left', pad=pad)
+        leg = ax.get_legend()
+        if leg is not None:
+            ax_h = ax.get_window_extent().height * 72.0 / dpi
+            y_top = 1.0 + (pad - gap_title) / ax_h
+            leg.set_bbox_to_anchor((-0.01, y_top), transform=ax.transAxes)
+            if hasattr(leg, 'set_loc'):
+                leg.set_loc('upper left')
+            else:
+                leg._loc = 2
+    return pad
 
 
 def fig_header_legend(fig, entries, ncol=None, legend_size=9.5):
