@@ -6,7 +6,7 @@ provenance). Math label puts the exponent in the legend.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import apply_style, paper, G_BLUE
+from style import apply_style, paper, header_legend, G_BLUE
 
 apply_style()
 
@@ -31,4 +31,5 @@ ax.set_yscale('log')
 ax.set_xlabel('Compute (FLOPs)')
 ax.set_ylabel('Optimal Parameters (M)')
 ax.set_title(r'$N_{\mathrm{opt}}$: Modality A')
-ax.legend(loc='upper left')
+# announcement header: line proxy above the axes, below the bold left title
+header_legend(ax, [(r'Modality A: $C^{0.47}$', color, '-')], legend_size=8)

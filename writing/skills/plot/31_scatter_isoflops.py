@@ -6,15 +6,18 @@ parabola fit. Marker size grows with parameter count (paper convention).
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import apply_style, hue_ramp, G_BLUE
+from style import (apply_style, apply_tier, header_legend,
+                   G_BLUE, G_GREEN, G_PURPLE, G_RED, G_YELLOW)
 
 apply_style()
 rng = np.random.default_rng(0)
 
 COMPUTE_LEVELS = [6e18, 6e19, 3e20, 6e20, 1e21]
 COMPUTE_LABELS = ['6e18', '6e19', '3e20', '6e20', '1e21']
-# One hue per figure: compute budget is ordered, so encode it as darkness
-COMPUTE_COLORS = hue_ramp(G_BLUE, len(COMPUTE_LEVELS))
+# More than 3 series: distinct Google hues (single-hue ramps stop reading
+# past three steps; use hue_ramp only for <= 3 series)
+COMPUTE_COLORS = [apply_tier(c, 'medium')
+                  for c in (G_BLUE, G_RED, G_YELLOW, G_GREEN, G_PURPLE)]
 
 
 def isoflop_curve(N, c_level):
@@ -48,4 +51,5 @@ ax.set_xticks([1e8, 3e8, 1e9, 3e9, 1e10])
 ax.set_xticklabels(['100M', '300M', '1B', '3B', '10B'])
 ax.set_ylim(2.65, 4.15)
 ax.set_title('IsoFLOPs: Modality A')
-ax.legend(fontsize=9, loc='upper right')
+# announcement header: budget legend row above the axes
+header_legend(ax, list(zip(COMPUTE_LABELS, COMPUTE_COLORS)), ncol=5, legend_size=8)

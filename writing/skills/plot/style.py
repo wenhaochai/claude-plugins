@@ -34,9 +34,12 @@ def apply_style():
         'axes.titlecolor': INK,
         'text.color': INK,
         'axes.grid': False,
-        # Uniform weight everywhere — no bold text in figures.
-        'axes.titlesize': 15,
-        'axes.titleweight': 'normal',
+        # Announcement header: every title is left-aligned bold ink, sitting
+        # flush with the axes' left edge (the OpenAI-release / ICLR-deck look).
+        # Titles are the ONLY bold text in a figure.
+        'axes.titlelocation': 'left',
+        'axes.titlesize': 11,
+        'axes.titleweight': 'bold',
         'axes.labelsize': 14,
         'xtick.labelsize': 13,
         'ytick.labelsize': 13,
@@ -165,23 +168,72 @@ def hue_ramp(base, n, tier='medium', light=0.55, dark=0.32):
     return [lighten(anchor, s) if s >= 0 else darken(anchor, -s) for s in stops]
 
 
-def title_legend(ax, title, entries, ncol=None, title_size=11.0,
-                 legend_size=8.5, y_title=1.15, y_legend=1.01):
-    """Announcement-style header: left-aligned title above the axes, with a
-    horizontal white-edged dot legend between title and plot. `entries` is a
-    list of (label, color) or (label, color, marker) tuples. Returns the
-    legend so callers can tweak it.
+def legend_handles(entries):
+    """White-edged proxy handles for the announcement legend row. `entries`
+    is a list of (label, color) or (label, color, marker) tuples. marker 'o'
+    (default) or any marker char gives a dot proxy; marker '--' gives a
+    dashed-line proxy (for reference lines); marker '-' a solid-line proxy.
     """
-    ax.text(-0.01, y_title, title, transform=ax.transAxes,
-            fontsize=title_size, color=INK, va='bottom', ha='left')
     handles = []
     for entry in entries:
         label, color, marker = (entry if len(entry) == 3 else (*entry, 'o'))
-        handles.append(Line2D([0], [0], marker=marker, color='none',
-                              markerfacecolor=color, markeredgecolor='white',
-                              markeredgewidth=0.8, markersize=6.0, label=label))
+        if marker == '--':
+            handles.append(Line2D([0], [0], color=color, linestyle=REF_DASH,
+                                  linewidth=1.4, label=label))
+        elif marker == '-':
+            handles.append(Line2D([0], [0], color=color, linestyle='-',
+                                  linewidth=1.6, label=label))
+        else:
+            handles.append(Line2D([0], [0], marker=marker, color='none',
+                                  markerfacecolor=color,
+                                  markeredgecolor='white',
+                                  markeredgewidth=0.8, markersize=6.0,
+                                  label=label))
+    return handles
+
+
+def header_legend(ax, entries, ncol=None, legend_size=8.5, y=1.0):
+    """Announcement-style legend row: white-edged dot/line proxies laid out
+    horizontally, left-aligned, directly ABOVE the axes and BELOW the
+    left-aligned bold title (the rc default slot). Call after set_title;
+    the title is re-padded to clear the legend rows. Returns the legend.
+    """
+    handles = legend_handles(entries)
+    n = ncol or len(handles)
+    rows = -(-len(handles) // n)
+    title = ax.get_title(loc='left')
+    if title:
+        ax.set_title(title, loc='left', pad=8 + rows * (legend_size + 4.5))
     return ax.legend(handles=handles, loc='lower left',
-                     bbox_to_anchor=(-0.01, y_legend), ncol=ncol or len(handles),
+                     bbox_to_anchor=(-0.01, y), ncol=n,
+                     frameon=False, fontsize=legend_size,
+                     handletextpad=0.3, columnspacing=0.9,
+                     borderpad=0.0, borderaxespad=0.0)
+
+
+def fig_header_legend(fig, entries, ncol=None, legend_size=8.5):
+    """Figure-level announcement legend row for multi-panel figures: one
+    horizontal white-edged proxy row across the top, left-aligned, above all
+    panels. Requires constrained_layout (uses loc='outside upper left').
+    """
+    handles = legend_handles(entries)
+    return fig.legend(handles=handles, loc='outside upper left',
+                      ncol=ncol or len(handles), frameon=False,
+                      fontsize=legend_size, handletextpad=0.3,
+                      columnspacing=0.9)
+
+
+def title_legend(ax, title, entries, ncol=None, title_size=11.0,
+                 legend_size=8.5, y_title=1.15, y_legend=1.01):
+    """Announcement-style header for a single-axes figure: left-aligned bold
+    title above the axes, with the horizontal white-edged legend row between
+    title and plot. Returns the legend so callers can tweak it.
+    """
+    ax.text(-0.01, y_title, title, transform=ax.transAxes,
+            fontsize=title_size, fontweight='bold', color=INK,
+            va='bottom', ha='left')
+    return ax.legend(handles=legend_handles(entries), loc='lower left',
+                     bbox_to_anchor=(-0.01, y_legend), ncol=ncol or len(entries),
                      frameon=False, fontsize=legend_size,
                      handletextpad=0.3, columnspacing=0.9)
 

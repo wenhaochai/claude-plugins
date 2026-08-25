@@ -5,7 +5,7 @@ reference (e.g. Chinchilla). Two solid lines + one dashed reference.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import apply_style, hue_ramp, G_BLUE, REF_GREY, REF_DASH
+from style import apply_style, hue_ramp, header_legend, G_BLUE, REF_GREY, REF_DASH
 
 # One hue per figure: the two modalities are light/dark steps of one hue
 RAMP = hue_ramp(G_BLUE, 2)
@@ -37,4 +37,8 @@ ax.set_yscale('log')
 ax.set_xlabel('Compute (FLOPs)')
 ax.set_ylabel('Optimal Parameters (M)')
 ax.set_title(r'$N_{\mathrm{opt}}$ Comparison')
-ax.legend(loc='upper left')
+# announcement header: line proxies above the axes ('-' solid, '--' ref dash)
+header_legend(ax, [(CURVES['a']['label'], CURVES['a']['color'], '-'),
+                   (CURVES['b']['label'], CURVES['b']['color'], '-'),
+                   (CURVES['ref']['label'], REF_GREY, '--')],
+              ncol=1, legend_size=8)
