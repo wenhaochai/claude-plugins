@@ -62,7 +62,7 @@ def apply_style():
         # flush with the axes' left edge (the OpenAI-release / ICLR-deck look).
         # Titles are the ONLY bold text in a figure.
         'axes.titlelocation': 'left',
-        'axes.titlesize': 11,
+        'axes.titlesize': 12.5,
         'axes.titleweight': 'bold',
         'axes.labelsize': 14,
         'xtick.labelsize': 13,
@@ -216,7 +216,7 @@ def legend_handles(entries):
     return handles
 
 
-def header_legend(ax, entries, ncol=None, legend_size=8.5, y=1.0):
+def header_legend(ax, entries, ncol=None, legend_size=9.5, y=1.0):
     """Announcement-style legend row: white-edged dot/line proxies laid out
     horizontally, left-aligned, directly ABOVE the axes and BELOW the
     left-aligned bold title (the rc default slot). Call after set_title;
@@ -235,7 +235,7 @@ def header_legend(ax, entries, ncol=None, legend_size=8.5, y=1.0):
                      borderpad=0.0, borderaxespad=0.0)
 
 
-def fig_header_legend(fig, entries, ncol=None, legend_size=8.5):
+def fig_header_legend(fig, entries, ncol=None, legend_size=9.5):
     """Figure-level announcement legend row for multi-panel figures: one
     horizontal white-edged proxy row across the top, left-aligned, above all
     panels. Requires constrained_layout (uses loc='outside upper left').
@@ -247,8 +247,8 @@ def fig_header_legend(fig, entries, ncol=None, legend_size=8.5):
                       columnspacing=0.9)
 
 
-def title_legend(ax, title, entries, ncol=None, title_size=11.0,
-                 legend_size=8.5, y_title=1.15, y_legend=1.01):
+def title_legend(ax, title, entries, ncol=None, title_size=12.5,
+                 legend_size=9.5, y_title=1.15, y_legend=1.01):
     """Announcement-style header for a single-axes figure: left-aligned bold
     title above the axes, with the horizontal white-edged legend row between
     title and plot. Returns the legend so callers can tweak it.
