@@ -1,17 +1,17 @@
 ---
 name: style
-description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 18 page-capped additions (RULE-P1..P18) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
+description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 20 canonical rules everywhere; 18 page-capped additions (RULE-P1..P18) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
 ---
 
 # Writing Style
 
 Default standards for English prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
 
-**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P18 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
+**Scope.** RULE-01..20 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P18 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
 
-## Canonical (RULE-01..17)
+## Canonical (RULE-01..20)
 
-RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RULE-13..17 added by Wenhao Chai.
+RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RULE-13..20 added by Wenhao Chai.
 
 1. **RULE-01** Do not assume the reader shares your tacit knowledge. (Pinker 2014, Ch. 3)
 2. **RULE-02** Do not use passive voice when the agent matters. (Orwell 1946 Rule 3; S&W §II.14)
@@ -26,10 +26,13 @@ RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RUL
 11. **RULE-11** Place new or important information in the stress position at the end of the sentence. (Gopen & Swan 1990)
 12. **RULE-12** Break long sentences; vary length. Split sentences over 30 words. (S&W §II.18; Pinker 2014 Ch. 4)
 13. **RULE-13** Do not use em-dashes (`—` in prose, `---` in LaTeX) or prose parentheses `()` in body text. Use colons plus lists, `, namely ...`, `, where ...`, or new sentences instead. Math parentheses (ordered pairs, function application, set notation) and page-range en-dashes (`pp.~12--15`) are exempt.
-14. **RULE-14** Do not use vocabulary that signals LLM-generated prose. Common tells: "delve", "crucially", "multifaceted", "tapestry", "navigate the complexities", "in the realm of", "leverage" where "use" suffices, "moreover"/"furthermore" chains, em-dash sandwiches. If a phrase pattern-matches GPT default, swap for a plainer equivalent.
+14. **RULE-14** Do not use vocabulary that signals LLM-generated prose. Common tells: "delve", "crucially", "multifaceted", "tapestry", "navigate the complexities", "in the realm of", "leverage" where "use" suffices, "moreover"/"furthermore" chains, em-dash sandwiches. Also: "reveal" or "demonstrate that" as the default discovery verb (prefer "show", or state the fact directly); "comprehensive" where "complete" or "all" is literal (or nothing is); "serves as" where "is" suffices; intensity adverbs next to quantified evidence ("robustly", "substantially", "fundamentally", "critically"): the number is the intensity. If a phrase pattern-matches GPT default, swap for a plainer equivalent.
 15. **RULE-15** Be consistent within a single piece. Define an abbreviation on first use, then never re-expand. Once you pick italic vs roman "e.g.", "GPT-5-thinking" vs "GPT-5 (thinking)", a hyphenation convention, or a math-mode policy, hold it. Inconsistency reads as careless.
 16. **RULE-16** Do not use the same content word twice in one sentence or in adjacent sentences. Restructure, pronominalize, or pick a role-specific alternative. Function words and the piece's named signature concepts are exempt; reusing a defined term is desirable, not a violation.
 17. **RULE-17** Do not apologize in body prose for weak assumptions, narrow scope, or worse-than-baseline results. State each assumption once where it belongs and reserve limitations for a dedicated section. Phrasings like "Although our algorithm does not outperform X" frame weakness without communicating it; cut them.
+18. **RULE-18** Cap trailing participle clauses. A sentence ending ", V-ing ..." (", achieving X", ", ensuring Y", ", highlighting Z") is the strongest LLM sentence signature when it recurs; at most about one in four consecutive sentences may end this way. Rewrite the rest as coordinated main verbs ("and surpasses ..."), separate sentences, or "so that / which" clauses. Check every remaining participle for dangling: its implied subject must be the sentence subject ("complexity stabilizes, focusing on small edits" dangles; the agent focuses, not the complexity).
+19. **RULE-19** Do not clone sentence skeletons, and state each fact once. RULE-09's parallel form is for coordinate ideas *within* a sentence or list; reusing a whole-sentence template *across* paragraphs is a machine tell ("The EPR, defined as ..., quantifies ... in Fig. X" followed by "The CT, defined as ..., quantifies ... in Fig. Y"; twin openers "These A partition into four mechanisms." / "These B resolve through four pathways."). Vary the second construction. Likewise, a fact stated in the abstract and introduction does not reappear in the body in a third and fourth paraphrase ("without explicit programming" / "without hardcoded role prompts" / "without manually specified roles" are one fact).
+20. **RULE-20** Break template contrasts and perfect triads. Trailing "rather than X" / "without Y" contrasts read machine-generated when they recur: keep a few per paper where the contrast is the point, and convert the rest to direct assertions. In any three-item list whose items share one shape ("ADJ NOUN that VERB ..." three times), vary the shape of one item, unless the items are genuinely coordinate data (then RULE-09 governs).
 
 ## Page-capped paper additions (RULE-P1..P18)
 
@@ -87,7 +90,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> style v0.7.0 active: 17 canonical rules (RULE-01..17) + 18 page-capped additions (RULE-P1..P18, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> style v0.8.0 active: 20 canonical rules (RULE-01..20) + 18 page-capped additions (RULE-P1..P18, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 
