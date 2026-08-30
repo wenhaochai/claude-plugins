@@ -31,6 +31,8 @@ The complete style contract. Every figure — template-derived or written from s
 | `01_bar_horizontal.py` | Horizontal bar with value labels + dashed group separators | Component ablation rows where each row adds/removes a piece, value-labeled |
 | `02_bar_grouped_twotone.py` | Grouped 2-series bar + error bars, same-hue dark/light pair | Two models compared across task categories with uncertainty |
 | `03_bar_highlight_twotone.py` | Single-series bar, value labels, hero bar dark vs. light outlined rest | One model showcased against competitors on a single benchmark |
+| `04_bar_stacked_segments.py` | Horizontal 2-segment stacked bar, % inside + totals | Each row splits into two exhaustive parts and the split share is the story |
+| `05_bar_panel_grid.py` | 2×3 small-multiples bar grid, value labels, one twin log line | Telemetry-style summary of many categorical distributions in one figure |
 | `10_box_horizontal.py` | Horizontal boxplot with 4-step family gradient | One categorical factor with ordered levels (e.g. progressively more compute) |
 | `20_line_multi.py` | Multi-line plot with markers (linear xy) | Multiple model variants tracked across a hyperparameter sweep |
 | `21_line_broken_y.py` | Multi-line with broken y-axis | Two groups of curves on disjoint y-ranges, both must stay visible |
@@ -39,8 +41,17 @@ The complete style contract. Every figure — template-derived or written from s
 | `24_line_twotone.py` | 2-line sweep with round markers, same-hue dark/light pair | Two models tracked across an inference/compute budget sweep |
 | `25_scatter_twotone.py` | Metric-vs-compute scatter + baseline / best-recipe scaling lines | Showing a recipe's compute speedup over a baseline ladder |
 | `26_line_frontier_twotone.py` | Running-max frontier line | Tracing the best-so-far result across a session or run |
+| `27_line_band_scatter.py` | Smoothed mean + ±1σ band + raw event cloud | Per-event score over a long run where trend and spread both matter |
+| `28_line_dual_axis.py` | Twin-y two-metric line, tinted axis labels | Two related series on incompatible scales across one x sweep |
+| `29_line_event_annotations.py` | Dual-panel smoothed trajectory + pointed event callouts | Same derived metric over two runs with specific moments to call out |
 | `30_scatter_powerlaw.py` | Log-log scatter + linear fit line | Clean power-law `y = a · C^b`; closed-form line + sample points |
 | `31_scatter_isoflops.py` | Multi-curve parabola scatter with fits | IsoFLOPs-style — each compute budget yields a U-shape |
+| `32_scatter_regression.py` | Two-cohort scatter + pooled regression line | Many observations from two settings sharing one linear relation |
+| `33_errorbar_zone.py` | Binned mean ± SEM line + highlighted sweet-spot span | Metric peaks at an intermediate value of a binned factor |
+| `40_area_share_stack.py` | 100%-stacked share area with direct in-band labels | A categorical mix evolving over a run, shares summing to 100% |
+| `41_sankey_alluvial.py` | Alluvial/Sankey ribbons across ordered stages | Population re-partitioning across 3–4 stages with flows that matter |
+| `42_dag_lineage.py` | Exploration DAG with highlighted winner lineage | Search/evolution explored many branches and one lineage won |
+| `43_taxonomy_table.py` | Pill-table taxonomy figure (drawn table, not a chart) | Categorized checklist rows spanning lifecycle stages + metric columns |
 
 ## Quick start
 
