@@ -52,6 +52,20 @@ The complete style contract. Every figure — template-derived or written from s
 | `41_sankey_alluvial.py` | Alluvial/Sankey ribbons across ordered stages | Population re-partitioning across 3–4 stages with flows that matter |
 | `42_dag_lineage.py` | Exploration DAG with highlighted winner lineage | Search/evolution explored many branches and one lineage won |
 | `43_taxonomy_table.py` | Pill-table taxonomy figure (drawn table, not a chart) | Categorized checklist rows spanning lifecycle stages + metric columns |
+| `50_concept_node_flow.py` | Concept diagram: titled nodes joined by arrows, one row | How one artifact is taken apart into the pieces a task needs; any pipeline of 3–4 stages |
+| `51_concept_boundary.py` | Concept diagram: two parties, arrows that cross or stop at a boundary | A contract or sandbox: what is allowed through, what is blocked or withheld |
+| `52_concept_jigsaw_treemap.py` | Concept diagram: two jigsaw treemaps, one shared key | Composition of two related benchmarks or datasets by category, sized by count |
+
+## Concept diagrams (templates 50–52)
+
+Schematics rather than charts: no axes, no data series. They use `concept.py` (and `52_*` also `jigsaw.py`) instead of `apply_style()`, and differ from the chart templates in four ways:
+
+- **Faces.** Lato Heavy for the headline and titles, Lato Regular for everything else, the two faces of the arxiv template's section titles; `concept.py` registers them from TeX Live (`~/texmf` or the system tree) and falls back to DejaVu Sans. Five sizes only, `H1 11 / H2 8.5 / H3 7.5 / BODY 7 / META 6.5`; a sixth level means the figure says too much.
+- **Colour says whose side.** `BLUE_FILL` is the agent's side, `RED_FILL` is what is withheld from the agent, `PALE` is neither; connectors are always grey open-V arrows. Node titles sit in a tinted band with the panel letter, so nothing floats above the blocks.
+- **One gap.** `height_for(content_top)` and `headline_y(height)` seat the headline `TITLE_GAP` above the first block; `half_for(size)` gives any text line's half-height so a legend or heading row can be stacked with the same gap. Never hand-tune vertical offsets.
+- **Overflow raises.** Every template ends with `C.check(fig)`, which raises if text leaves the canvas or runs past the panel it starts in. Widen a node or shorten a label; do not eyeball it. `C.save(fig, stem)` runs the check and writes `stem.pdf / .svg / .png` without tight cropping, which would change the font size in LaTeX.
+
+`jigsaw.py` lays out a two-level squarified treemap (areas, then domains) as jigsaw pieces: knobs go only on seams longer than `MIN_SEAM`, radii shrink with piece size, and a label that does not fit falls back through wrapped, inline, rotated, and name-only forms, printing a warning on the last.
 
 ## Quick start
 
@@ -92,10 +106,10 @@ Every template label is a placeholder: `Model A/B` (methods), `Metric A` (metric
 
 - One figure per file; multi-panel needs are composed by the caller.
 - Templates never call `plt.show()` or `fig.savefig(...)` — add yours after `finalize_headers`.
-- `style.py` must be importable from the template's directory.
+- `style.py` must be importable from the template's directory; templates 50–52 also need `concept.py`, and `52_*` needs `jigsaw.py`.
 - `figsize` targets single-column / half-page paper figures (≈4×3 to 6×3.5 in); full-width paper figures use 7.6 in.
 
 ## Dependencies
 
 - `matplotlib >= 3.6`, `numpy >= 1.20`
-- Fonts: macOS ships Palatino; for real bold (and on Linux) install TeX Live's `tex-gyre` (TeX Gyre Pagella) — `apply_style()` picks it up automatically.
+- Fonts: macOS ships Palatino; for real bold (and on Linux) install TeX Live's `tex-gyre` (TeX Gyre Pagella) — `apply_style()` picks it up automatically. Concept diagrams (50–52) use TeX Live's `lato` package instead; `concept.py` falls back to DejaVu Sans when it is absent.
