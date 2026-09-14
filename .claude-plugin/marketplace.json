@@ -6,19 +6,14 @@
   },
   "plugins": [
     {
-      "name": "anti-autoresearch",
-      "source": "./anti-autoresearch",
-      "description": "Integrity forensics for autoresearch papers as an adversarial self-audit gate: /anti-autoresearch <paper-dir> runs a span-anchored evidence ledger + 6 auditor skills + a deterministic adjudicator (46 verdict-bearing hack-patterns across 8 families, GRIM/GRIMMER/statcheck numeric gates, 13 zero-weight AI-style impressions). Loop: draft, audit, fix every verdict-bearing finding, re-run until CLEAN_GIVEN_EVIDENCE. Vendored from wanshuiyin/Anti-Autoresearch (MIT) with paths repointed to the plugin root."
-    },
-    {
-      "name": "daily",
-      "source": "./daily",
-      "description": "Personal daily tools: /daily:todo for natural-language TODO.md management."
-    },
-    {
       "name": "writing",
       "source": "./writing",
-      "description": "Publication-prep tools for academic / public-facing writing. style (15 canonical English-prose rules from agent-style under CC BY 4.0 + 11 page-cap additions + 2 audit rules, auto-triggers on every writing task), plot (matplotlib templates for paper figures: bar / box / line / scatter, with a Palatino + Google-brand-tone setup), review (slash command /writing:review for pre-submission self-review of own AI/ML paper Overleaf draft, with mechanical preflight + section-by-section interrogation + CVPR/ARR/TMLR/AAAI/COLM-derived anti-pattern filters), and paper-overleaf (opus subagent for Overleaf-synced LaTeX paper editing: section-level conventions for NeurIPS / ICML / ICLR / COLM, red-mark workflow with \\textcolor{red}, bilingual zh/en side-by-side review, claim-evidence and number / citation audit, plus writing-taste guidance — argument structure, specificity over abstraction, and concrete before/after rewrites — beyond syntax rules)."
+      "description": "Publication-prep tools for academic / public-facing writing. Bundles style (17 canonical English-prose rules + 18 page-cap additions + 2 audit-time rules), plot (matplotlib templates for paper figures), review (pre-submission self-review of own AI/ML paper Overleaf draft), paper-overleaf (opus subagent for Overleaf-synced LaTeX paper editing), and the anti-autoresearch integrity-forensics suite (12 skills: /anti-autoresearch orchestrator + evidence-ledger, consistency-audit, citation-forensics, baseline-comparison-audit, experiment-forensics, eval-design-forensics, proof-derivation-forensics, presentation-signals, ai-style-impressions, adversarial-case-builder, novelty-duplication-advisory; vendored from wanshuiyin/Anti-Autoresearch, MIT, support files under anti-autoresearch/)."
+    },
+    {
+      "name": "kexue-fm",
+      "source": "./kexue-fm",
+      "description": "科学空间 kexue.fm（苏剑林博客）全站离线知识库 + skills：本地 SQLite（全文 Markdown、公式保留、标签、系列、互引、论文映射、官方引用格式），配套 kexue-search / kexue-read / kexue-explain / kexue-series / kexue-related / kexue-paper / kexue-cite / kexue-digest / kexue-sync。纯中文。"
     }
   ]
 }

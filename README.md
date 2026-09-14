@@ -2,64 +2,52 @@
 
 Personal Claude Code plugin marketplace by [Wenhao Chai](https://wenhaochai.com).
 
-## `daily` — personal daily tools
-
-Single plugin bundling the commands I use every day.
-
-| Command | What it does |
-|---|---|
-| `/daily:todo` | Show actionable items from `./TODO.md`; add / complete / delete / update items via natural language (e.g. `/daily:todo 加一条 修车`) |
-| `/daily:email` | Summarize recent unread Gmail messages, filtering out promotions / security alerts / noise (requires a Gmail MCP) |
-| `/daily:wrap` | Summarize the current conversation and append to `./memory/YYYY-MM-DD.md` |
-
 ## `writing` — publication-prep tools
 
-Three skills bundled together. All auto-load by context match; no slash commands.
+Skills auto-load by context match; the only slash command is `/anti-autoresearch`.
 
 ### `style` — default English-prose standards
 
-Auto-triggers on any writing task the user will send or publish — emails, message drafts, posts, docs, grant proposals, paper prose. 17 canonical English-prose rules apply everywhere (RULE-01..12 distilled from Strunk & White / Orwell / Pinker / Gopen & Swan, sourced from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; RULE-13..17 added). 18 page-cap additions (RULE-P1..P18) plus 2 final-pass audit rules (RULE-A1..A2) apply only when the target is a page-capped conference paper.
+Auto-triggers on any writing task the user will send or publish: emails, message drafts, posts, docs, grant proposals, paper prose. 17 canonical English-prose rules apply everywhere (RULE-01..12 distilled from Strunk & White / Orwell / Pinker / Gopen & Swan, sourced from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; RULE-13..17 added). 18 page-cap additions (RULE-P1..P18) plus 2 final-pass audit rules (RULE-A1..A2) apply only when the target is a page-capped conference paper.
 
 ### `plot` — matplotlib templates for paper figures
 
-Drop-in templates for publication-quality figures: vertical / horizontal bar, horizontal boxplot with family gradient, multi-line on linear / broken / log-x / log-log axes, log-log power-law fit, IsoFLOPs-style scatter. Each template is one .py file producing one subplot. Shared `style.py` sets Palatino body + STIX math (matching arxiv `mathpazo`) and a Google-brand palette softened to a paper-friendly tier (`brand → medium → paper → soft → mute`, switchable in one line). Labels ship pre-genericized (`Model A`, `Metric A`, `Task A`) to keep the templates portable; replace with real names when applying.
+Drop-in templates for publication-quality figures: vertical / horizontal bar, horizontal boxplot with family gradient, multi-line on linear / broken / log-x / log-log axes, log-log power-law fit, IsoFLOPs-style scatter, concept diagrams. Each template is one .py file producing one subplot. Shared `style.py` sets Palatino body + STIX math (matching arxiv `mathpazo`) and a Google-brand palette softened to a paper-friendly tier. Labels ship pre-genericized (`Model A`, `Metric A`, `Task A`); replace with real names when applying.
 
-Template dir: `~/.claude/plugins/marketplaces/wenhaochai/writing/skills/plot/`. Copy the chosen template plus `style.py` to your figures directory, edit the data block, add a `fig.savefig(...)` call, run.
+Template dir: `writing/skills/plot/`. Copy the chosen template plus `style.py` to your figures directory, edit the data block, add a `fig.savefig(...)` call, run.
 
 ### `review` — pre-submission AI/ML paper self-review
 
-Auto-triggers when reviewing own Overleaf drafts for top-tier ML venue submissions (NeurIPS, ICML, ICLR, etc.). Simulates detailed reviewer feedback on clarity, novelty, experimental rigor, presentation, and standards compliance. Default-loads `style` skill for clarity-rule citations.
+Auto-triggers when reviewing own Overleaf drafts for top-tier ML venue submissions (NeurIPS, ICML, ICLR, etc.). Simulates reviewer feedback on clarity, novelty, experimental rigor, presentation, and standards compliance. Default-loads `style` for clarity-rule citations.
+
+### `paper-overleaf` — Overleaf-synced LaTeX editing agent
+
+Opus subagent for section-level paper editing: venue conventions for NeurIPS / ICML / ICLR / COLM, red-mark workflow with `\textcolor{red}`, bilingual zh/en side-by-side review, and claim / number / citation audits against the codebase.
+
+### `anti-autoresearch` — integrity forensics for paper output
+
+Adversarial self-audit gate: `/anti-autoresearch <paper-dir>` builds a span-anchored evidence ledger, fans out 11 auditor skills (consistency, citation, baseline, experiment, eval design, proof / derivation, presentation, AI-style impressions, adversarial case, novelty advisory), and hands every finding to a deterministic adjudicator. Loop: draft, audit, fix each verdict-bearing finding, re-run until `CLEAN_GIVEN_EVIDENCE`. Vendored from [wanshuiyin/Anti-Autoresearch](https://github.com/wanshuiyin/Anti-Autoresearch) (MIT); tools, references, schemas, and eval live under `writing/anti-autoresearch/`, see its README for the path patch.
+
+## `kexue-fm` — offline library of kexue.fm
+
+A SQLite snapshot of every post on [科学空间](https://kexue.fm/) (Su Jianlin's blog, 2009 to the last sync) with one `kexue` skill on top. Full text as Markdown with LaTeX intact, tags, series order, cross-references, and the site's official citation format. One script handles crawl and query:
+
+```bash
+python3 kexue-fm/scripts/kexue.py search 位置编码 --excerpt
+python3 kexue-fm/scripts/kexue.py show 8265 --toc
+python3 kexue-fm/scripts/kexue.py sync
+```
+
+Skill and docs are in Chinese. Post content is © 苏剑林 under CC BY-NC-SA; the snapshot is for personal study and retrieval.
 
 ## Install
 
 ```
 /plugin marketplace add wenhaochai/claude-plugins
-/plugin install daily@wenhaochai
 /plugin install writing@wenhaochai
+/plugin install kexue-fm@wenhaochai
 ```
-
-## Optional config
-
-Config lives at `~/.claude/plugins/daily/config.json`:
-
-```json
-{
-  "calendars": ["foo@example.com"],
-  "email_account": "you@example.com"
-}
-```
-
-- `calendars` — extra Google Calendars to include in `/daily:todo`'s today view (primary is always included)
-- `email_account` — restrict `/daily:email` to a specific Gmail account (defaults to the primary)
-
-Both are optional.
-
-## Conventions
-
-- All dates are `MM/DD/YYYY`.
-- `/daily:todo` and `/daily:wrap` operate on the project's working directory (`./TODO.md`, `./memory/`).
-- `/daily:email` and `/daily:todo`'s calendar feature require corresponding MCP servers to be connected.
 
 ## License
 
-MIT for plugin code. The `writing` plugin's `skills/style/SKILL.md` contains rules redistributed from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; attribution is preserved in that file.
+MIT for plugin code. `writing/skills/style/SKILL.md` redistributes rules from [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0, attribution preserved in that file. `writing/anti-autoresearch/` carries its upstream MIT license in `LICENSE.upstream`. `kexue-fm/data/kexue.sqlite` holds third-party content under CC BY-NC-SA.
