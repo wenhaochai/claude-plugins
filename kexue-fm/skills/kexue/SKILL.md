@@ -24,6 +24,8 @@ python3 "$KX" sync        # 抓取新文章
 1. 把问题拆成文中会出现的具体词，中英写法都试，一次传进去：
    `search 优化器 Muon MuP 学习率 "Batch Size" "Scaling Law" MoE 损失函数 --since 2023-01-01`
 2. 每个参数是一路查询，结果按各路排名融合，`←` 后面标出命中了哪几路。命中路数多的文章更核心。
-3. 输出末尾列出无命中的查询，换同义词再搜。
-4. 对候选文章读 `excerpt` 判断是否相关：`sqlite3 "$DB" "select id, excerpt from posts where id in (...)"`。
-5. 读正文用 `show ID`。长文可以用 SQL 取 `content_md` 的片段。回答时注明文章 id、标题和链接 `https://kexue.fm/archives/<id>`，引用时给出 `cite_text` 或 `bibtex`。
+3. 大问题按子主题分几次查，每次 8 到 12 路。优化器、学习率这类词命中面很广，和架构、分词类的词放在同一次里会把后者压到后面。
+4. 两个字的泛词（数据、模型、训练）不要单独成一路，会命中无关文章；和别的词合成一路加引号，如 `"训练 数据"`。
+5. 输出末尾列出无命中的查询，换同义词再搜。
+6. 对候选文章读 `excerpt` 判断是否相关：`sqlite3 "$DB" "select id, excerpt from posts where id in (...)"`。
+7. 读正文用 `show ID`。长文可以用 SQL 取 `content_md` 的片段。回答时注明文章 id、标题和链接 `https://kexue.fm/archives/<id>`，引用时给出 `cite_text` 或 `bibtex`。
