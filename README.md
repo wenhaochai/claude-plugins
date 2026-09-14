@@ -30,15 +30,15 @@ Adversarial self-audit gate: `/anti-autoresearch <paper-dir>` builds a span-anch
 
 ## `kexue-fm` — offline library of kexue.fm
 
-A SQLite snapshot of every post on [科学空间](https://kexue.fm/) (Su Jianlin's blog, 2009 to the last sync) with one `kexue` skill on top. Full text as Markdown with LaTeX intact, tags, series order, cross-references, and the site's official citation format. One script handles crawl and query:
+A SQLite snapshot of every post on [科学空间](https://kexue.fm/) (Su Jianlin's blog, 2009 to the last sync): full text as Markdown with LaTeX intact, tags, and the site's official citation. One script and one `kexue` skill on top:
 
 ```bash
-python3 kexue-fm/scripts/kexue.py search 位置编码 --excerpt
-python3 kexue-fm/scripts/kexue.py show 8265 --toc
+python3 kexue-fm/scripts/kexue.py search Muon MuP 学习率 --since 2023-01-01
+python3 kexue-fm/scripts/kexue.py show 8265
 python3 kexue-fm/scripts/kexue.py sync
 ```
 
-Skill and docs are in Chinese. Post content is © 苏剑林 under CC BY-NC-SA; the snapshot is for personal study and retrieval.
+Each `search` argument is a separate query; results from all queries merge by reciprocal rank fusion. Skill and docs are in Chinese. Post content is © 苏剑林 under CC BY-NC-SA; the snapshot is for personal study and retrieval.
 
 ## Install
 
