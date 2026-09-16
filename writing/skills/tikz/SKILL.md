@@ -25,15 +25,14 @@ A chart with real axes drawn in pgfplots sits between the two: it typesets in th
 which is worth a lot for a small chart, and it becomes unmanageable past a few hundred data points.
 Generate the `.tex` from data with a script rather than hand-writing coordinate lists.
 
-## Templates
+## Two shapes of source file
 
-| File | Type | Use when |
-|---|---|---|
-| `10_teaser_flow.tex` | Standalone teaser: a population splits and routes to two consumers, with vector insets | The teaser has to show a mechanism and a consequence in one strip above the abstract |
-| `11_pipeline_boxes.tex` | Inline box-and-arrow pipeline with a caption | A process figure of 4 to 6 stages that belongs in the `.tex` and will be edited later |
+A **standalone** figure is its own document, built to a PDF that the paper includes. Keep it under
+`figures/src/`, build it into a scratch directory, and place the result at 1:1.
 
-`10_*` is a `standalone` document producing its own PDF. `11_*` is a figure body you `\input` inside
-the document, and its header comments list the preamble lines it needs.
+An **inline** figure is a `\begin{figure}` body that the paper `\input`s, so it inherits the document's
+preamble. List the packages and `\definecolor` lines it needs in a header comment, because a figure
+that silently depends on the host preamble breaks the first time it is reused.
 
 ## Build recipe for a standalone figure
 
