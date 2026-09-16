@@ -8,7 +8,12 @@
     {
       "name": "writing",
       "source": "./writing",
-      "description": "Publication-prep tools for academic / public-facing writing. Bundles style (17 canonical English-prose rules + 18 page-cap additions + 2 audit-time rules), plot (matplotlib templates for paper figures), review (pre-submission self-review of own AI/ML paper Overleaf draft), paper-overleaf (opus subagent for Overleaf-synced LaTeX paper editing), and the anti-autoresearch integrity-forensics suite (12 skills: /anti-autoresearch orchestrator + evidence-ledger, consistency-audit, citation-forensics, baseline-comparison-audit, experiment-forensics, eval-design-forensics, proof-derivation-forensics, presentation-signals, ai-style-impressions, adversarial-case-builder, novelty-duplication-advisory; vendored from wanshuiyin/Anti-Autoresearch, MIT, support files under anti-autoresearch/)."
+      "description": "Publication-prep tools for academic and public-facing writing. Five skills: style (17 canonical English-prose rules, 20 page-cap additions, 2 audit-time rules), preflight (deterministic pre-submission checks on a LaTeX tree), and the three figure skills plot, concept, and tikz, sharing one design system under figures/ (Google palette, venue-matched fonts, and the ten-rule DOCTRINE.md)."
+    },
+    {
+      "name": "anti-autoresearch",
+      "source": "./anti-autoresearch",
+      "description": "Integrity forensics for research papers, and the reviewer discipline for writing up what it finds. /anti-autoresearch builds a span-anchored evidence ledger, fans out 11 auditors, and hands every finding to a deterministic adjudicator: the model proposes, the adjudicator decides. Detect-only and observability-aware. Vendored from wanshuiyin/Anti-Autoresearch (MIT); support files under support/."
     },
     {
       "name": "kexue-fm",

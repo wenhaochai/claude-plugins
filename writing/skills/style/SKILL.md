@@ -1,13 +1,13 @@
 ---
 name: style
-description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 18 page-capped additions (RULE-P1..P18) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
+description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 20 page-capped additions (RULE-P1..P20) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
 ---
 
 # Writing Style
 
 Default standards for English prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
 
-**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P18 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
+**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P20 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
 
 ## Canonical (RULE-01..17)
 
@@ -31,7 +31,7 @@ RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RUL
 16. **RULE-16** Do not use the same content word twice in one sentence or in adjacent sentences. Restructure, pronominalize, or pick a role-specific alternative. Function words and the piece's named signature concepts are exempt; reusing a defined term is desirable, not a violation.
 17. **RULE-17** Do not apologize in body prose for weak assumptions, narrow scope, or worse-than-baseline results. State each assumption once where it belongs and reserve limitations for a dedicated section. Phrasings like "Although our algorithm does not outperform X" frame weakness without communicating it; cut them.
 
-## Page-capped paper additions (RULE-P1..P18)
+## Page-capped paper additions (RULE-P1..P20)
 
 Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps and similar). Field-observed from paper-review workflows.
 
@@ -71,6 +71,10 @@ Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps 
 
 - **RULE-P18** Treat a displayed equation as part of its containing sentence: end the equation with a comma if the sentence continues, a period if it terminates. The sentence after a terminal-period equation begins with a capital letter.
 
+- **RULE-P19** Do not make the reader hold a long-range correspondence. `, respectively` is almost always the wrong construction: it asks the reader to zip two lists across a clause boundary, so split it into one sentence per pair, or move it into a table. A `, which` chain does the same with modifiers, and a file whose density climbs has sentences that stopped carrying one idea each. An abbreviation defined many pages earlier gets its expansion or its role restated at the use site, which is RULE-P16 applied to names instead of symbols. (Jia-Bin Huang, `paper-writing.md`)
+
+- **RULE-P20** One table, one message. A table holding two unrelated blocks becomes two tables; two tables sharing a row structure and a caption pattern become one. Label the direction of every metric in the header, `Acc $\uparrow$` or `FID $\downarrow$`, so a reader who does not know the metric can still read the column. Bold the winner, and say in the caption what bold means. (Jia-Bin Huang, `paper-writing.md`)
+
 ## Final-pass paper audit (RULE-A1..A2)
 
 Layout and typography rules that depend on rendered output. Trigger *only* when reviewing the compiled PDF for submission, not during drafting or generation. Skip these when editing `.tex` source without a fresh build.
@@ -87,7 +91,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> style v0.7.0 active: 17 canonical rules (RULE-01..17) + 18 page-capped additions (RULE-P1..P18, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> style v0.9.0 active: 17 canonical rules (RULE-01..17) + 20 page-capped additions (RULE-P1..P20, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 
