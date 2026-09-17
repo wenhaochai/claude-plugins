@@ -1,6 +1,6 @@
 ---
 name: plot
-description: "18 matplotlib chart templates for paper, blog, and slide figures: bars, boxplot, curve grids, broken axes, IsoFLOPs and labelled-frontier scatter, quadrant plots, stacked shares, alluvial ribbons, sparse-group DAGs. All on one header: a left-aligned Lato Heavy title with a single legend row above the axes, never inside them, spaced by measurement. L-spines, no grid, Google palette, venue-matched serif. Use when the user wants a chart they will save and paste into a document. Skip for exploratory notebook plots. Schematics with no data axes go to `concept`; figures drawn in LaTeX go to `tikz`."
+description: "18 matplotlib chart templates for paper, blog, and slide figures: bars, boxplot, curve grids, broken axes, IsoFLOPs and labelled-frontier scatter, quadrant plots, stacked shares, alluvial ribbons, sparse-group DAGs. All on one header: a left-aligned Lato Heavy title with a single legend row above the axes, never inside them, spaced by measurement. L-spines, no grid, Google palette, venue-matched serif. Use when the user wants a chart they will save and paste into a document. Skip for exploratory notebook plots. Schematics with no data axes go to `concept`."
 ---
 
 # Plot
@@ -58,11 +58,9 @@ Two more rules keep the header uniform:
 2. **Type.** Ticks, axis labels and math take the venue's body serif; the headline
    and legend row take Lato. One scale, no sixth size:
    `HEADLINE 10.5 / PANEL 8.5 / LEGEND 8.0 / LABEL 8.0 / TICK 7.5 / NOTE 7.0`.
-3. **Hue count follows series count.** At most 3 coloured series means one brand
-   hue with lightness steps, `hue_ramp(base, n)` with index 0 lightest, or
-   `twotone(base)`. More than 3 means distinct Google hues at the medium tier.
-   Neutrals never count as a hue: `HUMAN_DARK` and `HUMAN_SOFT` for human or
-   reference cohorts, greys for annotations.
+3. **Hue count follows series count.** Two series take `twotone(base)`, an
+   ordered set of four takes `family_4(base)`, both one hue. More than that
+   means distinct Google hues at the medium tier. Grey never counts as a hue.
 4. **References: one grey, one dash.** Every reference or baseline line is
    `REF_GREY` with `REF_DASH`. A second dashed series separates by colour and
    label, reusing the same pattern.
@@ -116,14 +114,11 @@ Two more rules keep the header uniform:
 ```python
 from style import (
     apply_style,          # one-shot rc setup, call once, first; venue='arxiv'|'iclr'|...
-    header, fig_header, finalize_headers, note,   # THE header format
+    header, fig_header, finalize_headers, note,   # the header format, and nothing else
     clean_axes,           # re-assert the frame on twin/secondary axes
-    G_BLUE, G_RED, G_YELLOW, G_GREEN, G_GREY, G_PURPLE,
-    INK, HUMAN_DARK, HUMAN_SOFT,   # ink + neutral greys
-    REF_GREY, REF_DASH,            # the reference-line convention
+    G_BLUE, G_RED, G_YELLOW, G_GREEN, G_GREY, G_PURPLE, INK, REF_GREY, REF_DASH,
     apply_tier, paper,             # softness control
-    hue_ramp, twotone, family_4,   # single-hue ramps, pairs, gradients
-    header_legend, fig_header_legend,   # the legend row on its own
+    twotone, family_4,             # a same-hue pair, a 4-step gradient
     HEADLINE_PT, PANEL_PT, WIDTH_1COL, WIDTH_FULL,
     rounded_bar, lighten, darken, arrow,
 )

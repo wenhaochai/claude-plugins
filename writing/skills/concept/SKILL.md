@@ -1,6 +1,6 @@
 ---
 name: concept
-description: "Three matplotlib schematic templates, drawn with no data axes: a node flow that takes one artifact apart, a boundary diagram of what crosses and what is blocked, and a pair of jigsaw treemaps for composition. Lato type, a fixed five-size scale, colour that says which side a node belongs to, and an overflow check that raises rather than being eyeballed. Use for a teaser or method figure that explains a mechanism. Charts with real data axes go to `plot`; figures drawn in LaTeX go to `tikz`."
+description: "Three matplotlib schematic templates, drawn with no data axes: a node flow that takes one artifact apart, a boundary diagram of what crosses and what is blocked, and a pair of jigsaw treemaps for composition. Lato type, a fixed five-size scale, colour that says which side a node belongs to, and an overflow check that raises rather than being eyeballed. Use for a teaser or method figure that explains a mechanism. Charts with real data axes go to `plot`."
 ---
 
 # Concept

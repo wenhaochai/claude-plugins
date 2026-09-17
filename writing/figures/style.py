@@ -3,7 +3,7 @@ type, L-spine ink frame, and left-aligned bold titles with a legend row
 above the axes.
 
 Usage: apply_style(venue='arxiv'|'iclr'|...) once, plot, set_title() per axes,
-header_legend() or fig_header_legend() for series identity, finalize_headers(fig)
+_header_legend() or _fig_header_legend() for series identity, finalize_headers(fig)
 before savefig. Save PDF (the shipping artifact) plus a dpi=200 PNG preview.
 
 The venue picks the figure's body face so a figure placed at 1:1 matches the
@@ -21,10 +21,8 @@ from matplotlib.patches import PathPatch
 from matplotlib.path import Path
 from matplotlib.transforms import ScaledTranslation
 
-# Ink frame + neutrals. Neutrals never count as series hues.
+# Ink and the reference grey. Neither ever counts as a series hue.
 INK = '#1a1a1a'          # spines / ticks / titles
-HUMAN_DARK = '#2b2b2b'   # primary human/neutral series
-HUMAN_SOFT = '#8a8a8a'   # secondary human/neutral series
 REF_GREY = '#828589'     # every reference line: this grey ...
 REF_DASH = (0, (3, 2.2))  # ... with this one dash pattern
 
@@ -262,17 +260,6 @@ def twotone(base, tier=DEFAULT_TIER):
     return dark, lighten(dark, 0.55)
 
 
-def hue_ramp(base, n, tier='medium', light=0.55, dark=0.32):
-    """n lightness steps of ONE hue, index 0 lightest -> n-1 darkest.
-    The single-hue rule for figures with at most 3 series; use distinct
-    Google hues once a figure has more."""
-    anchor = apply_tier(base, tier)
-    if n == 1:
-        return [anchor]
-    stops = [light - (light + dark) * i / (n - 1) for i in range(n)]
-    return [lighten(anchor, s) if s >= 0 else darken(anchor, -s)
-            for s in stops]
-
 
 def family_4(base, tier=DEFAULT_TIER):
     """4-step ordered gradient: lightest, light, tier mid, gentle dark."""
@@ -282,7 +269,7 @@ def family_4(base, tier=DEFAULT_TIER):
 
 # --- Announcement header: title + legend row above the axes -----------------
 
-def legend_handles(entries):
+def _legend_handles(entries):
     """Proxy handles for header rows. Each entry is (label, color) for a
     white-edged dot, or (label, color, marker) where marker is a marker
     char, '-' for a solid-line proxy, or '--' for the reference dash."""
@@ -323,7 +310,7 @@ def header(ax, title, entries=None, ncol=None, size=None):
     ax.set_title(title, loc='left', fontproperties=heavy,
                  fontsize=size or HEADLINE_PT, color=INK)
     if entries:
-        header_legend(ax, entries, ncol=ncol)
+        _header_legend(ax, entries, ncol=ncol)
     return ax
 
 
@@ -335,16 +322,15 @@ def fig_header(fig, title, entries=None, ncol=None):
     fig.suptitle(title, x=0.008, ha='left', fontproperties=heavy,
                  fontsize=HEADLINE_PT, color=INK)
     if entries:
-        fig_header_legend(fig, entries, ncol=ncol)
+        _fig_header_legend(fig, entries, ncol=ncol)
     return fig
 
 
-def header_legend(ax, entries, ncol=None, legend_size=None):
-    """The legend row on its own, between an already-set title and the plot.
-    Prefer header(); this stays for a figure that titles its axes elsewhere."""
+def _header_legend(ax, entries, ncol=None, legend_size=None):
+    """The legend row alone, between an already-set title and the plot."""
     _, regular = lato_fonts()
     size = legend_size or LEGEND_PT
-    handles = legend_handles(entries)
+    handles = _legend_handles(entries)
     n = ncol or len(handles)
     rows = -(-len(handles) // n)
     t = _left_title(ax)
@@ -358,14 +344,14 @@ def header_legend(ax, entries, ncol=None, legend_size=None):
                      labelcolor=INK, borderpad=0.0, borderaxespad=0.0)
 
 
-def fig_header_legend(fig, entries, ncol=None, legend_size=None):
+def _fig_header_legend(fig, entries, ncol=None, legend_size=None):
     """Figure-level legend row above all panels, left-aligned.
     Requires constrained_layout."""
     _, regular = lato_fonts()
     # Plain loc, not 'outside ...': finalize_headers reserves the band itself and
     # seats this row under the figure title, which the outside placement cannot
     # do -- both artists land at the top of the same band and collide.
-    return fig.legend(handles=legend_handles(entries),
+    return fig.legend(handles=_legend_handles(entries),
                       loc='upper left', bbox_to_anchor=(0.008, 1.0),
                       bbox_transform=fig.transFigure,
                       ncol=ncol or len(entries), frameon=False,
@@ -385,7 +371,7 @@ def note(ax, x, y, text, **kw):
 
 def finalize_headers(fig, gap=6.0, min_pad=8.0, level_all=True):
     """Measure-and-level pass; call ONCE, after all set_title /
-    header_legend calls and right before savefig.
+    _header_legend calls and right before savefig.
 
     Draws the canvas, measures each header legend's height in points, sets
     every left title to one shared pad (tallest legend + a `gap` on each

@@ -4,7 +4,7 @@ Personal Claude Code plugin marketplace by [Wenhao Chai](https://wenhaochai.com)
 
 ## `writing` — publication-prep tools
 
-Five skills, all auto-loading by context match. One shared figure design system under
+Four skills, all auto-loading by context match. One shared figure design system under
 `writing/figures/`.
 
 ### `style` — default English-prose standards
@@ -40,19 +40,11 @@ Diagrams with no data axes: node flows, boundary and contract diagrams, jigsaw t
 fixed five-size scale, colour that encodes which side a node belongs to, and an overflow check that
 raises rather than being eyeballed.
 
-### `tikz` — figures drawn in LaTeX
-
-Conventions rather than templates, for now: when to draw in LaTeX rather than matplotlib, the
-standalone and inline source shapes, the build recipe, palette and tikzset discipline, and writing a
-figure's geometry down in prose so a reader can reproduce it. The two ported templates were cut for
-not being good enough; the skill keeps what does not depend on them.
-
 ### `writing/figures/` — the shared design system
 
 `style.py` (Google palette, venue-matched serif, the `header` / `fig_header` / `finalize_headers`
 contract, measured spacing), `concept.py` (the five-size scale and the overflow check), `jigsaw.py`
-(squarified treemap), `case_style.py` (a headline plus panel-title layer for a set of small case-study
-figures), and `DOCTRINE.md`, the eleven rules every figure in this plugin follows.
+(squarified treemap), and `DOCTRINE.md`, the eleven rules every figure in this plugin follows.
 
 ## `anti-autoresearch` — integrity forensics for paper output
 

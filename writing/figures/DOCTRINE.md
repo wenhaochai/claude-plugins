@@ -1,8 +1,8 @@
 # Figure doctrine
 
-Eleven rules that hold for every figure in this plugin: charts from `skills/plot`, schematics from
-`skills/concept`, and LaTeX-native figures from `skills/tikz`. The shared modules in this directory
-encode most of them; the rest are decisions no module can make for you.
+Eleven rules that hold for every figure in this plugin: charts from `skills/plot` and schematics from
+`skills/concept`. `style.py` and `concept.py` encode most of them; the rest are decisions no module
+can make for you.
 
 ## 1. The canvas is the text width, and the figure goes in at 1:1
 

@@ -8,7 +8,7 @@
     {
       "name": "writing",
       "source": "./writing",
-      "description": "Publication-prep tools for academic and public-facing writing. Five skills: style (17 canonical English-prose rules, 20 page-cap additions, 2 audit-time rules), preflight (deterministic pre-submission checks on a LaTeX tree), and the three figure skills plot, concept, and tikz, sharing one design system under figures/ (Google palette, venue-matched fonts, and the ten-rule DOCTRINE.md)."
+      "description": "Publication-prep tools for academic and public-facing writing. Four skills: style (17 canonical English-prose rules, 20 page-cap additions, 2 audit-time rules), preflight (deterministic pre-submission checks on a LaTeX tree), plot (18 matplotlib chart templates) and concept (3 schematic templates), the two figure skills sharing one design system under figures/: Google palette, venue-matched fonts, one header format, and the eleven-rule DOCTRINE.md."
     },
     {
       "name": "anti-autoresearch",
