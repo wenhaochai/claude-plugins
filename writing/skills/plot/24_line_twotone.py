@@ -6,7 +6,7 @@ announcement-chart look. Use when: two models swept over a budget axis
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, PercentFormatter
 
-from style import apply_style, header_legend, finalize_headers, G_BLUE, twotone
+from style import apply_style, header, finalize_headers, G_BLUE, twotone
 
 apply_style()
 
@@ -19,7 +19,7 @@ series = {
 
 dark, light = twotone(G_BLUE, 'brand')   # lines want full-strength color
 
-fig, ax = plt.subplots(figsize=(4.8, 3.5))
+fig, ax = plt.subplots(figsize=(5.5, 3.0))
 
 for (name, (xs, ys)), color, z in zip(series.items(), (dark, light), (3, 2)):
     ax.plot(xs, ys, color=color, linewidth=2.6, marker='o', markersize=8,
@@ -34,5 +34,6 @@ ax.yaxis.set_major_formatter(PercentFormatter(decimals=0))
 ax.set_xlabel('Output tokens')
 ax.set_ylabel('Metric A')
 
-header_legend(ax, list(zip(series, (dark, light))))
+header(ax, 'Metric A against the inference budget',
+       list(zip(series, (dark, light))))
 finalize_headers(fig)

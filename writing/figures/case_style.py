@@ -5,7 +5,7 @@ of concept.py (H1 11 for the headline claim, H2 8.5 for panel titles, BODY 7 for
 ticks and labels, META 6.5 for notes). Canvas 5.5 in wide, inserted at 1:1.
 
 One hue carries the subject of the figure and grey carries everything set aside,
-which lets a reader compare panels without a legend: see DOCTRINE.md rule 4 for
+which lets a reader compare panels without a legend: see DOCTRINE.md rule 5 for
 what a colour is allowed to mean.
 """
 import matplotlib

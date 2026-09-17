@@ -7,7 +7,7 @@ deeper shade of the same hue.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from style import (apply_style, header_legend, finalize_headers,
+from style import (apply_style, header, finalize_headers,
                    G_BLUE, darken, twotone)
 
 apply_style()
@@ -27,7 +27,7 @@ xs, ys = np.concatenate([x1, x2]), np.concatenate([y1, y2])
 slope, intercept = np.polyfit(xs, ys, 1)
 x_fit = np.linspace(xs.min(), xs.max(), 100)
 
-fig, ax = plt.subplots(figsize=(6.4, 2.8), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5.5, 2.7))
 
 ax.scatter(x1, y1, color=dark, alpha=0.38, s=18, edgecolors='none', zorder=3)
 ax.scatter(x2, y2, color=light, alpha=0.42, s=18, edgecolors='none', zorder=3)
@@ -37,8 +37,9 @@ ax.set_xlim(0, 215)
 ax.set_ylim(0, 38)
 ax.set_xlabel('Metric A')
 ax.set_ylabel('Metric B (%)')
-ax.set_title('Metric B vs. Metric A')
 
-header_legend(ax, [('Setting A', dark), ('Setting B', light),
+
+header(ax, 'Metric B against Metric A',
+       [('Setting A', dark), ('Setting B', light),
                    ('Pooled fit', fit_color, '-')])
 finalize_headers(fig)

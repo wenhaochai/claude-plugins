@@ -28,10 +28,11 @@ into a larger gate.
 
 ### `plot` — matplotlib chart templates
 
-25 drop-in templates: bar, boxplot, line on linear, broken, log-x and log-log axes, power-law and
-IsoFLOPs scatter, errorbar zones, stacked share areas, alluvial ribbons, exploration DAGs, and pill
-tables. Announcement-clean frame: L-spines, no grid, left-aligned bold titles, and a legend row above
-the axes rather than inside them. Labels ship pre-genericized; replace them before saving.
+18 drop-in templates: grouped and highlighted bars, boxplots, curve grids, broken axes, IsoFLOPs and
+labelled-frontier scatter, quadrant plots, stacked share areas, alluvial ribbons, and sparse-group
+DAGs. Every one carries the same header: a left-aligned Lato Heavy title with one Lato Regular legend
+row above the axes, never inside them, spaced by measurement rather than by eye. Labels ship
+pre-genericized; replace them before saving.
 
 ### `concept` — matplotlib schematics
 
@@ -47,10 +48,10 @@ share the page's own fonts and macros.
 
 ### `writing/figures/` — the shared design system
 
-`style.py` (Google palette, venue-matched serif, header legends, measured spacing), `concept.py` (the
-five-size scale and the overflow check), `jigsaw.py` (squarified treemap), `case_style.py` (a headline
-plus panel-title layer for a set of small case-study figures), and `DOCTRINE.md`, the ten rules every
-figure in this plugin follows.
+`style.py` (Google palette, venue-matched serif, the `header` / `fig_header` / `finalize_headers`
+contract, measured spacing), `concept.py` (the five-size scale and the overflow check), `jigsaw.py`
+(squarified treemap), `case_style.py` (a headline plus panel-title layer for a set of small case-study
+figures), and `DOCTRINE.md`, the eleven rules every figure in this plugin follows.
 
 ## `anti-autoresearch` — integrity forensics for paper output
 

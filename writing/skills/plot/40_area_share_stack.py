@@ -8,7 +8,7 @@ bands separable.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from style import apply_style, finalize_headers, G_BLUE, INK, family_4
+from style import header, apply_style, finalize_headers, G_BLUE, INK, family_4
 
 apply_style()
 
@@ -25,7 +25,7 @@ shares = 100 * np.array(raw) / np.sum(raw, axis=0)
 
 colors = family_4(G_BLUE)[::-1]   # darkest at the bottom
 
-fig, ax = plt.subplots(figsize=(5.8, 3.0), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5.5, 2.8))
 
 ax.stackplot(days, shares, colors=colors, alpha=0.92,
              edgecolor=INK, linewidth=0.6, zorder=2)
@@ -43,6 +43,6 @@ ax.set_xlim(0, 50)
 ax.set_ylim(0, 100)
 ax.set_xlabel('Run Days')
 ax.set_ylabel('Share (%)')
-ax.set_title('Category Mix over the Run')
+header(ax, 'Category mix over the run')
 
 finalize_headers(fig)

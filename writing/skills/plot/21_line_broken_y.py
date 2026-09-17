@@ -7,7 +7,7 @@ sharing x; small diagonal slashes mark the break.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from style import (apply_style, apply_tier, header_legend, finalize_headers,
+from style import (apply_style, apply_tier, header, finalize_headers,
                    arrow, G_BLUE, G_GREEN, G_RED, G_YELLOW)
 
 # More than 3 series: distinct Google hues (single-hue ramps stop reading
@@ -32,9 +32,12 @@ BOT_SERIES = {
 LINE_KW = dict(linestyle='--', linewidth=1.4, markersize=6.5,
                markeredgecolor='white', markeredgewidth=0.6)
 
-fig = plt.figure(figsize=(4.4, 3.4))
+fig = plt.figure(figsize=(5.5, 3.2))
+# This figure places its own axes, so the layout engine stays off; `top` leaves
+# room for the two-row header the four series need.
+fig.set_layout_engine('none')
 gs = GridSpec(2, 1, height_ratios=[1, 1], hspace=0.18,
-              left=0.16, right=0.97, top=0.90, bottom=0.14)
+              left=0.13, right=0.97, top=0.80, bottom=0.14)
 ax_top = fig.add_subplot(gs[0])
 ax_bot = fig.add_subplot(gs[1])
 
@@ -50,11 +53,12 @@ ax_top.set_xticklabels([])
 ax_bot.set_xlabel('Hyperparameter (X)')
 ax_top.set_ylabel(arrow('Value', 'down'))
 ax_bot.set_ylabel(arrow('Value', 'down'))
-ax_top.set_title(arrow('Metric A', 'down').replace(r'$\downarrow$', r'($\downarrow$)'))
+
 entries = [(s['label'], s['color'], s['marker'])
            for s in list(TOP_SERIES.values()) + list(BOT_SERIES.values())]
 # one header row for both stacked axes
-header_legend(ax_top, entries, ncol=2, legend_size=8)
+header(ax_top, arrow('Metric A', 'down').replace(r'$\downarrow$', r'($\downarrow$)'),
+       entries, ncol=2)
 
 # Spine break + diagonal slashes (rc already hides ax_bot's top spine)
 ax_top.spines['bottom'].set_visible(False)

@@ -8,7 +8,7 @@ description: "Schematic figures drawn in matplotlib with no data axes: pipeline 
 Schematics rather than charts: no axes, no data series, no fitted curves. They use `concept.py`
 instead of `apply_style()`, and `52_*` also uses `jigsaw.py`.
 
-Read `${CLAUDE_PLUGIN_ROOT}/figures/DOCTRINE.md` first. Rules 4, 5, 6, and 8 do most of the work here:
+Read `${CLAUDE_PLUGIN_ROOT}/figures/DOCTRINE.md` first. Rules 5, 6, 7, and 9 do most of the work here:
 colour means which side a node belongs to, five type sizes and no sixth, geometry carries the relation,
 and overflow raises rather than being eyeballed.
 

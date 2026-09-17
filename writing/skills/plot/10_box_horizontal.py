@@ -5,7 +5,7 @@ training compute), reading a metric distribution across runs/seeds.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from style import apply_style, family_4, G_BLUE
+from style import apply_style, header, finalize_headers, family_4, G_BLUE
 
 apply_style()
 rng = np.random.default_rng(0)
@@ -30,7 +30,7 @@ def gen_box(median, std, n_out, out_offset, n=12):
     return s
 
 
-fig, ax = plt.subplots(figsize=(5.2, 2.6), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5.5, 2.5))
 
 data = [gen_box(*s) for s in SPECS]
 positions = [4, 3, 2, 1]  # top → bottom: levels 0..3
@@ -51,4 +51,5 @@ ax.set_yticklabels(LEVEL_LABELS)
 ax.set_xlabel('Metric value')
 ax.set_ylim(0.4, 4.6)
 ax.tick_params(axis='y', length=0)
-ax.set_title('Method A — Task A')
+header(ax, 'Method A on Task A')
+finalize_headers(fig)

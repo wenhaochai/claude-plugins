@@ -7,7 +7,7 @@ one hue via `twotone` (Principle 8 band alpha).
 import numpy as np
 import matplotlib.pyplot as plt
 
-from style import apply_style, header_legend, finalize_headers, G_BLUE, twotone
+from style import apply_style, header, finalize_headers, G_BLUE, twotone
 
 apply_style()
 
@@ -28,7 +28,7 @@ for i, t in enumerate(grid):
 
 dark, light = twotone(G_BLUE, 'medium')
 
-fig, ax = plt.subplots(figsize=(5.4, 3.3), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5.5, 3.0))
 
 ax.scatter(days, scores, s=7, color=light, alpha=0.30,
            edgecolors='none', zorder=2)
@@ -40,8 +40,9 @@ ax.set_xlim(0, 50)
 ax.set_ylim(0, 75)
 ax.set_xlabel('Run Days')
 ax.set_ylabel('Metric A')
-ax.set_title('Metric A over the Run')
 
-header_legend(ax, [('Mean', dark, '-'), ('Events', light),
+
+header(ax, 'Metric A over the run',
+       [('Mean', dark, '-'), ('Events', light),
                    (r'$\pm 1\sigma$', dark, 's')])
 finalize_headers(fig)

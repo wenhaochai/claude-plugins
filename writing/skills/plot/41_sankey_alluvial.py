@@ -1,22 +1,36 @@
-"""Template 41: alluvial / Sankey flow across ordered stages,
-announcement-chart look. Use when: a population re-partitions across 3-4
-ordered stages (depth, phase, round) and the flows between adjacent
-stages matter — rounded stage bars, cubic-Bezier ribbons colored by
-source category, % labels inside bars that are tall enough. 4 categories
-use one hue's `family_4`; flows are (src, tgt, weight) triples per
-stage pair.
+"""Alluvial flow across ordered stages: rounded stage bars, cubic-Bezier
+ribbons coloured by source category, and a percentage inside every bar tall
+enough to hold one.
+
+Use when a population re-partitions across three or four ordered stages (depth,
+phase, round) and the flows between adjacent stages are the point. Four
+categories take one hue through `family_4`; flows are (source, target, weight)
+triples per stage pair.
+
+Set NEUTRAL to a category name when one category is the uninteresting majority:
+it and its ribbons render grey, so the minority categories carry the only colour
+in the figure and a reader sees where the population concentrates without
+counting bands. Leave it None for a figure where every category is equally the
+subject.
+
+Contains no measured results; the counts below are illustrative.
+Output: 5.5 in wide, placed at 1:1.
 """
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.path import Path
 
-from style import (apply_style, header_legend, finalize_headers,
-                   G_BLUE, INK, darken, family_4)
+from style import (apply_style, header, finalize_headers,
+                   G_BLUE, G_GREY, INK, darken, lighten, family_4)
 
 apply_style()
 
 CATS = ['Category A', 'Category B', 'Category C', 'Category D']
+NEUTRAL = None          # e.g. 'Category D' to grey out the dominant category
+
 colors = dict(zip(CATS, family_4(G_BLUE)[::-1]))  # A darkest
+if NEUTRAL:
+    colors[NEUTRAL] = lighten(G_GREY, 0.62)
 
 stages = ['Stage 0', 'Stage 1', 'Stage 2', 'Stage 3']
 # category -> count at each stage (0 = absent)
@@ -48,7 +62,7 @@ flows = [
 BAR_W, GAP = 0.22, 1.5   # stage-bar width, gap between stacked segments (%)
 stage_x = list(range(len(stages)))
 
-fig, ax = plt.subplots(figsize=(6.8, 2.9), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5.5, 2.7))
 
 # stack each stage's categories into (ymin, ymax) boxes normalized to 100
 boxes = {}   # (stage_idx, cat) -> (ymin, ymax, pct)
@@ -100,7 +114,7 @@ for (s, c), (ymin, ymax, pct) in boxes.items():
         boxstyle='round,pad=0,rounding_size=0.012', facecolor=col,
         edgecolor=darken(col, 0.2), linewidth=0.85, zorder=4))
     if ymax - ymin >= 6.0:
-        light_band = col == colors['Category D']
+        light_band = c == CATS[-1] or c == NEUTRAL
         ax.text(stage_x[s], (ymin + ymax) / 2,
                 '100%' if s == 0 else f'{pct:.0f}%', ha='center',
                 va='center', fontsize=8, fontweight='bold',
@@ -111,7 +125,8 @@ ax.set_ylim(-4, 104)
 ax.set_xticks(stage_x, stages)
 ax.set_yticks([])
 ax.spines['left'].set_visible(False)
-ax.set_title('Composition Cascades Across Stages')
 
-header_legend(ax, [(c, colors[c], 's') for c in CATS])
+
+header(ax, 'Composition cascades across stages',
+       [(c, colors[c], 's') for c in CATS])
 finalize_headers(fig)

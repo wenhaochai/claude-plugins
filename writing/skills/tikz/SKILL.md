@@ -9,7 +9,7 @@ A figure drawn in LaTeX typesets in the document's own font and macros, so it ne
 page the way an imported PDF does. That is the reason to reach for it, and the cost is that layout is
 hand-placed: every coordinate is a decision you make rather than one a layout engine makes for you.
 
-Read `${CLAUDE_PLUGIN_ROOT}/figures/DOCTRINE.md` first. Rules 1, 4, and 6 apply unchanged: the canvas
+Read `${CLAUDE_PLUGIN_ROOT}/figures/DOCTRINE.md` first. Rules 1, 5, and 7 apply unchanged: the canvas
 is the text width, a colour means one thing, and geometry carries the relation.
 
 ## Which tool draws this figure
@@ -53,7 +53,7 @@ under `figures/src/`, and place the result with `width=\linewidth` and no scale 
 next to the source states the numbers behind anything a reader might take as measured: the vectors an
 inset draws, the ratios between them, the threshold a circle represents, the scale in cm per unit. A
 figure with no measured data says `contains no measured results` in both the source header and the
-caption. This is DOCTRINE rule 7 for a figure with no docstring to put it in.
+caption. This is DOCTRINE rule 8 for a figure with no docstring to put it in.
 
 **One palette block at the top.** Define the colours once with `\definecolor` and name them for their
 role, `ink`, `soft`, `faint`, and one name per party. Never write a hex value inline. The values match

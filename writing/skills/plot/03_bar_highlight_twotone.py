@@ -8,7 +8,8 @@ import numpy as np
 import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 
-from style import apply_style, G_BLUE, INK, darken, lighten, rounded_bar, twotone
+from style import (apply_style, header, finalize_headers,
+                   G_BLUE, INK, darken, lighten, rounded_bar, twotone)
 
 apply_style()
 
@@ -21,7 +22,7 @@ dark, light = twotone(G_BLUE, 'medium')    # bars want the medium tier
 edge = darken(dark, 0.25)                  # outlines sit deeper than the hero
 dark = lighten(dark, 0.20)                 # fills sit a notch lighter; edge stays
 
-fig, ax = plt.subplots(figsize=(4.4, 3.4))
+fig, ax = plt.subplots(figsize=(5.5, 2.9))
 
 x = np.arange(len(models))
 w = 0.90                                    # near-touching bars
@@ -32,7 +33,7 @@ for i, (cx, v) in enumerate(zip(x, values)):
     rounded_bar(ax, cx, v, w, r_frac=0.07, facecolor=face,
                 edgecolor=edge, linewidth=0.9)
     ax.text(cx, v + (YMAX - YMIN) * 0.03, f'{v:.2f}%', ha='center',
-            fontsize=11.5, color=INK)
+            fontsize=7.0, color=INK)
 
 # floating y labels: left spine off, y ticks length 0
 ax.spines['left'].set_visible(False)
@@ -41,7 +42,5 @@ ax.tick_params(axis='y', length=0)
 ax.set_yticks(np.arange(YMIN, YMAX, 10))    # top tick dropped: title sits there
 ax.set_ylabel('Metric A (%)')
 ax.set_xticks(x, models, rotation=30, ha='right', rotation_mode='anchor')
-# thin same-color stroke fakes bold where only the regular Palatino face exists
-ax.text(0, 1.0, 'Benchmark A', transform=ax.transAxes, ha='left',
-        va='center', fontsize=14, color=INK,
-        path_effects=[pe.withStroke(linewidth=0.8, foreground=INK)])
+header(ax, 'Benchmark A')
+finalize_headers(fig)

@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
 
-from style import (apply_style, header_legend, finalize_headers,
+from style import (apply_style, header, finalize_headers,
                    G_BLUE, INK, darken, twotone)
 
 apply_style()
@@ -24,7 +24,7 @@ stroke_white = [pe.withStroke(linewidth=2.0, foreground='white')]
 part = np.array(totals) * np.array(part_pcts) / 100.0
 rest = np.array(totals) - part
 
-fig, ax = plt.subplots(figsize=(6.4, 3.2), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5.5, 2.9))
 
 y = np.arange(len(rows))
 ax.barh(y, part, height=0.55, color=light, edgecolor=edge_l,
@@ -45,7 +45,8 @@ ax.set_yticks(y, rows)
 ax.invert_yaxis()
 ax.set_xlabel('Count')
 ax.set_xlim(0, max(totals) * 1.14)
-ax.set_title('Metric A Split by Cause')
 
-header_legend(ax, [('Segment A', light, 's'), ('Segment B', dark, 's')])
+
+header(ax, 'Metric A splits by cause',
+       [('Segment A', light, 's'), ('Segment B', dark, 's')])
 finalize_headers(fig)

@@ -10,7 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
 
-from style import (apply_style, clean_axes, finalize_headers,
+from style import (apply_style, clean_axes, finalize_headers, header,
+                   fig_header, PANEL_PT,
                    G_BLUE, INK, darken, family_4)
 
 apply_style()
@@ -36,7 +37,7 @@ PANELS = [
 ]
 line_metric = [64978, 371, 178, 98]   # twin log-line on the first panel
 
-fig, axes = plt.subplots(2, 3, figsize=(6.85, 3.1), constrained_layout=True)
+fig, axes = plt.subplots(2, 3, figsize=(5.5, 3.0))
 
 for ax, (title, labels, vals, fmt) in zip(axes.flat, PANELS):
     x = np.arange(len(labels))
@@ -49,7 +50,7 @@ for ax, (title, labels, vals, fmt) in zip(axes.flat, PANELS):
     ax.set_xticks(x, labels, fontsize=6.2, linespacing=0.85)
     ax.tick_params(labelsize=7)
     ax.set_ylim(0, max(vals) * 1.28)
-    ax.set_title(title, fontsize=8.2, pad=5)
+    header(ax, title, size=PANEL_PT)
 
 # twin log-scale line on the first panel (second metric per category)
 ax0 = axes.flat[0]
@@ -63,4 +64,5 @@ clean_axes(tw)
 tw.spines['right'].set_visible(True)
 tw.spines['right'].set_color(INK)
 
-finalize_headers(fig)
+fig_header(fig, 'Telemetry across task categories')
+finalize_headers(fig, level_all=False)

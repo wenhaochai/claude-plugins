@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 import style
 
+# A concept diagram owns its canvas in inches, so the layout engine style.py
+# turns on for charts must stay off here.
+
 # The two faces the arxiv template's Figure 1 uses: Lato Heavy for the headline,
 # the same face as arxivtmpl's section titles, and Lato Regular for everything
 # else. TeX Live ships both; register them rather than letting matplotlib pick
@@ -164,9 +167,18 @@ def heading(ax, x, y, letter, title):
     text(ax, x + 0.20, y, title, size=H2, weight='bold')
 
 
+def _no_layout(fig):
+    try:
+        fig.set_layout_engine('none')
+    except Exception:
+        pass
+    return fig
+
+
 def check(fig):
     """Raise if any text leaves the canvas or runs past the panel it starts in.
     Every template ends with this; save() calls it too."""
+    _no_layout(fig)
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     frame = fig.bbox

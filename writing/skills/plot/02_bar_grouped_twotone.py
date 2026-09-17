@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 
-from style import (apply_style, header_legend, finalize_headers,
+from style import (apply_style, header, finalize_headers,
                    G_GREEN, INK, darken, lighten, rounded_bar, twotone)
 
 apply_style()
@@ -24,7 +24,7 @@ dark, light = twotone(G_GREEN, 'medium')   # bars want the medium tier
 edge = darken(dark, 0.25)                  # outlines sit deeper than the dark bar
 dark = lighten(dark, 0.20)                 # fills sit a notch lighter; edge stays
 
-fig, ax = plt.subplots(figsize=(6.0, 3.4))
+fig, ax = plt.subplots(figsize=(5.5, 3.0))
 
 x = np.arange(len(categories))
 w = 0.34                                    # bar width; pair gap = 0.04
@@ -45,5 +45,5 @@ ax.yaxis.set_major_formatter(PercentFormatter(decimals=0))
 ax.set_ylabel('Metric A (%)')
 ax.set_xticks(x, categories, rotation=30, ha='right', rotation_mode='anchor')
 
-header_legend(ax, list(zip(series, (dark, light))))
+header(ax, 'Metric A by task category', list(zip(series, (dark, light))))
 finalize_headers(fig)

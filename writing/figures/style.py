@@ -10,11 +10,16 @@ The venue picks the figure's body face so a figure placed at 1:1 matches the
 page it sits on: Palatino for a mathpazo template, Times for one that loads
 times. See VENUE_FONT.
 """
+import glob
+import os
+
 import matplotlib.colors as mc
+import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
 from matplotlib.path import Path
+from matplotlib.transforms import ScaledTranslation
 
 # Ink frame + neutrals. Neutrals never count as series hues.
 INK = '#1a1a1a'          # spines / ticks / titles
@@ -63,9 +68,76 @@ def _register_venue_face(pattern):
                 pass
 
 
+# --- Type: two faces, one scale ---------------------------------------------
+# Ticks, axis labels and math take the venue's body serif, so the figure reads
+# as part of the page. The headline and the legend row take Lato, the face the
+# arxiv template sets its section titles in. Every figure in this plugin uses
+# that split and this scale; a figure that wants a sixth size is saying too much.
+#
+#   HEADLINE  10.5  Lato Heavy    the figure's claim, or a grid's figure title
+#   PANEL      8.5  Lato Heavy    one panel's title inside a grid
+#   LEGEND     8.0  Lato Regular  the header legend row
+#   LABEL      8.0  serif         axis labels
+#   TICK       7.5  serif         tick labels
+#   NOTE       7.0  Lato Regular  annotations placed in the plot
+#
+# The scale assumes the shipping geometry: 5.5 in wide, placed at 1:1.
+HEADLINE_PT, PANEL_PT, LEGEND_PT, LABEL_PT, TICK_PT, NOTE_PT = 10.5, 8.5, 8.0, 8.0, 7.5, 7.0
+WIDTH_1COL, WIDTH_FULL = 5.5, 7.6
+
+LATO_DIRS = [os.path.expanduser('~/texmf/fonts/truetype/typoland/lato'),
+             '/usr/local/texlive/*/texmf-dist/fonts/truetype/typoland/lato',
+             '/opt/homebrew/texlive/*/texmf-dist/fonts/truetype/typoland/lato',
+             '/usr/share/texlive/texmf-dist/fonts/truetype/typoland/lato',
+             '/usr/share/texmf/fonts/truetype/typoland/lato']
+
+
+def sized(fp, pt):
+    """A copy of a FontProperties at `pt`. A face loaded from a file carries
+    its own size, and matplotlib's `prop=` beats `fontsize=`, so anything that
+    passes `prop` must size it here first."""
+    fp = fp.copy()
+    fp.set_size(pt)
+    return fp
+
+
+def lato_fonts():
+    """(HEAVY, REGULAR) FontProperties for the headline face, registering Lato
+    from TeX Live on the first call. Falls back to the default sans, which
+    changes the metrics, so check a figure rendered without Lato before it
+    ships."""
+    global _LATO_CACHE
+    if _LATO_CACHE is None:
+        faces = [f for d in LATO_DIRS for f in glob.glob(d + '/Lato-*.ttf')]
+        for face in faces:
+            try:
+                from matplotlib import font_manager
+                font_manager.fontManager.addfont(face)
+            except Exception:
+                pass
+        heavy = next((f for f in faces if f.endswith('Lato-Heavy.ttf')), None)
+        regular = next((f for f in faces if f.endswith('Lato-Regular.ttf')), None)
+        _LATO_CACHE = (
+            fm.FontProperties(fname=heavy) if heavy else fm.FontProperties(weight='bold'),
+            fm.FontProperties(fname=regular) if regular else fm.FontProperties(),
+            'Lato' if faces else 'DejaVu Sans',
+        )
+    return _LATO_CACHE[0], _LATO_CACHE[1]
+
+
+def sans_name():
+    """The registered headline family name, for rcParams that take a name."""
+    lato_fonts()
+    return _LATO_CACHE[2]
+
+
+_LATO_CACHE = None
+
+
 def apply_style(venue=DEFAULT_VENUE):
     face_glob, serif_stack, math_rm = VENUE_FONT[venue]
     _register_venue_face(face_glob)
+    lato_fonts()
     plt.rcParams.update({
         # Body face of the venue + STIX math. The first entry is the TeX Gyre
         # clone, for its real bold face; the DejaVu tail catches unicode glyphs.
@@ -84,28 +156,38 @@ def apply_style(venue=DEFAULT_VENUE):
         'axes.titlecolor': INK,
         'text.color': INK,
         'axes.grid': False,
-        # Titles: left-aligned bold — the only bold text in a figure.
+        # Titles: left-aligned, Lato Heavy, the only heavy text in a figure.
+        # header() sets the face per call; these cover a bare set_title.
         'axes.titlelocation': 'left',
-        'axes.titlesize': 12.5,
+        'axes.titlesize': HEADLINE_PT,
         'axes.titleweight': 'bold',
-        'axes.labelsize': 14,
-        'xtick.labelsize': 13,
-        'ytick.labelsize': 13,
+        'axes.labelsize': LABEL_PT,
+        'xtick.labelsize': TICK_PT,
+        'ytick.labelsize': TICK_PT,
         'xtick.color': INK,
         'ytick.color': INK,
         'xtick.direction': 'out',
         'ytick.direction': 'out',
         'xtick.major.size': 3.5,
         'ytick.major.size': 3.5,
-        'xtick.major.width': 0.8,
-        'ytick.major.width': 0.8,
-        'legend.fontsize': 12.5,
+        'xtick.major.width': 0.7,
+        'ytick.major.width': 0.7,
+        'legend.fontsize': LEGEND_PT,
         'legend.frameon': False,
-        'lines.linewidth': 1.6,
-        'lines.markersize': 6,
+        'lines.linewidth': 1.3,
+        'lines.markersize': 4.2,
         'figure.dpi': 120,
         'savefig.dpi': 200,
-        'savefig.bbox': 'tight',
+        # Never tight-crop: it changes the canvas, so LaTeX rescales the figure
+        # and every font inside it. DOCTRINE.md rule 1.
+        'savefig.bbox': None,
+        # With no tight crop the canvas is fixed, so the layout engine has to
+        # fit the content inside it. A template that sets its own margins turns
+        # this off with fig.set_layout_engine('none').
+        'figure.constrained_layout.use': True,
+        'figure.constrained_layout.h_pad': 0.03,
+        'figure.constrained_layout.w_pad': 0.03,
+        'pdf.fonttype': 42,
     })
 
 
@@ -229,30 +311,83 @@ def legend_handles(entries):
     return handles
 
 
-def header_legend(ax, entries, ncol=None, legend_size=9.5):
-    """Per-axes legend row between the bold left title and the plot.
-    Call after set_title; finalize_headers(fig) locks the spacing."""
+def _left_title(ax):
+    """The left-title artist. `ax.title` is the CENTRE one, so reading it for a
+    figure titled with loc='left' silently returns an empty text."""
+    return getattr(ax, '_left_title', ax.title)
+
+
+def header(ax, title, entries=None, ncol=None, size=None):
+    """THE standard header: a left-aligned Lato Heavy title with, under it, a
+    single Lato Regular legend row above the axes. Every chart in this plugin
+    ends with one `header(...)` per axes and one `finalize_headers(fig)`.
+
+    `size` defaults to HEADLINE_PT for a single-panel figure; pass PANEL_PT for
+    one panel of a grid whose figure-level title comes from fig_header().
+    `entries` may be None for a figure that needs no legend.
+    """
+    heavy, _ = lato_fonts()
+    ax.set_title(title, loc='left', fontproperties=heavy,
+                 fontsize=size or HEADLINE_PT, color=INK)
+    if entries:
+        header_legend(ax, entries, ncol=ncol)
+    return ax
+
+
+def fig_header(fig, title, entries=None, ncol=None):
+    """Figure-level title and one legend row above a whole panel grid, both
+    left-aligned to the figure. Needs constrained_layout. Panels then take
+    header(ax, 'Panel title', size=PANEL_PT) with no entries of their own."""
+    heavy, _ = lato_fonts()
+    fig.suptitle(title, x=0.008, ha='left', fontproperties=heavy,
+                 fontsize=HEADLINE_PT, color=INK)
+    if entries:
+        fig_header_legend(fig, entries, ncol=ncol)
+    return fig
+
+
+def header_legend(ax, entries, ncol=None, legend_size=None):
+    """The legend row on its own, between an already-set title and the plot.
+    Prefer header(); this stays for a figure that titles its axes elsewhere."""
+    _, regular = lato_fonts()
+    size = legend_size or LEGEND_PT
     handles = legend_handles(entries)
     n = ncol or len(handles)
     rows = -(-len(handles) // n)
-    title = ax.get_title(loc='left')
-    if title:  # rough reservation; finalize_headers measures the real pad
-        ax.set_title(title, loc='left', pad=8 + rows * (legend_size + 4.5))
+    t = _left_title(ax)
+    if t.get_text():  # rough reservation; finalize_headers measures the real pad
+        ax.set_title(t.get_text(), loc='left', pad=8 + rows * (size + 4.5),
+                     fontproperties=t.get_fontproperties())
     return ax.legend(handles=handles, loc='lower left',
                      bbox_to_anchor=(-0.01, 1.0), ncol=n,
-                     frameon=False, fontsize=legend_size,
+                     frameon=False, prop=sized(regular, size),
                      handletextpad=0.3, columnspacing=0.9,
-                     borderpad=0.0, borderaxespad=0.0)
+                     labelcolor=INK, borderpad=0.0, borderaxespad=0.0)
 
 
-def fig_header_legend(fig, entries, ncol=None, legend_size=9.5):
+def fig_header_legend(fig, entries, ncol=None, legend_size=None):
     """Figure-level legend row above all panels, left-aligned.
     Requires constrained_layout."""
+    _, regular = lato_fonts()
+    # Plain loc, not 'outside ...': finalize_headers reserves the band itself and
+    # seats this row under the figure title, which the outside placement cannot
+    # do -- both artists land at the top of the same band and collide.
     return fig.legend(handles=legend_handles(entries),
-                      loc='outside upper left',
+                      loc='upper left', bbox_to_anchor=(0.008, 1.0),
+                      bbox_transform=fig.transFigure,
                       ncol=ncol or len(entries), frameon=False,
-                      fontsize=legend_size, handletextpad=0.3,
-                      columnspacing=0.9)
+                      prop=sized(regular, legend_size or LEGEND_PT),
+                      labelcolor=INK, handletextpad=0.3, columnspacing=0.9)
+
+
+def note(ax, x, y, text, **kw):
+    """A short label placed directly at a point, Lato Regular, no leader line.
+    The standard replacement for an in-axes legend entry."""
+    _, regular = lato_fonts()
+    kw.setdefault('ha', 'center')
+    kw.setdefault('va', 'bottom')
+    kw.setdefault('color', G_GREY)
+    return ax.text(x, y, text, fontproperties=sized(regular, kw.pop('fontsize', NOTE_PT)), **kw)
 
 
 def finalize_headers(fig, gap=6.0, min_pad=8.0, level_all=True):
@@ -277,19 +412,60 @@ def finalize_headers(fig, gap=6.0, min_pad=8.0, level_all=True):
             heights[ax] = leg.get_window_extent().height * 72.0 / dpi
     pad = max([min_pad] + [h + 2 * gap for h in heights.values()])
     for ax in fig.axes:
-        title = ax.get_title(loc='left')
-        if title and (level_all or ax in heights):
-            ax.set_title(title, loc='left', pad=pad)
+        t = _left_title(ax)
+        if t.get_text() and (level_all or ax in heights):
+            ax.set_title(t.get_text(), loc='left', pad=pad,
+                         fontproperties=t.get_fontproperties())
         leg = ax.get_legend()
         if leg is not None:
-            ax_h = ax.get_window_extent().height * 72.0 / dpi
-            leg.set_bbox_to_anchor((-0.01, 1.0 + (pad - gap) / ax_h),
-                                   transform=ax.transAxes)
+            # loc first: set_loc() resets the anchor, so anchoring before it
+            # leaves the legend hanging from its lower edge, on top of the title.
             if hasattr(leg, 'set_loc'):
                 leg.set_loc('upper left')
             else:
                 leg._loc = 2
+            # Offset in POINTS off the axes' top-left, not in axes fractions: a
+            # layout engine resizes the axes after this runs, and a fractional
+            # anchor would then land somewhere else while the title pad, in
+            # points, stayed put.
+            off = ScaledTranslation(0, (pad - gap) / 72.0, fig.dpi_scale_trans)
+            leg.set_bbox_to_anchor((-0.01, 1.0), transform=ax.transAxes + off)
+    _stack_figure_header(fig, gap)
     return pad
+
+
+def _stack_figure_header(fig, gap):
+    """Reserve a band at the top of the canvas for a figure-level title and its
+    legend row, then seat them in it with one `gap` between and around them.
+
+    The layout engine reserves nothing for either artist once they are placed by
+    hand, so the band is measured here and handed back to the engine as `rect`.
+    """
+    leg = fig.legends[0] if fig.legends else None
+    sup = getattr(fig, '_suptitle', None)
+    if leg is None and sup is None:
+        return
+    fig.canvas.draw()
+    height = fig.get_window_extent().height
+    gpx = gap * fig.dpi / 72.0
+    h_leg = leg.get_window_extent().height if leg is not None else 0.0
+    h_sup = sup.get_window_extent().height if sup is not None and sup.get_text() else 0.0
+    band = h_leg + h_sup + gpx * (1 + (1 if h_leg and h_sup else 0))
+    engine = fig.get_layout_engine()
+    if engine is not None and hasattr(engine, 'set'):
+        try:
+            engine.set(rect=(0, 0, 1, max(0.35, 1.0 - band / height)))
+            fig.canvas.draw()
+        except (TypeError, ValueError):
+            pass
+    if h_sup:
+        sup.set_verticalalignment('top')
+        sup.set_y(1.0)
+    if leg is not None:
+        if hasattr(leg, 'set_loc'):
+            leg.set_loc('upper left')
+        leg.set_bbox_to_anchor((0.008, 1.0 - (h_sup + (gpx if h_sup else 0)) / height),
+                               transform=fig.transFigure)
 
 
 # --- Extras -----------------------------------------------------------------
