@@ -1,6 +1,6 @@
 {
   "name": "anti-autoresearch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Integrity forensics for research papers, and the reviewer discipline for writing up what it finds. `/anti-autoresearch <paper-dir>` builds a span-anchored evidence ledger, fans out 11 auditors (consistency, citation, baseline, experiment, eval design, proof / derivation, presentation, AI-style impressions, adversarial case, novelty advisory), and hands every finding to a deterministic adjudicator: the model proposes, the adjudicator decides. Detect-only, observability-aware (L0 PDF / L1 source / L2 repo), never an opaque AI-text classifier. Vendored from wanshuiyin/Anti-Autoresearch (MIT); support files under support/.",
   "author": {
     "name": "Wenhao Chai",

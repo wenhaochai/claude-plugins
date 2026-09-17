@@ -745,8 +745,8 @@ python3 "$ROOT/tools/adjudicate_findings.py" \
 
 The verdict reflects only the deterministic patterns; the report's limitations must say
 the semantic / code-level dimensions were not run. Run `python3 "$ROOT/eval/run_eval.py"`
-(and `python3 "$ROOT/tests/test_adjudicator.py"`) any time to prove this core still
-catches the bundled injected defects and stays clean on the clean fixture (the CI gate).
+any time to prove this core still catches the bundled injected defects and stays clean
+on the clean fixture (the CI gate).
 
 ## Output contract
 

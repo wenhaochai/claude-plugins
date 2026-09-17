@@ -17,6 +17,9 @@ is local, not upstream.
    `tools/`, `references/`, and `schemas/` resolve inside the installed plugin.
 2. `"${CLAUDE_PLUGIN_ROOT}/anti-autoresearch"` → `"${CLAUDE_PLUGIN_ROOT}/support"`, from the 2026-09-16
    split that moved these skills out of the `writing` plugin into their own.
+3. The `$ROOT/tests/test_adjudicator.py` call in `skills/anti-autoresearch/SKILL.md` is dropped:
+   upstream references that file but has never shipped it. Restore the line if a resync brings the
+   file with it.
 
 To resync with upstream: re-copy `skills/ workflows/ tools/ references/ schemas/ eval/` from a fresh
 clone, re-apply both patches with a python string replace, never `sed` with a `|` delimiter, and keep
