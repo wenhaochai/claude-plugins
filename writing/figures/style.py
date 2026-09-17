@@ -120,15 +120,8 @@ def lato_fonts():
         _LATO_CACHE = (
             fm.FontProperties(fname=heavy) if heavy else fm.FontProperties(weight='bold'),
             fm.FontProperties(fname=regular) if regular else fm.FontProperties(),
-            'Lato' if faces else 'DejaVu Sans',
         )
-    return _LATO_CACHE[0], _LATO_CACHE[1]
-
-
-def sans_name():
-    """The registered headline family name, for rcParams that take a name."""
-    lato_fonts()
-    return _LATO_CACHE[2]
+    return _LATO_CACHE
 
 
 _LATO_CACHE = None

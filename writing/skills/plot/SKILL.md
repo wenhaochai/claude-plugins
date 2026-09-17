@@ -1,6 +1,6 @@
 ---
 name: plot
-description: "Matplotlib chart templates for paper, blog, and slide figures: bar, boxplot, line, scatter, errorbar, area, sankey, DAG. Announcement-clean frame with L-spines, no grid, left-aligned bold titles, and a legend row above the axes. Google palette, venue-matched serif type. Use when the user wants a chart they will save and paste into a document. Skip for exploratory notebook plots. Schematics with no data axes go to `concept`; figures drawn in LaTeX go to `tikz`."
+description: "18 matplotlib chart templates for paper, blog, and slide figures: bars, boxplot, curve grids, broken axes, IsoFLOPs and labelled-frontier scatter, quadrant plots, stacked shares, alluvial ribbons, sparse-group DAGs. All on one header: a left-aligned Lato Heavy title with a single legend row above the axes, never inside them, spaced by measurement. L-spines, no grid, Google palette, venue-matched serif. Use when the user wants a chart they will save and paste into a document. Skip for exploratory notebook plots. Schematics with no data axes go to `concept`; figures drawn in LaTeX go to `tikz`."
 ---
 
 # Plot

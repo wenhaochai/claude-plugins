@@ -35,7 +35,7 @@ fig, ax = plt.subplots(figsize=(5.5, 2.5))
 data = [gen_box(*s) for s in SPECS]
 positions = [4, 3, 2, 1]  # top → bottom: levels 0..3
 bp = ax.boxplot(
-    data, vert=False, positions=positions, widths=0.55, patch_artist=True,
+    data, orientation='horizontal', positions=positions, widths=0.55, patch_artist=True,
     medianprops=dict(color='#222222', linewidth=1.2),
     whiskerprops=dict(color='#444444', linewidth=0.9),
     capprops=dict(color='#444444', linewidth=0.9),

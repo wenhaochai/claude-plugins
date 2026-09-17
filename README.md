@@ -42,9 +42,10 @@ raises rather than being eyeballed.
 
 ### `tikz` — figures drawn in LaTeX
 
-Standalone teaser flows and inline box-and-arrow pipelines, plus the build recipe and the convention of
-writing a figure's geometry down in prose so a reader can reproduce it. Use when the figure should
-share the page's own fonts and macros.
+Conventions rather than templates, for now: when to draw in LaTeX rather than matplotlib, the
+standalone and inline source shapes, the build recipe, palette and tikzset discipline, and writing a
+figure's geometry down in prose so a reader can reproduce it. The two ported templates were cut for
+not being good enough; the skill keeps what does not depend on them.
 
 ### `writing/figures/` — the shared design system
 

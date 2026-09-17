@@ -1,6 +1,6 @@
 ---
 name: tikz
-description: "Figures drawn in LaTeX with TikZ and pgfplots: standalone teaser flows, inline box-and-arrow pipelines, and charts that typeset in the document's own font. Google palette, build recipe, and the convention of recording a figure's geometry in prose so a reader can reproduce it. Use when the figure should share the page's fonts and macros, or when the user is editing a `.tex` figure. Data charts rendered to PDF go to `plot`; matplotlib schematics go to `concept`."
+description: "Conventions for drawing a figure in LaTeX with TikZ or pgfplots, so it typesets in the document's own font and macros: when to reach for it rather than matplotlib, the standalone and inline source shapes, the build recipe, palette and tikzset discipline, and writing a figure's geometry down in prose so a reader can reproduce it. Carries no templates yet. Use when editing a `.tex` figure or deciding how to draw one. Data charts rendered to PDF go to `plot`; matplotlib schematics go to `concept`."
 ---
 
 # TikZ
