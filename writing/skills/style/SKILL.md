@@ -1,13 +1,13 @@
 ---
 name: style
-description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 20 page-capped additions (RULE-P1..P20) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
+description: Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 19 page-capped additions (RULE-P1..P19) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting.
 ---
 
 # Writing Style
 
 Default standards for English prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
 
-**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P20 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
+**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P19 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
 
 ## Canonical (RULE-01..17)
 
@@ -31,7 +31,7 @@ RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RUL
 16. **RULE-16** Do not use the same content word twice in one sentence or in adjacent sentences. Restructure, pronominalize, or pick a role-specific alternative. Function words and the piece's named signature concepts are exempt; reusing a defined term is desirable, not a violation.
 17. **RULE-17** Do not apologize in body prose for weak assumptions, narrow scope, or worse-than-baseline results. State each assumption once where it belongs and reserve limitations for a dedicated section. Phrasings like "Although our algorithm does not outperform X" frame weakness without communicating it; cut them.
 
-## Page-capped paper additions (RULE-P1..P20)
+## Page-capped paper additions (RULE-P1..P19)
 
 Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps and similar). Field-observed from paper-review workflows.
 
@@ -41,39 +41,37 @@ Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps 
 
 - **RULE-P3** Researcher voice. Do not open sections or paragraphs with meta-scaffold sentences: "The motivation is empirical:", "In this section, we ...", "To begin, ...". Start with the concrete claim or observation. Do not plain-ify researcher-formal terms (`regime`, `load-bearing`, `orthogonal`, `ablation`, `identifiable`); they carry precision. Delete redundant forward and backward references such as `(defined in §3.2)` or `, as discussed above`, when the surrounding text already introduces the concept.
 
-- **RULE-P4** Space economy under page caps. Before adding a paragraph, numbered list, or subsection, ask what information is lost if it is cut; if the answer is "only structural scaffold", do not add it. Do not default to a numbered Contributions list in the introduction; let contributions emerge through the narrative. Keep titles to a method name plus 1–2 signature concepts; stack more than two concepts in a title signals either unfocused framing or a missing abstract.
+- **RULE-P4** Do not insert blank lines inside a `\paragraph{}` block: all prose belongs to a single LaTeX paragraph. If a sub-topic feels distinct enough to need a break, give it its own `\paragraph{}` header instead. Layout breaks around numbered display equations (`\begin{equation}`) are exempt.
 
-- **RULE-P5** Do not insert blank lines inside a `\paragraph{}` block: all prose belongs to a single LaTeX paragraph. If a sub-topic feels distinct enough to need a break, give it its own `\paragraph{}` header instead. Layout breaks around numbered display equations (`\begin{equation}`) are exempt.
+- **RULE-P5** Audit every equation, display and inline, for undefined symbols. Each free variable, custom function (input/output type), index, and custom operator must be defined in prose: as setup before the equation, as unpacking after, or, for inline math, at the equation site itself where definition and use often coincide. State output types when arithmetic depends on them.
 
-- **RULE-P6** Audit every equation, display and inline, for undefined symbols. Each free variable, custom function (input/output type), index, and custom operator must be defined in prose: as setup before the equation, as unpacking after, or, for inline math, at the equation site itself where definition and use often coincide. State output types when arithmetic depends on them.
+- **RULE-P6** Citation discipline. Every `\bib` entry must correspond to a real, locatable paper: title, authors, year all verified; do not trust LLM-generated entries without checking, since a fabricated reference is citation fraud and damages credibility more than any prose flaw. Use `\citet` only when the citation is a sentence component, e.g., `\citet{tong24} show that ...` renders as "Tong et al. (2024) show that ..."; use `\citep` everywhere else, e.g., "...as shown in prior work \citep{tong24}" renders as "...as shown in prior work (Tong et al., 2024)". Test by removing the citation: if the sentence is still grammatical, use `\citep`; if it breaks, use `\citet`. Order multiple citations chronologically. In `.bib` entries: prefer the published venue over arXiv when both exist; use `@inproceedings` for conferences and `@article` for journals or arXiv-only papers; use the 4-letter conference abbreviation, e.g., CVPR or ICML, not the full name; drop page, volume, and number fields; deduplicate entries. Source `.bib` from Google Scholar, since arXiv and Semantic Scholar exports use inconsistent formatting.
 
-- **RULE-P7** Citation discipline. Every `\bib` entry must correspond to a real, locatable paper: title, authors, year all verified; do not trust LLM-generated entries without checking, since a fabricated reference is citation fraud and damages credibility more than any prose flaw. Use `\citet` only when the citation is a sentence component, e.g., `\citet{tong24} show that ...` renders as "Tong et al. (2024) show that ..."; use `\citep` everywhere else, e.g., "...as shown in prior work \citep{tong24}" renders as "...as shown in prior work (Tong et al., 2024)". Test by removing the citation: if the sentence is still grammatical, use `\citep`; if it breaks, use `\citet`. Order multiple citations chronologically. In `.bib` entries: prefer the published venue over arXiv when both exist; use `@inproceedings` for conferences and `@article` for journals or arXiv-only papers; use the 4-letter conference abbreviation, e.g., CVPR or ICML, not the full name; drop page, volume, and number fields; deduplicate entries. Source `.bib` from Google Scholar, since arXiv and Semantic Scholar exports use inconsistent formatting.
+- **RULE-P7** Use the precision the measurement supports: 81.2% over 81.23% in most cases. Pick math-mode (`$82.8$`) or text-mode (`82.8`) and hold it across the whole paper, including tables.
 
-- **RULE-P8** Use the precision the measurement supports: 81.2% over 81.23% in most cases. Pick math-mode (`$82.8$`) or text-mode (`82.8`) and hold it across the whole paper, including tables.
+- **RULE-P8** Section titles do work. Use the question or finding the section answers, not a generic label: "Where is the signal?" over "Interpretability"; "Grounding agent reviews" over "Applications". Keep to 1–4 words unless the question form needs more. Avoid subsubsections.
 
-- **RULE-P9** Section titles do work. Use the question or finding the section answers, not a generic label: "Where is the signal?" over "Interpretability"; "Grounding agent reviews" over "Applications". Keep to 1–4 words unless the question form needs more. Avoid subsubsections.
+- **RULE-P9** The conclusion must extend, not paraphrase, the abstract. Restate key results in one or two lines, then add implication, interpretation, or forward-looking discussion. Naming it "Conclusion and Discussion" reminds you to do the second half.
 
-- **RULE-P10** The conclusion must extend, not paraphrase, the abstract. Restate key results in one or two lines, then add implication, interpretation, or forward-looking discussion. Naming it "Conclusion and Discussion" reminds you to do the second half.
+- **RULE-P10** Use simple present tense as the default voice, and hold it consistently within a piece. Switch tense only when meaning requires it.
 
-- **RULE-P11** Use simple present tense as the default voice, and hold it consistently within a piece. Switch tense only when meaning requires it.
+- **RULE-P11** Each paragraph carries one idea. The first sentence states the thesis; the rest supports or extends it; the last either concludes or hands off to the next paragraph. After drafting, re-read and split or merge paragraphs so this holds.
 
-- **RULE-P12** Each paragraph carries one idea. The first sentence states the thesis; the rest supports or extends it; the last either concludes or hands off to the next paragraph. After drafting, re-read and split or merge paragraphs so this holds.
+- **RULE-P12** Lead with the simplest example that captures the crux of the problem, then generalize. Generality without a grounded toy case is the enemy of understanding. For every parameter or feature in the toy, check whether removing it keeps the problem interesting; if so, remove it before generalizing.
 
-- **RULE-P13** Lead with the simplest example that captures the crux of the problem, then generalize. Generality without a grounded toy case is the enemy of understanding. For every parameter or feature in the toy, check whether removing it keeps the problem interesting; if so, remove it before generalizing.
+- **RULE-P13** A figure caption must stand alone: state what is plotted, what the axes are, and what the reader is meant to take away. A reader who skims only figures and captions should still get the main empirical claim.
 
-- **RULE-P14** A figure caption must stand alone: state what is plotted, what the axes are, and what the reader is meant to take away. A reader who skims only figures and captions should still get the main empirical claim.
+- **RULE-P14** Treat theorems as the paper's public API. State at most 2–3 main theorems up front, informally if needed; a reader applying the result should not need to read the proof. Push technical lemmas and proof details into the appendix or encapsulated lemmas.
 
-- **RULE-P15** Treat theorems as the paper's public API. State at most 2–3 main theorems up front, informally if needed; a reader applying the result should not need to read the proof. Push technical lemmas and proof details into the appendix or encapsulated lemmas.
+- **RULE-P15** When a defined symbol reappears across pages or sections, restate its semantic role at the use site: prefer "if the rank $d$ is small" over "if $d$ is small". This complements RULE-P3, which deletes ceremonial cross-references like `(defined in §3.2)`; together they remove boilerplate while keeping the concept fresh.
 
-- **RULE-P16** When a defined symbol reappears across pages or sections, restate its semantic role at the use site: prefer "if the rank $d$ is small" over "if $d$ is small". This complements RULE-P3, which deletes ceremonial cross-references like `(defined in §3.2)`; together they remove boilerplate while keeping the concept fresh.
+- **RULE-P16** A paper introduces at most 1–2 newly coined terms; every additional name is jargon the reader must learn. Do not invent acronyms. Do not collapse a problem and an algorithm into one name (e.g., "K-means" used for both the objective and the heuristic).
 
-- **RULE-P17** A paper introduces at most 1–2 newly coined terms; every additional name is jargon the reader must learn. Do not invent acronyms. Do not collapse a problem and an algorithm into one name (e.g., "K-means" used for both the objective and the heuristic).
+- **RULE-P17** Treat a displayed equation as part of its containing sentence: end the equation with a comma if the sentence continues, a period if it terminates. The sentence after a terminal-period equation begins with a capital letter.
 
-- **RULE-P18** Treat a displayed equation as part of its containing sentence: end the equation with a comma if the sentence continues, a period if it terminates. The sentence after a terminal-period equation begins with a capital letter.
+- **RULE-P18** Do not make the reader hold a long-range correspondence. `, respectively` is almost always the wrong construction: it asks the reader to zip two lists across a clause boundary, so split it into one sentence per pair, or move it into a table. A `, which` chain does the same with modifiers, and a file whose density climbs has sentences that stopped carrying one idea each. An abbreviation defined many pages earlier gets its expansion or its role restated at the use site, which is RULE-P15 applied to names instead of symbols. (Jia-Bin Huang, `paper-writing.md`)
 
-- **RULE-P19** Do not make the reader hold a long-range correspondence. `, respectively` is almost always the wrong construction: it asks the reader to zip two lists across a clause boundary, so split it into one sentence per pair, or move it into a table. A `, which` chain does the same with modifiers, and a file whose density climbs has sentences that stopped carrying one idea each. An abbreviation defined many pages earlier gets its expansion or its role restated at the use site, which is RULE-P16 applied to names instead of symbols. (Jia-Bin Huang, `paper-writing.md`)
-
-- **RULE-P20** One table, one message. A table holding two unrelated blocks becomes two tables; two tables sharing a row structure and a caption pattern become one. Label the direction of every metric in the header, `Acc $\uparrow$` or `FID $\downarrow$`, so a reader who does not know the metric can still read the column. Bold the winner, and say in the caption what bold means. (Jia-Bin Huang, `paper-writing.md`)
+- **RULE-P19** One table, one message. A table holding two unrelated blocks becomes two tables; two tables sharing a row structure and a caption pattern become one. Label the direction of every metric in the header, `Acc $\uparrow$` or `FID $\downarrow$`, so a reader who does not know the metric can still read the column. Bold the winner, and say in the caption what bold means. (Jia-Bin Huang, `paper-writing.md`)
 
 ## Final-pass paper audit (RULE-A1..A2)
 
@@ -91,7 +89,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> style v0.9.0 active: 17 canonical rules (RULE-01..17) + 20 page-capped additions (RULE-P1..P20, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> style v0.9.1 active: 17 canonical rules (RULE-01..17) + 19 page-capped additions (RULE-P1..P19, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 

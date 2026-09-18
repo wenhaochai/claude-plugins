@@ -101,5 +101,5 @@ order, with a bold caption title. Group subfigures explicitly rather than trusti
 them with the prose. Ask of every figure whether it earns its column inches, and of every panel
 whether it carries one message.
 
-These are RULE-P14, RULE-P19, and RULE-P20 of the `style` skill, which is where the prose side of the
+These are RULE-P13, RULE-P18, and RULE-P19 of the `style` skill, which is where the prose side of the
 same rules lives.
