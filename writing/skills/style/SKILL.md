@@ -25,7 +25,7 @@ RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RUL
 10. **RULE-10** Keep related words together. (S&W §II.20; Gopen & Swan 1990)
 11. **RULE-11** Place new or important information in the stress position at the end of the sentence. (Gopen & Swan 1990)
 12. **RULE-12** Break long sentences; vary length. Split sentences over 30 words. (S&W §II.18; Pinker 2014 Ch. 4)
-13. **RULE-13** Do not use em-dashes (`—` in prose, `---` in LaTeX) or prose parentheses `()` in body text. Use colons plus lists, `, namely ...`, `, where ...`, or new sentences instead. Math parentheses (ordered pairs, function application, set notation) and page-range en-dashes (`pp.~12--15`) are exempt.
+13. **RULE-13** Do not use em-dashes (`—` in prose, `---` in LaTeX) or prose parentheses `()` in body text. Use colons plus lists, `, namely ...`, `, where ...`, or new sentences instead. Math parentheses (ordered pairs, function application, set notation), first-use abbreviation glosses (`Large Language Model (LLM)`), citation parentheses from `\citep`/`\citet`, and page-range en-dashes (`pp.~12--15`) are exempt.
 14. **RULE-14** Do not use vocabulary that signals LLM-generated prose. Common tells: "delve", "crucially", "multifaceted", "tapestry", "navigate the complexities", "in the realm of", "leverage" where "use" suffices, "moreover"/"furthermore" chains, em-dash sandwiches. If a phrase pattern-matches GPT default, swap for a plainer equivalent.
 15. **RULE-15** Be consistent within a single piece. Define an abbreviation on first use, then never re-expand. Once you pick italic vs roman "e.g.", "GPT-5-thinking" vs "GPT-5 (thinking)", a hyphenation convention, or a math-mode policy, hold it. Inconsistency reads as careless.
 16. **RULE-16** Do not use the same content word twice in one sentence or in adjacent sentences. Restructure, pronominalize, or pick a role-specific alternative. Function words and the piece's named signature concepts are exempt; reusing a defined term is desirable, not a violation.
@@ -89,7 +89,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> style v0.9.1 active: 17 canonical rules (RULE-01..17) + 19 page-capped additions (RULE-P1..P19, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> style v0.9.2 active: 17 canonical rules (RULE-01..17) + 19 page-capped additions (RULE-P1..P19, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 
