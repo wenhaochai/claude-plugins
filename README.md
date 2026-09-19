@@ -75,6 +75,15 @@ Each `search` argument is a separate query; results from all queries merge by re
 Skill and docs are in Chinese. Post content is © 苏剑林 under CC BY-NC-SA; the snapshot is for personal
 study and retrieval.
 
+## `training-monitor` — reading a pretraining run
+
+One text skill, no code. It restates Chunyuan Deng's ["Reading a Pretraining Run"](https://charlesdddd.github.io/blog/reading-a-pretraining-run.html) (2026)
+as doctrine an agent can apply to any training stack: the nine first-screen signals, the full
+metric table with cadence and priority (P0 every step, P1 every 100 steps, P2 on demand), the
+formulas, the cross-rank reduction rules, a robust spike detector, the fixed triage order, and
+the common mistakes. The agent inventories what its stack already logs, fills the P0 gaps first,
+sets thresholds from healthy runs, and decides for itself whether a script is warranted.
+
 ## Install
 
 ```
@@ -82,6 +91,7 @@ study and retrieval.
 /plugin install writing@wenhaochai
 /plugin install anti-autoresearch@wenhaochai
 /plugin install kexue-fm@wenhaochai
+/plugin install training-monitor@wenhaochai
 ```
 
 Upgrading from `writing` 1.x: the 12 integrity-forensics skills moved out of `writing` into the new

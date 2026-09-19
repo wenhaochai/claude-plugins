@@ -19,6 +19,11 @@
       "name": "kexue-fm",
       "source": "./kexue-fm",
       "description": "科学空间 kexue.fm（苏剑林博客）全站离线库：一个 SQLite（全文 Markdown、LaTeX 原样、标签、官方引用格式）+ 一个 kexue skill（多路检索 search、读全文 show、增量 sync）。"
+    },
+    {
+      "name": "training-monitor",
+      "source": "./training-monitor",
+      "description": "Monitoring doctrine for pretraining runs, distilled from Chunyuan Deng's \"Reading a Pretraining Run\" (2026): nine first-screen signals, a 40-row metric table with cadence and priority, formulas, cross-rank reduction rules, a robust spike detector, the triage order, and the common mistakes. Text only; the agent decides how to implement it for its own stack."
     }
   ]
 }
