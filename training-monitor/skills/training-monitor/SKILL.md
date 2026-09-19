@@ -24,7 +24,7 @@ A pretraining run fails in a small number of ways, and most of them show up in a
 
 | Priority | Cadence | Role |
 |---|---|---|
-| P0 | every step | "Alert. Check it every step. Keep this list to about ten metrics. If one crosses its limit, stop the run or page someone." |
+| P0 | every step for the alerts; the table below marks the P0 rows sampled every 100 steps or at checkpoints | "Alert. Check it every step. Keep this list to about ten metrics. If one crosses its limit, stop the run or page someone." |
 | P1 | every 100 steps | "Debug. Open these when a P0 metric looks wrong. Most are per-layer or per-tensor, so no one needs to watch them all day." |
 | P2 | on demand | "Details. Turn these on for one investigation, such as a closer look at one parameter, expert, or data source." |
 
@@ -45,6 +45,8 @@ Deng's starting point: "compute cheap alerts every step, scan tensors every 100 
 | Experts | expert-load MaxVio | Catches a router sending too many tokens to a few experts. |
 | Numerics | absolute max at the output | Catches overflow or bad values before they affect the loss. |
 | Quality | held-out loss per byte, every 0.5–2% of training | Shows whether more training is still helping. |
+
+One inconsistency in the source, kept here rather than silently resolved: the first screen records the absolute max at the output every step, while the full table samples it every 100 steps. Choose by cost and record the choice.
 
 **Triage order.** "When something looks wrong, start here: job state → loss → gradient norm and spikes → step time → memory → expert balance. If those do not explain the problem, open the per-layer charts."
 
@@ -102,8 +104,8 @@ Let $\ell_{r,t}$ be the loss of target token $t$ on rank $r$ and $m_{r,t}\in\{0,
 
 - **Global mean.** $L=\dfrac{\sum_{r,t} m_{r,t}\,\ell_{r,t}}{\sum_{r,t} m_{r,t}}$: add the loss of every valid token on every rank, then divide by the number of valid tokens. This is the number that compares runs.
 - **Local mean per rank.** $L_r=\dfrac{\sum_t m_{r,t}\,\ell_{r,t}}{\sum_t m_{r,t}}$. "If a rank has no valid targets, skip it. Do not record a zero."
-- **Worst-rank mean.** $L_{\max}=\max_r L_r$, a maximum over GPU ranks, not over tokens. It exposes a bad worker or an unusual shard that the global mean hides.
-- **Loss by source and modality.** For group $\mu$ with mask $m^{(\mu)}_{r,t}$, report $L^{(\mu)}$ with the same masked-mean formula, and always report the group's token share $\pi^{(\mu)}=\sum_{r,t} m^{(\mu)}_{r,t}\big/\sum_{r,t} m_{r,t}$ next to it, because a share that moves explains a loss that moves. To combine ranks, add the loss sums and the token counts separately, then divide; do not average the per-rank group means.
+- **Worst-rank mean.** $L_{\max}=\max_r L_r$, a maximum over GPU ranks, not over tokens or examples. It exposes a bad worker or an unusual shard that the global mean hides.
+- **Loss by source and modality.** For group $\mu$ with mask $m^{(\mu)}_{r,t}$, report $L^{(\mu)}$ with the same masked-mean formula, and always report the group's token share $\pi^{(\mu)}=\sum_{r,t} m^{(\mu)}_{r,t}\big/\sum_{r,t} m_{r,t}$ next to it, because a share that moves explains a loss that moves. "A group with only a small share of the tokens can get worse for thousands of steps without noticeably changing $L$. Compare each group with its own past, not with other groups." To combine ranks, add the loss sums and the token counts separately, then divide; do not average the per-rank group means.
 
 **Reduction rules that hold everywhere in this skill.** "Add sums and element counts before computing a mean. For a maximum, take the largest value across ranks. Do not average local maxima or ratios with different denominators."
 
@@ -113,7 +115,7 @@ Let $g\in\mathbb{R}^P$ be the gradient. "Record when you measure. Say whether a 
 
 - **Global norm.** $G_2=\sqrt{\sum_{j=1}^{P} g_j^2}$. It moves before the loss does.
 - **Clip rate.** With clip threshold $c$ and window $W$ steps, $\operatorname{Clip}=\frac{1}{W}\sum_t \mathbf{1}[G_{2,t}>c]$. "A low, steady rate is normal. If it keeps rising, clipping is reducing the effective learning rate too often."
-- **Mean and max element.** $G_{\mathrm{mean}}=\frac{1}{P}\sum_j \lvert g_j\rvert$ shows the usual scale; $G_{\max}=\max_j \lvert g_j\rvert$ shows one exploding element. A rising $G_{\max}$ with a flat $G_{\mathrm{mean}}$ points at one layer, not at the run.
+- **Mean and max element.** $G_{\mathrm{mean}}=\frac{1}{P}\sum_j \lvert g_j\rvert$ shows the usual scale; $G_{\max}=\max_j \lvert g_j\rvert$ shows one exploding element. A rising $G_{\max}$ under a flat $G_{\mathrm{mean}}$ is one exploding element, not a change in the whole gradient.
 - **Zero fraction.** $Z_g=\frac{1}{P}\sum_j \mathbf{1}[g_j=0]$ for exact zeros. Report embeddings and expert parameters separately, since they are sparse by design.
 - **Skip and replay counters.** Count steps dropped by a spike guard and replays that did not reproduce the original loss. Deng on a replay that gives a different loss for the same input: "That points to hardware or nondeterminism rather than the data itself."
 
@@ -129,7 +131,7 @@ $$z_t = 0.6745\,\frac{\lvert u_t-q_t\rvert}{D_t+\varepsilon}.$$
 
 Let $\tau_r$ be the step time on rank $r$. The step finishes when the slowest rank finishes, so the wall time is $\tau=\max_r \tau_r$, and it includes data loading, forward, backward, the optimizer, and synchronization.
 
-- **Throughput.** $\operatorname{TPS}=N_{\mathrm{tok}}/\tau$ over valid tokens. A sudden drop or a growing variance means a stall, a replay, a slow worker, or a communication slowdown; the next three metrics say which.
+- **Throughput.** $\operatorname{TPS}=N_{\mathrm{tok}}/\tau$ over valid tokens. A sudden drop or a growing variance means a stall, a replay, a slow worker, or a communication slowdown; the straggler score, the communication wait, and the device stats say which.
 - **Compute rate.** With $F_{\mathrm{step}}$ estimated operations per step across $D$ devices, $\Phi=\dfrac{F_{\mathrm{step}}}{D\,\tau}$. "Use the same FLOP estimate for every run you compare. Otherwise the number can change even when the hardware does not."
 - **Straggler score.** $S=\dfrac{\tau}{\operatorname{median}_r(\tau_r)+\varepsilon}$; "$S\approx1$ means the ranks are moving together. A larger value means one slow rank is holding up the job." Alert on the trend, with the level taken from healthy runs.
 - **Communication wait.** $W_{\mathrm{comm}}=\tau_{\mathrm{wait}}/\tau$, where $\tau_{\mathrm{wait}}$ is the time spent waiting for collective communication that does not overlap with compute, sampled every 10 steps. Also record the number of calls and the bytes sent, which says whether the time comes from many small calls or a few large ones. "Put device events around the real asynchronous wait and read them at an existing synchronization point. Adding a new host sync changes the overlap you are trying to measure."
@@ -148,7 +150,7 @@ For a tensor $x\in\mathbb{R}^N$, computed in one pass and reduced across ranks b
 - **Zero fraction.** $Z_x=\frac{1}{N}\sum_j \mathbf{1}[x_j=0]$ for exact zeros; a rising fraction is sparsity, underflow, or a dead path. Keep embeddings and experts in their own series.
 - **Update ratio.** $\rho=\dfrac{\operatorname{RMS}(\Delta w)}{\operatorname{RMS}(w)+\varepsilon}$ per parameter, where $\Delta w$ is the applied update. "If $\rho$ keeps falling toward zero, the updates may be too small to matter. A sudden rise means the update is large for that parameter. Unlike the raw update norm, this ratio can be compared across layers and runs."
 - **Excess kurtosis.** $\kappa=\dfrac{\frac{1}{N}\sum_j (x_j-\mu)^4}{\big[\frac{1}{N}\sum_j (x_j-\mu)^2\big]^2}-3$, undefined at zero variance. Heavy tails are a low-precision risk; this matters for weights and rarely for activations.
-- **Optimizer chain.** For one parameter, keep the raw gradient, the normalized gradient, the preconditioned direction, and the final update as four separate tensors, so that a scale or direction change can be attributed to normalization, preconditioning, weight decay, learning rate, or clipping.
+- **Optimizer chain.** "Record the raw gradient, normalized gradient, preconditioned direction, and final update separately. If the scale or direction changes, these values tell you where it happened. They are too noisy for the main dashboard, so turn them on only while debugging."
 
 ### Expert balance
 
@@ -163,10 +165,10 @@ Let $c_i$ be the number of tokens routed to expert $i$ of $E$, and $\bar c=\frac
 
 ### Residual paths
 
-For one token, let $s\in\mathbb{R}^d$ be the residual stream before a block, $b$ the branch output, and $a=s+b$ the stream after. Report the mean and the high percentiles over tokens, not only the mean.
+For one token, let $s\in\mathbb{R}^d$ be the residual stream before a block, $b$ the branch output, and $a=s+b$ the stream after. "Keep tokens separate. Compute these values for each valid token, then report the mean and high percentiles. If you flatten tokens and features together, unusual tokens can disappear in the average." For vectors $u$ and $v$, $\cos(u,v)=\dfrac{u^\top v}{\lVert u\rVert_2\lVert v\rVert_2+\varepsilon}$.
 
-- **Relative branch scale.** $R_b=\dfrac{\lVert b\rVert_2}{\lVert s\rVert_2+\varepsilon}$: a branch too weak to matter, or one that dominates the stream.
-- **Block importance.** $B=1-\cos(s,a)$, with the angular form $A=\arccos(\cos(s,a))/\pi$. $B$ near zero means the block no longer changes the direction of the stream.
+- **Relative branch scale.** With $N_b=\lVert b\rVert_2$ and $N_s=\lVert s\rVert_2$, $R_b=\dfrac{N_b}{N_s+\varepsilon}$: small means the branch may be too weak to matter, large means it may dominate the stream. Plot it for every layer, and "also plot $N_s$ and $N_b$, because the ratio alone cannot tell whether the branch shrank or the stream grew."
+- **Block importance.** $B=1-\cos(s,a)$, with the angular form $A=\arccos(\cos(s,a))/\pi$. $B$ near zero means the block no longer changes the direction of the stream. "If a block's $B$ trends toward zero, it is doing little even when its branch norm looks large."
 - **Bfloat16 no-op fraction.** $F_{\mathrm{noop}}=\frac{1}{d}\sum_j \mathbf{1}\big[Q_{\mathrm{BF16}}(s_j+b_j)=Q_{\mathrm{BF16}}(s_j)\ \wedge\ b_j\neq 0\big]$, the share of nonzero branch updates that round away when added to the stream in bfloat16. A large value means bfloat16 is too coarse to keep many residual updates. "This tends to rise with the stream norm, so check it beside $N_s$."
 - **Gate saturation.** For a gated branch with gate values $\beta_j=\sigma(g_j/T)$, $F_{\mathrm{gate}}(\theta)=\frac{1}{d}\sum_j \mathbf{1}[\beta_j<\theta]$. "Try a few thresholds, such as $\theta\in\{0.05,0.1,0.25\}$. If nearly all gates are closed, the branch contributes little and may not recover."
 
@@ -186,7 +188,7 @@ On the held-out set, let $M$ be the number of valid tokens and $\ell_k$ the loss
 - **Choice accuracy.** $\operatorname{Accuracy}=\frac{1}{Q}\sum_q \mathbf{1}[\hat a_q=a_q]$, scoring each option by length-normalized NLL. "Do not change the prompt format or answer cleanup during the run."
 - **Greedy generation.** Generate at temperature 0, clean the answer for the task, score with exact match, pass@1, or a symbolic checker. "This catches problems that likelihood scores miss. Run it on every important checkpoint, not just the final one."
 - **Media gain.** $\Delta_{\mathrm{media}}=Q_{\mathrm{with}}-Q_{\mathrm{without}}$, the same score with and without the media input. "This tells you whether the model is using the media or answering from the text alone." A value near zero means the media adds no measurable value on that evaluation.
-- **Pass@k** as a P1 metric: for one problem sample $n$ answers, of which $c$ pass, and estimate $\operatorname{pass@}k$ with the unbiased binomial formula for $k\le n$. **Sampled generation and IoU** at final checkpoints, and **averaged-weight evaluation** at every evaluation as a less noisy way to compare checkpoints.
+- **Pass@k and IoU**, P1 metrics at final checkpoints. For one problem sample $n$ answers, of which $c$ pass; for $k\le n$, $\widehat{\operatorname{pass@}k}=1-\binom{n-c}{k}\big/\binom{n}{k}$, and the estimate is 1 when $n-c<k$. For a predicted region $\mathcal{P}$ and reference $\mathcal{G}$, $\operatorname{IoU}=\lvert\mathcal{P}\cap\mathcal{G}\rvert\big/\lvert\mathcal{P}\cup\mathcal{G}\rvert$. **Averaged-weight evaluation** at every evaluation is a less noisy way to compare checkpoints.
 - **Scaling fits.** "When a scaling fit predicts beyond the runs you measured, report a range instead of one exact number."
 - **Comparing runs.** "If batch sizes differ, compare by tokens seen or estimated FLOPs, not by step."
 
@@ -232,7 +234,7 @@ The metric set is opinionated by its author's own account. Drop a row that your 
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> training-monitor v0.1.2 active: 9 first-screen signals, 39-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order.
+> training-monitor v0.1.3 active: 9 first-screen signals, 39-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order.
 
 ## Credits
 
