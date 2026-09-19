@@ -1,6 +1,6 @@
 {
   "name": "training-monitor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Monitoring doctrine for pretraining runs, distilled from Chunyuan Deng's \"Reading a Pretraining Run\" (2026): the nine first-screen signals, a 39-row metric table with cadence and priority (P0 every step, P1 every 100 steps, P2 on demand), the formulas, the cross-rank reduction rules, a robust spike detector, the fixed triage order, and the common mistakes. One text skill, no code: the agent maps each signal onto what its stack already logs and decides for itself whether a script is warranted.",
   "author": {
     "name": "Wenhao Chai",

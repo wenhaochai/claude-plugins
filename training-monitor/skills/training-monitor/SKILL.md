@@ -24,9 +24,9 @@ A pretraining run fails in a small number of ways, and most of them show up in a
 
 | Priority | Cadence | Role |
 |---|---|---|
-| P0 | every step, roughly ten metrics | on-call alerts; each one has a threshold and a response |
-| P1 | every 100 steps | diagnostics opened when a P0 signal fires |
-| P2 | on demand | "Turn these on for one investigation, such as a closer look at one parameter, expert, or data source." |
+| P0 | every step | "Alert. Check it every step. Keep this list to about ten metrics. If one crosses its limit, stop the run or page someone." |
+| P1 | every 100 steps | "Debug. Open these when a P0 metric looks wrong. Most are per-layer or per-tensor, so no one needs to watch them all day." |
+| P2 | on demand | "Details. Turn these on for one investigation, such as a closer look at one parameter, expert, or data source." |
 
 Deng's starting point: "compute cheap alerts every step, scan tensors every 100 steps, and evaluate every 0.5–2% of training. If you see a problem, sample more often or replay the step."
 
@@ -109,7 +109,7 @@ Let $\ell_{r,t}$ be the loss of target token $t$ on rank $r$ and $m_{r,t}\in\{0,
 
 ### Gradients and spikes
 
-Let $g\in\mathbb{R}^P$ be the full gradient after accumulation and before clipping.
+Let $g\in\mathbb{R}^P$ be the gradient. "Record when you measure. Say whether a gradient is scaled, accumulated, or clipped. Values taken at different points in the optimizer cannot be compared."
 
 - **Global norm.** $G_2=\sqrt{\sum_{j=1}^{P} g_j^2}$. It moves before the loss does.
 - **Clip rate.** With clip threshold $c$ and window $W$ steps, $\operatorname{Clip}=\frac{1}{W}\sum_t \mathbf{1}[G_{2,t}>c]$. "A low, steady rate is normal. If it keeps rising, clipping is reducing the effective learning rate too often."
@@ -130,10 +130,10 @@ $$z_t = 0.6745\,\frac{\lvert u_t-q_t\rvert}{D_t+\varepsilon}.$$
 Let $\tau_r$ be the step time on rank $r$. The step finishes when the slowest rank finishes, so the wall time is $\tau=\max_r \tau_r$, and it includes data loading, forward, backward, the optimizer, and synchronization.
 
 - **Throughput.** $\operatorname{TPS}=N_{\mathrm{tok}}/\tau$ over valid tokens. A sudden drop or a growing variance means a stall, a replay, a slow worker, or a communication slowdown; the next three metrics say which.
-- **Compute rate $\Phi$.** Hardware efficiency measured against a fixed FLOP estimator, so that a change in $\Phi$ means a change in the system and never a change in the counting.
-- **Straggler score.** $S=\dfrac{\tau}{\operatorname{median}_r(\tau_r)+\varepsilon}$; one rank setting the pace shows up as $S$ drifting above one. Alert on the trend, with the level taken from healthy runs.
-- **Communication wait.** The fraction of the step spent waiting for unmasked collectives, sampled every 10 steps. "Put device events around the real asynchronous wait and read them at an existing synchronization point. Adding a new host sync changes the overlap you are trying to measure."
-- **Peak memory.** Per-rank peak allocated and peak reserved bytes, reduced by max over ranks. A growing gap between reserved and allocated is allocator fragmentation, not model growth. Reset the peak counters at fixed, documented points so that neighboring samples cover the same span of time.
+- **Compute rate.** With $F_{\mathrm{step}}$ estimated operations per step across $D$ devices, $\Phi=\dfrac{F_{\mathrm{step}}}{D\,\tau}$. "Use the same FLOP estimate for every run you compare. Otherwise the number can change even when the hardware does not."
+- **Straggler score.** $S=\dfrac{\tau}{\operatorname{median}_r(\tau_r)+\varepsilon}$; "$S\approx1$ means the ranks are moving together. A larger value means one slow rank is holding up the job." Alert on the trend, with the level taken from healthy runs.
+- **Communication wait.** $W_{\mathrm{comm}}=\tau_{\mathrm{wait}}/\tau$, where $\tau_{\mathrm{wait}}$ is the time spent waiting for collective communication that does not overlap with compute, sampled every 10 steps. Also record the number of calls and the bytes sent, which says whether the time comes from many small calls or a few large ones. "Put device events around the real asynchronous wait and read them at an existing synchronization point. Adding a new host sync changes the overlap you are trying to measure."
+- **Peak memory.** Per-rank peak allocated and peak reserved bytes, reduced by max over ranks. "If the gap between reserved and allocated memory keeps growing, look for fragmentation or an oversized cache." "Reset peak counters at fixed, documented points so neighboring samples cover the same length of time."
 - **Device and host stats.** Utilization, power, temperature, clocks, process memory, CPU load, page faults, and network traffic separate a system fault from a training problem. "Count network traffic once per node. If every local rank reads the same network interface, the reported traffic will be multiplied."
 
 ## Part III. Every 100 steps
@@ -142,11 +142,11 @@ Let $\tau_r$ be the step time on rank $r$. The step finishes when the slowest ra
 
 For a tensor $x\in\mathbb{R}^N$, computed in one pass and reduced across ranks by the rules above:
 
-- **Absolute maximum.** $\operatorname{AbsMax}(x)=\max_j \lvert x_j\rvert$, the quickest way to catch an outlier, an overflow, or a local explosion. "At the model output, treat it as P0 because it often rises before the loss." Trace a rising output AbsMax backward through the per-block maxima.
+- **Absolute maximum.** $\operatorname{AbsMax}(x)=\max_j \lvert x_j\rvert$, the quickest way to catch an outlier, an overflow, or a local explosion. "At the model output, treat it as P0 because it often rises before the loss."
 - **RMS.** $\operatorname{RMS}(x)=\sqrt{\frac{1}{N}\sum_j x_j^2}$. To combine ranks, add the squared sums and the element counts, then take the root; never average per-rank RMS values.
 - **Absolute mean.** $\operatorname{AbsMean}(x)=\frac{1}{N}\sum_j \lvert x_j\rvert$. A large gap between AbsMean and RMS means a few large elements carry the scale.
 - **Zero fraction.** $Z_x=\frac{1}{N}\sum_j \mathbf{1}[x_j=0]$ for exact zeros; a rising fraction is sparsity, underflow, or a dead path. Keep embeddings and experts in their own series.
-- **Update ratio.** $\rho=\dfrac{\operatorname{RMS}(\Delta w)}{\operatorname{RMS}(w)+\varepsilon}$ per parameter, where $\Delta w$ is the applied update. It catches updates too small to matter or large enough to damage; a layer whose $\rho$ trends to zero has stopped learning, and one whose $\rho$ jumps is where the next spike starts.
+- **Update ratio.** $\rho=\dfrac{\operatorname{RMS}(\Delta w)}{\operatorname{RMS}(w)+\varepsilon}$ per parameter, where $\Delta w$ is the applied update. "If $\rho$ keeps falling toward zero, the updates may be too small to matter. A sudden rise means the update is large for that parameter. Unlike the raw update norm, this ratio can be compared across layers and runs."
 - **Excess kurtosis.** $\kappa=\dfrac{\frac{1}{N}\sum_j (x_j-\mu)^4}{\big[\frac{1}{N}\sum_j (x_j-\mu)^2\big]^2}-3$, undefined at zero variance. Heavy tails are a low-precision risk; this matters for weights and rarely for activations.
 - **Optimizer chain.** For one parameter, keep the raw gradient, the normalized gradient, the preconditioned direction, and the final update as four separate tensors, so that a scale or direction change can be attributed to normalization, preconditioning, weight decay, learning rate, or clipping.
 
@@ -156,7 +156,7 @@ Let $c_i$ be the number of tokens routed to expert $i$ of $E$, and $\bar c=\frac
 
 - **MaxVio.** $\operatorname{MaxVio}=\dfrac{\max_i c_i-\bar c}{\bar c}=I-1$, where $I=\max_i c_i/\bar c$ is the imbalance ratio. Perfect balance gives $I=1$ and $\operatorname{MaxVio}=0$. "A MaxVio of 0.25 means the busiest expert gets 25% more tokens than average." MaxVio reads better on a dashboard because balance appears as zero.
 - **Shard imbalance.** The same ratio applied to expert-parallel shard loads. "Balanced experts do not always mean balanced communication groups. A busy shard can still slow down the whole step."
-- **Normalized entropy.** With $p_i=c_i/\sum_j c_j$, $H=-\sum_i p_i\log p_i$ and $H_{\mathrm{norm}}=H/\log E$: one at uniform routing, zero when all work lands on one expert. A sharp drop is the router concentrating, and it usually precedes a MaxVio rise.
+- **Normalized entropy.** With $p_i=c_i/\sum_j c_j$, $H=-\sum_i p_i\log p_i$ and $H_{\mathrm{norm}}=H/\log E$: one at uniform routing, zero when all work lands on one expert. "A sharp drop shows that the router is favoring a few experts, often before the imbalance ratio makes it obvious."
 - **Per-expert load and router scores.** Token fractions per expert, routing biases, and top-$k$ margin distributions, opened after the aggregate metrics flag a problem; they say which expert and by how much.
 
 "Ignore padding and invalid tokens. If no valid token reaches a layer, skip its ratio. An empty shard is missing data, not a measured zero."
@@ -167,14 +167,14 @@ For one token, let $s\in\mathbb{R}^d$ be the residual stream before a block, $b$
 
 - **Relative branch scale.** $R_b=\dfrac{\lVert b\rVert_2}{\lVert s\rVert_2+\varepsilon}$: a branch too weak to matter, or one that dominates the stream.
 - **Block importance.** $B=1-\cos(s,a)$, with the angular form $A=\arccos(\cos(s,a))/\pi$. $B$ near zero means the block no longer changes the direction of the stream.
-- **Bfloat16 no-op fraction.** $F_{\mathrm{noop}}=\frac{1}{d}\sum_j \mathbf{1}\big[Q_{\mathrm{BF16}}(s_j+b_j)=Q_{\mathrm{BF16}}(s_j)\ \wedge\ b_j\neq 0\big]$, the share of nonzero branch updates that round away when added to the stream in bfloat16. Read it together with the stream norm, since a large stream is what makes small updates vanish.
+- **Bfloat16 no-op fraction.** $F_{\mathrm{noop}}=\frac{1}{d}\sum_j \mathbf{1}\big[Q_{\mathrm{BF16}}(s_j+b_j)=Q_{\mathrm{BF16}}(s_j)\ \wedge\ b_j\neq 0\big]$, the share of nonzero branch updates that round away when added to the stream in bfloat16. A large value means bfloat16 is too coarse to keep many residual updates. "This tends to rise with the stream norm, so check it beside $N_s$."
 - **Gate saturation.** For a gated branch with gate values $\beta_j=\sigma(g_j/T)$, $F_{\mathrm{gate}}(\theta)=\frac{1}{d}\sum_j \mathbf{1}[\beta_j<\theta]$. "Try a few thresholds, such as $\theta\in\{0.05,0.1,0.25\}$. If nearly all gates are closed, the branch contributes little and may not recover."
 
 ### Modality paths
 
 - **Token share.** $\pi^{(\mu)}$ per modality, every 1–10 steps, always shown next to the modality loss; a change reveals a data-mix change, a packing bug, or a lost decoder shard.
 - **Media scale ratio.** $\gamma=\dfrac{\operatorname{RMS}(e^{(\mathrm{media})})}{\operatorname{RMS}(e^{(\mathrm{text})})+\varepsilon}$ at the point where embeddings enter the language backbone. Near one, media and text enter at the same scale; small means the model can ignore media tokens, large means media can dominate the early layers. "In either case, check the projector before blaming the encoder."
-- **Encoder gradient share.** $S_{\mathrm{enc}}=\lVert g_{\mathrm{enc}}\rVert_2^2/\lVert g\rVert_2^2$, compared against the encoder's share of parameters; near zero means the encoder stopped learning, unusually high early in training points at the projector scale.
+- **Encoder gradient share.** $S_{\mathrm{enc}}=\lVert g_{\mathrm{enc}}\rVert_2^2/\lVert g\rVert_2^2$, compared against the encoder's share of all parameters. "Near zero means the encoder is barely learning." An unusually high value early in training may point to the projector scale.
 - Media length varies, so weight by token count, not by sample. A rank with no media contributes no measurement, not a zero.
 
 ## Part IV. Every checkpoint
@@ -185,8 +185,8 @@ On the held-out set, let $M$ be the number of valid tokens and $\ell_k$ the loss
 - **Bits per byte.** With $N_{\mathrm{byte}}$ source bytes covered by those tokens, $\operatorname{BPB}=\dfrac{\sum_k \ell_k}{N_{\mathrm{byte}}\log 2}$. "If tokenizers differ, bits per byte is safer than token-level perplexity because it does not depend on vocabulary size or token boundaries." This is the first-screen quality signal, run every 0.5–2% of training.
 - **Choice accuracy.** $\operatorname{Accuracy}=\frac{1}{Q}\sum_q \mathbf{1}[\hat a_q=a_q]$, scoring each option by length-normalized NLL. "Do not change the prompt format or answer cleanup during the run."
 - **Greedy generation.** Generate at temperature 0, clean the answer for the task, score with exact match, pass@1, or a symbolic checker. "This catches problems that likelihood scores miss. Run it on every important checkpoint, not just the final one."
-- **Media gain.** $\Delta_{\mathrm{media}}=Q_{\mathrm{with}}-Q_{\mathrm{without}}$, the same score with and without the media input; it is the only direct evidence that the model uses the media at all.
-- **Sampled generation and IoU** at final checkpoints, and **averaged-weight evaluation** at every evaluation as a less noisy way to compare checkpoints.
+- **Media gain.** $\Delta_{\mathrm{media}}=Q_{\mathrm{with}}-Q_{\mathrm{without}}$, the same score with and without the media input. "This tells you whether the model is using the media or answering from the text alone." A value near zero means the media adds no measurable value on that evaluation.
+- **Pass@k** as a P1 metric: for one problem sample $n$ answers, of which $c$ pass, and estimate $\operatorname{pass@}k$ with the unbiased binomial formula for $k\le n$. **Sampled generation and IoU** at final checkpoints, and **averaged-weight evaluation** at every evaluation as a less noisy way to compare checkpoints.
 - **Scaling fits.** "When a scaling fit predicts beyond the runs you measured, report a range instead of one exact number."
 - **Comparing runs.** "If batch sizes differ, compare by tokens seen or estimated FLOPs, not by step."
 
@@ -232,7 +232,7 @@ The metric set is opinionated by its author's own account. Drop a row that your 
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> training-monitor v0.1.1 active: 9 first-screen signals, 39-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order.
+> training-monitor v0.1.2 active: 9 first-screen signals, 39-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order.
 
 ## Credits
 
