@@ -232,7 +232,7 @@ The metric set is opinionated by its author's own account. Drop a row that your 
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> training-monitor v0.1.0 active: 9 first-screen signals, 40-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order.
+> training-monitor v0.1.1 active: 9 first-screen signals, 39-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order.
 
 ## Credits
 

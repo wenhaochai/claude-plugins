@@ -23,7 +23,7 @@
     {
       "name": "training-monitor",
       "source": "./training-monitor",
-      "description": "Monitoring doctrine for pretraining runs, distilled from Chunyuan Deng's \"Reading a Pretraining Run\" (2026): nine first-screen signals, a 40-row metric table with cadence and priority, formulas, cross-rank reduction rules, a robust spike detector, the triage order, and the common mistakes. Text only; the agent decides how to implement it for its own stack."
+      "description": "Monitoring doctrine for pretraining runs, distilled from Chunyuan Deng's \"Reading a Pretraining Run\" (2026): nine first-screen signals, a 39-row metric table with cadence and priority, formulas, cross-rank reduction rules, a robust spike detector, the triage order, and the common mistakes. Text only; the agent decides how to implement it for its own stack."
     }
   ]
 }
