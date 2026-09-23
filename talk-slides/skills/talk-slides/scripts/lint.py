@@ -48,7 +48,7 @@ class Parser(HTMLParser):
                 num = re.sub('[^0-9.]', '', v)
                 if num and float(num) < 24:
                     self.issues.append(f'font-size {v} on <{tag}>')
-            if k in ('margin', 'z-index') or 'var(' in v or v.endswith('em') or v.endswith('rem'):
+            if k in ('margin', 'z-index') or 'var(' in v or v.endswith('rem') or (v.endswith('em') and k != 'letter-spacing'):
                 self.issues.append(f'unsupported css {k}:{v}')
             if k in ('left', 'top') and v.startswith('-'):
                 self.issues.append(f'negative {k}:{v} is clamped to 0 by the runtime')

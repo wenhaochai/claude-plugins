@@ -81,7 +81,7 @@ def cover(sid, eyebrow_text, title_html, subtitle, left, right, note=''):
 '''
 
 
-def agenda(sid, parts, note='', title='Four parts'):
+def agenda(sid, parts, title, note=''):
     """parts: [(name, one-line description)], one row per part of the talk."""
     rows = ''
     for i, (name, desc) in enumerate(parts):
@@ -134,7 +134,7 @@ def swatch_legend(items):
 # ---------------------------------------------------------------- charts
 
 
-def composition(groups, px_per_unit, legend_items=None, width=820, gap=18, formula=None):
+def composition(groups, px_per_unit, legend_items=None, width=820, gap=18):
     """Weighted composition: one block per group, a bar split into member segments, member names below.
 
     groups: [(heading, [(units, color)], names_line)]. Units become px_per_unit pixels wide.
@@ -142,8 +142,6 @@ def composition(groups, px_per_unit, legend_items=None, width=820, gap=18, formu
     parts = []
     if legend_items:
         parts.append(swatch_legend(legend_items))
-    if formula:
-        parts.append(f'<p style="font-family:{SERIF}; font-style:italic; font-size:28px; line-height:1.3; color:{INK}">{formula}</p>')
     for heading, segs, names in groups:
         bars = ''.join(f'<div style="width:{round(u * px_per_unit)}px; height:28px; background:{c}"></div>' for u, c in segs)
         parts.append(f'''<div style="display:flex; flex-direction:column; gap:8px">

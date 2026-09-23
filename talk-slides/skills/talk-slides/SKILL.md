@@ -12,17 +12,20 @@ The Slides artifact type's own instructions cover the file format and the Artifa
 1. Agree on the parts first, one idea per slide. Put open choices to the user as short multiple-choice questions, and cite only the sources the user names.
 2. Take every number from a primary source, keep the raw files next to the deck and recompute what you plot. Re-fetch live leaderboards on the day you publish and put the read date in the source line.
 3. `python3 scripts/build_template.py OUT` writes one example slide per layout. Build slides with the builders in `scripts/deckkit.py` and replace every bracketed string and example number.
-4. Before each publish, run `python3 scripts/lint.py DECK_DIR` and `python3 scripts/audit_render.py RUNTIME_DIR`, look at every screenshot, and check each chart against its source.
+4. Before each publish, run `python3 scripts/lint.py DECK_DIR` and `python3 scripts/audit_render.py RUNTIME_DIR`; the audit's docstring says how to set up RUNTIME_DIR. Look at every screenshot and check each chart against its source.
 5. Read the live deck before publishing so edits made in the page survive, then send only the changed files.
 6. Report in a few Chinese lines: the version, the link and what changed on which slide.
 
 ## Slides
 
-- A title is a noun label for what the slide shows and makes no claim. A title the user gives stays as given. The eyebrow names the part.
+- Titles, slide and chart alike, are noun labels for what is shown and make no claim; none is a comma-joined list of clipped phrases. A title the user gives stays as given. The eyebrow names the part.
 - The slide holds labels, numbers and at most one short sentence per block; the rest goes into the notes. Wording stays plain, without the "X, not Y" pattern, em dashes or the word campaign.
-- Data goes in charts, with each headline number beside the figure that produced it. Every mark carries data, so leave out decorative icons, invented examples and side facts. A source's official figure is used as is.
+- Data goes in charts, and so do concepts and mechanisms such as how a score is built: a chart, a pipeline or a worked example beats rows of labels and sentences. Each headline number sits beside the figure that produced it. A source's official figure is used as is.
+- Every mark carries data. Leave out decorative icons, big numerals with no quantity behind them, invented examples, side facts such as cost or release counts, one model's numbers shown alone, and categories with fuzzy or unclear edges.
+- Signed values are drawn as magnitudes with the two directions labelled at the ends; the source's sign convention goes in the notes.
 - A paper takes three slides: its first page with the question, one method figure, one comparison figure.
-- One slide per method, index or example. The first slide of a new topic says what it is and how it works.
+- One slide per method, index or example. The first slide of a new topic says what it is and how it works, with one real example.
+- An index slide shows its composition and principles; strengths and weaknesses go in the notes.
 - A leaderboard shows the top five with the uncertainty the source publishes, and its title names the interval.
 - The cover states title, author and date. The agenda lists the parts, and the summary gives one point per part and a closing line.
 
@@ -32,7 +35,7 @@ The notes are the script the speaker reads aloud: the English lines, one blank l
 
 - The speaker reads the English in a second language: one sentence per line, at most 18 words, common words.
 - Leave out names the speaker may not know how to say. Say "the author" or "one model", and keep only the names the audience needs, such as the leaders on a leaderboard.
-- About a minute per slide: first what the slide shows, then one strength and one problem.
+- About a minute per slide: first what the slide shows, then one strength and one problem, in the author's words when the author gave them.
 - Numbers printed on the slide are said exactly; the rest are rounded.
 
 ## Runtime

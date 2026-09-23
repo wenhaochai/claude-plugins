@@ -1,6 +1,6 @@
 {
   "name": "talk-slides",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Build, revise and audit talk decks as claude.ai Slides artifacts: the author's rules for the slides and the spoken script, layout builders with a template, a static lint and a render audit in the Slides runtime.",
   "author": {
     "name": "Wenhao Chai",
