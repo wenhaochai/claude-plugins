@@ -84,6 +84,25 @@ formulas, the cross-rank reduction rules, a robust spike detector, the fixed tri
 the common mistakes. The agent inventories what its stack already logs, fills the P0 gaps first,
 sets thresholds from healthy runs, and decides for itself whether a script is warranted.
 
+## `talk-slides` — talk decks as claude.ai Slides artifacts
+
+One skill for building, revising and auditing a talk deck in the claude.ai Slides artifact
+format: a paper presentation, a survey of benchmarks, reading-group slides. It carries the
+author's slide rules, distilled from one talk revised over 23 versions: noun titles, charts over
+tables, little text on the slide with the detail in Chinese speaker notes, no decorative visuals,
+official figures, and live numbers re-fetched on publish day. `deckkit.py` holds the design and
+the layout builders; `build_template.py` writes a 14-slide template from them.
+
+```bash
+python3 talk-slides/skills/talk-slides/scripts/build_template.py OUT
+python3 talk-slides/skills/talk-slides/scripts/lint.py DECK_DIR
+python3 talk-slides/skills/talk-slides/scripts/audit_render.py RUNTIME_DIR --out shots
+```
+
+`lint.py` checks the file contract and the subset limits. `audit_render.py` renders every slide
+in the Slides runtime with headless Chrome and reports shrunk text, overflow, margin breaks and
+overlapping labels, which a plain browser preview does not show.
+
 ## Install
 
 ```
@@ -92,6 +111,7 @@ sets thresholds from healthy runs, and decides for itself whether a script is wa
 /plugin install anti-autoresearch@wenhaochai
 /plugin install kexue-fm@wenhaochai
 /plugin install training-monitor@wenhaochai
+/plugin install talk-slides@wenhaochai
 ```
 
 Upgrading from `writing` 1.x: the 12 integrity-forensics skills moved out of `writing` into the new

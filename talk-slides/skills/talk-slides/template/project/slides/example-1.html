@@ -1,0 +1,32 @@
+<section id="example-1" data-transition="fade" style="background:#F6F3EC; color:#15141A; font-family:'Inter Tight', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#7A1A1A">Part 4 · [Benchmark] · Example 1</p>
+    <h2 style="font-family:'Newsreader', Georgia, serif; font-size:56px; font-weight:500; line-height:1.1; letter-spacing:-1px; color:#15141A">[Task name]</h2>
+  </div>
+  <div style="flex:1; display:flex; gap:56px">
+    <div style="width:780px; display:flex; flex-direction:column; gap:28px"><div style="display:flex; flex-direction:column; gap:10px; background:#FBFAF6; border:1px solid #D9D3C3; border-radius:12px; padding:24px 28px">
+        <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#4A4852">Prompt, excerpt</p>
+        <p style="font-family:'Newsreader', Georgia, serif; font-style:italic; font-size:28px; line-height:1.4; color:#15141A">“… [the sentence of the prompt that matters] …”</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#4A4852">Rubric for [the output]</p>
+        <div style="display:flex; gap:16px; align-items:center">
+          <p style="width:150px; font-size:24px; font-weight:600; color:#15141A; background:#E7E2D6; padding:6px 0; border-radius:999px; text-align:center">Objective</p>
+          <p style="font-size:28px; color:#15141A">body contains <b>[string]</b></p>
+        </div>
+        <div style="display:flex; gap:16px; align-items:center">
+          <p style="width:150px; font-size:24px; font-weight:600; color:#7A1A1A; background:#F1DCD6; padding:6px 0; border-radius:999px; text-align:center">Guardrail</p>
+          <p style="font-size:28px; color:#15141A">body does not contain <b><span style="color:#7A1A1A">[string]</span></b></p>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px"><div style="display:flex; flex-direction:column; gap:10px; background:#FBFAF6; border:1px solid #D9D3C3; border-radius:12px; padding:24px 28px">
+        <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#4A4852">[Run], [output]</p>
+        <p style="font-size:28px; line-height:1.4; color:#15141A">[Output text with the tripped string] <b><span style="color:#7A1A1A">[string]</span></b> [rest of the output]</p>
+      </div>
+      <p style="font-size:28px; line-height:1.4; color:#15141A">[How many runs failed on this check, and why the work was correct]</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6F6C76">Source: [task id], [benchmark version]; [where the runs come from]</p>
+  <aside>[讲稿] prompt 要求什么，正确答案是什么，检查写了什么，哪几个运行因此失败。</aside>
+</section>
