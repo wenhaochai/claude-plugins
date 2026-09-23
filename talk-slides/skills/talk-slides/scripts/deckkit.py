@@ -7,6 +7,7 @@ with a footer band. Change data freely; change widths only together with the bud
 """
 import html as _html
 import math
+import re
 
 # ---------------------------------------------------------------- tokens
 INK, SOFT, MUTED, ACC = '#15141A', '#4A4852', '#6F6C76', '#7A1A1A'
@@ -55,6 +56,20 @@ def foot(text):
 
 def aside(note):
     return f'\n  <aside>{esc(note)}</aside>' if note else ''
+
+
+def script(zh, en, max_words=18):
+    """Speaker notes as the script the speaker reads aloud.
+
+    zh: Chinese paragraphs. en: the same content in English, one sentence per line, each at most
+    max_words words. Returns the note text for the note argument of slide, cover, agenda and
+    summary, and checks the 4,000-character limit of the Slides runtime.
+    """
+    long = [s for line in en for s in re.split(r'(?<=[.?!])\s+', line.strip()) if len(s.split()) > max_words]
+    assert not long, f'English sentences over {max_words} words: {long}'
+    note = '中文：\n' + '\n'.join(zh) + '\n\nEnglish:\n' + '\n'.join(en)
+    assert len(note) <= 4000, f'notes are {len(note)} characters, the limit is 4,000'
+    return note
 
 
 def slide(sid, eyebrow_text, title_text, body, source=None, gap=40, note=''):

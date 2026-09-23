@@ -9,7 +9,11 @@ to 0, and an empty width-only div, which the runtime drops together with its gap
 wording the author bans on slides: em dashes, the "X, not Y" pattern and the word campaign, and
 any [bracketed] placeholder left from the template, on the slide or in the notes. These wording
 hits are warnings to read: a verbatim quote or an interval such as [19%, 39%] may trip them.
+For the speaker notes it enforces the 4,000-character limit and warns when the notes are not a
+中文 then English script, when an English sentence runs over 18 words, or when a time word such
+as "yesterday" would go stale before the talk.
 """
+import html
 import os
 import re
 import sys
@@ -122,8 +126,25 @@ def lint(deck_dir):
         left = re.findall(r'\[[^\]\n]{1,60}\]', visible)
         if left:
             warns.append(f'{len(left)} placeholder(s) left, e.g. {left[0]}')
-        if '[讲稿]' in notes:
+        if '[讲稿]' in notes or '[Script]' in notes:
             warns.append('template notes left')
+        m = re.search(r'<aside>(.*?)</aside>', src, re.S)
+        if m:
+            raw = html.unescape(m.group(1))
+            if len(raw) > 4000:
+                errs.append(f'notes are {len(raw)} characters, the limit is 4,000')
+            if '中文：' not in raw or '\nEnglish:\n' not in raw:
+                warns.append('notes are not a script: 中文： paragraphs, then English:')
+            else:
+                en = raw.split('\nEnglish:\n', 1)[1]
+                sents = [s for line in en.splitlines() for s in re.split(r'(?<=[.?!])\s+', line.strip()) if s]
+                long = [s for s in sents if len(s.split()) > 18]
+                if long:
+                    warns.append(f'{len(long)} English sentence(s) over 18 words, e.g. "{long[0][:40]}..."')
+                stale = sorted({w.lower() for w in re.findall(
+                    r'\b(?:yesterday|tomorrow|the next day|last week|this week|this morning|tonight)\b', en, re.I)})
+                if stale:
+                    warns.append('time words that go stale: ' + ', '.join(stale))
         bad += bool(errs)
         tag = '!!' if errs else ('..' if warns else 'ok')
         print(f'{tag} {sid:16s} elements={p.n:3d} pinned_max={max(p.pinned.values()) if p.pinned else 0:2d} div_depth={p.max_div:2d}',

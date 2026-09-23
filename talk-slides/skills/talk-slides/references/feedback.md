@@ -1,6 +1,6 @@
 # The author's revision notes
 
-These notes came in over 23 published versions of one paper talk: a paper on picking a subset of benchmark tasks, a part on why benchmark rankings agree, four public indices, and two grading errors in an agent benchmark. Each row gives the note in the author's words, what changed in the deck, and the rule that the note became in `SKILL.md`.
+These notes came in over 28 published versions of one paper talk: a paper on picking a subset of benchmark tasks, a part on why benchmark rankings agree, four public indices, and two grading errors in an agent benchmark. Each row gives the note in the author's words, what changed in the deck, and the rule that the note became in `SKILL.md`.
 
 ## Standing preferences
 
@@ -8,6 +8,7 @@ These notes came in over 23 published versions of one paper talk: a paper on pic
 - Slides, talks and notes stay plain: facts and numbers, no slogans, no elevated framing.
 - English on slides follows the author's prose rules: no "X, not Y" construction, no comma-joined clipped headlines, no em dashes, no "campaign" outside verbatim quotes.
 - Before publishing, read the live deck and keep any edit made in the page.
+- The speaker reads the English script in a second language: short lines, common words and no names that are hard to say.
 
 ## Notes in order
 
@@ -38,6 +39,9 @@ These notes came in over 23 published versions of one paper talk: a paper on pic
 | 23 | Claude Opus 5.5 66.16错了吧 | The leaderboard re-fetched; the source had updated overnight | Re-fetch live data on publish day |
 | 24 | 整体你觉得还有什么要改吗，审计 | A shrunk summary slide and a clamped tick label fixed; optional edits offered as choices | Audit, then ask about optional changes |
 | 25 | 每一页的标题，我不想你总是带有某些结论式的，你就简单的比如 AA Index Harbor Index这种名词说明一下这页是什么就好了 | Every title became a noun label; eyebrows name the part | Noun titles |
+| 26 | 现在帮我写讲稿，中英双语 | The notes on all 14 slides became a script: Chinese paragraphs, then the same content in English | The notes are a bilingual script |
+| 27 | 审计，讲稿口语化，我不是native speaker | One English sentence per line and at most 18 words, common words, rounded numbers, no time words that go stale | Spoken English for a second-language speaker |
+| 28 | 讲稿再压短一些，不会读的名字就应该删掉 | The script cut by about 40% to near 12 minutes; authors, people in task data and hard product names replaced by roles | Short scripts without hard names |
 
 ## What the rules protect against
 
@@ -45,3 +49,4 @@ These notes came in over 23 published versions of one paper talk: a paper on pic
 - **Decoration posing as information.** A request for stronger visuals was followed by a request to strip the weak ones. Keep a visual only when it shows data that matters to the talk.
 - **Stale or wrong numbers.** One leaderboard number was out of date by the time the author read it, and one chart category misread what its source meant. Recompute from raw files, re-fetch live pages, and read every category label against the source.
 - **Runtime drift.** Local previews passed while the runtime shifted a row, clamped a label and shrank a slide. Only the runtime audit catches these.
+- **A script too hard to read aloud.** The first script had long written sentences, exact decimals and names the speaker could not say. Short spoken lines, rounded numbers and roles in place of names fixed it, and the cut brought the talk from about 20 minutes to about 12.
