@@ -55,19 +55,25 @@ def foot(text):
 
 
 def aside(note):
-    return f'\n  <aside>{esc(note)}</aside>' if note else ''
+    """Speaker notes. The runtime reads <aside> like HTML text and turns a raw newline into a space,
+    so every line break is written as <br>; the raw newline after it only keeps the file readable."""
+    if not note:
+        return ''
+    body = re.sub(r'<br>(?!<br>)', '<br>\n', esc(note).replace('\n', '<br>'))
+    return f'\n  <aside>{body}</aside>'
 
 
-def script(zh, en, max_words=18):
-    """Speaker notes as the script the speaker reads aloud.
+def script(en, zh, max_words=18):
+    """Speaker notes as the script the speaker reads aloud: the English lines, a blank line, then
+    the same content in Chinese.
 
-    zh: Chinese paragraphs. en: the same content in English, one sentence per line, each at most
-    max_words words. Returns the note text for the note argument of slide, cover, agenda and
-    summary, and checks the 4,000-character limit of the Slides runtime.
+    en: one sentence per line, each at most max_words words. zh: Chinese paragraphs. Returns the
+    note text for the note argument of slide, cover, agenda and summary; aside() writes its line
+    breaks as <br>. Checks the 4,000-character limit of the Slides runtime.
     """
     long = [s for line in en for s in re.split(r'(?<=[.?!])\s+', line.strip()) if len(s.split()) > max_words]
     assert not long, f'English sentences over {max_words} words: {long}'
-    note = '中文：\n' + '\n'.join(zh) + '\n\nEnglish:\n' + '\n'.join(en)
+    note = '\n'.join(en) + '\n\n' + '\n'.join(zh)
     assert len(note) <= 4000, f'notes are {len(note)} characters, the limit is 4,000'
     return note
 

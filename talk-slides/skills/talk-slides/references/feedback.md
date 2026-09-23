@@ -1,6 +1,6 @@
 # The author's revision notes
 
-These notes came in over 28 published versions of one paper talk: a paper on picking a subset of benchmark tasks, a part on why benchmark rankings agree, four public indices, and two grading errors in an agent benchmark. Each row gives the note in the author's words, what changed in the deck, and the rule that the note became in `SKILL.md`.
+These notes came in over 29 published versions of one paper talk: a paper on picking a subset of benchmark tasks, a part on why benchmark rankings agree, four public indices, and two grading errors in an agent benchmark. Each row gives the note in the author's words, what changed in the deck, and the rule that the note became in `SKILL.md`.
 
 ## Standing preferences
 
@@ -42,11 +42,12 @@ These notes came in over 28 published versions of one paper talk: a paper on pic
 | 26 | 现在帮我写讲稿，中英双语 | The notes on all 14 slides became a script: Chinese paragraphs, then the same content in English | The notes are a bilingual script |
 | 27 | 审计，讲稿口语化，我不是native speaker | One English sentence per line and at most 18 words, common words, rounded numbers, no time words that go stale | Spoken English for a second-language speaker |
 | 28 | 讲稿再压短一些，不会读的名字就应该删掉 | The script cut by about 40% to near 12 minutes; authors, people in task data and hard product names replaced by roles | Short scripts without hard names |
+| 29 | 中文在后、英文在前，中间空行 | English first, one blank line, then Chinese, without labels. The check behind it found that the runtime turns raw newlines in `<aside>` into spaces, so every script so far had shown as one paragraph; line breaks became `<br>` | Notes order, and `<br>` for every line break |
 
 ## What the rules protect against
 
 - **Text walls.** The first drafts read like a report on slides. The fix each time was fewer words and a chart.
 - **Decoration posing as information.** A request for stronger visuals was followed by a request to strip the weak ones. Keep a visual only when it shows data that matters to the talk.
 - **Stale or wrong numbers.** One leaderboard number was out of date by the time the author read it, and one chart category misread what its source meant. Recompute from raw files, re-fetch live pages, and read every category label against the source.
-- **Runtime drift.** Local previews passed while the runtime shifted a row, clamped a label and shrank a slide. Only the runtime audit catches these.
+- **Runtime drift.** Local previews passed while the runtime shifted a row, clamped a label and shrank a slide. Only the runtime audit catches these. The runtime also ran every script into one paragraph, because it reads raw newlines in `<aside>` as spaces; the file looked right until the notes panel was read.
 - **A script too hard to read aloud.** The first script had long written sentences, exact decimals and names the speaker could not say. Short spoken lines, rounded numbers and roles in place of names fixed it, and the cut brought the talk from about 20 minutes to about 12.

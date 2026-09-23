@@ -9,9 +9,10 @@ to 0, and an empty width-only div, which the runtime drops together with its gap
 wording the author bans on slides: em dashes, the "X, not Y" pattern and the word campaign, and
 any [bracketed] placeholder left from the template, on the slide or in the notes. These wording
 hits are warnings to read: a verbatim quote or an interval such as [19%, 39%] may trip them.
-For the speaker notes it enforces the 4,000-character limit and warns when the notes are not a
-中文 then English script, when an English sentence runs over 18 words, or when a time word such
-as "yesterday" would go stale before the talk.
+For the speaker notes it reads the text the way the runtime does, where a raw newline becomes a
+space and only <br> breaks a line. It enforces the 4,000-character limit and warns on raw line
+breaks, on notes that are not English lines, a blank line and then Chinese, on English sentences
+over 18 words, and on time words such as "yesterday" that go stale before the talk.
 """
 import html
 import os
@@ -20,6 +21,7 @@ import sys
 from html.parser import HTMLParser
 
 VOID = {'br', 'hr', 'img'}
+CJK = re.compile(r'[\u4e00-\u9fff]')
 PAINT = ('background', 'border', 'box-shadow')
 
 
@@ -130,13 +132,17 @@ def lint(deck_dir):
             warns.append('template notes left')
         m = re.search(r'<aside>(.*?)</aside>', src, re.S)
         if m:
-            raw = html.unescape(m.group(1))
-            if len(raw) > 4000:
-                errs.append(f'notes are {len(raw)} characters, the limit is 4,000')
-            if '中文：' not in raw or '\nEnglish:\n' not in raw:
-                warns.append('notes are not a script: 中文： paragraphs, then English:')
+            parts = re.split(r'<br\s*/?>', m.group(1))
+            if any('\n' in part.strip() for part in parts):
+                warns.append('raw line breaks in the notes: the runtime turns them into spaces, write <br>')
+            text = '\n'.join(re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', '', part))).strip() for part in parts)
+            if len(text) > 4000:
+                errs.append(f'notes are {len(text)} characters, the limit is 4,000')
+            blocks = text.split('\n\n')
+            if len(blocks) != 2 or CJK.search(blocks[0]) or not CJK.search(blocks[1]):
+                warns.append('notes are not a script: English lines, a blank line, then the Chinese')
             else:
-                en = raw.split('\nEnglish:\n', 1)[1]
+                en = blocks[0]
                 sents = [s for line in en.splitlines() for s in re.split(r'(?<=[.?!])\s+', line.strip()) if s]
                 long = [s for s in sents if len(s.split()) > 18]
                 if long:

@@ -24,12 +24,12 @@ S = {}
 # ---------------------------------------------------------------- 1 cover
 S['cover'] = cover('cover', 'Paper presentation · arXiv [id]', '[Paper title,<br>two lines at most]',
                    'Paper by [Author], [Month Year]', 'Presented by [Presenter]', '[Month Year]',
-                   note=script(['[讲稿] 一句话说论文问的问题，再说后面几个部分讲什么。'], ['[Script] One line on the question the paper asks.', '[Script] One line on what the other parts cover.']))
+                   note=script(['[Script] One line on the question the paper asks.', '[Script] One line on what the other parts cover.'], ['[讲稿] 一句话说论文问的问题，再说后面几个部分讲什么。']))
 
 # ---------------------------------------------------------------- 2 agenda
 S['agenda'] = agenda('agenda', [('The paper', '[the method in a few words]'), ('[Part 2]', '[the idea in a few words]'),
                                 ('[Part 3]', '[what the part covers]'), ('[Part 4]', '[what the part covers]')],
-                     note=script(['[讲稿] 分四部分，每部分一句话。'], ['[Script] The four parts, one sentence each.']))
+                     note=script(['[Script] The four parts, one sentence each.'], ['[讲稿] 分四部分，每部分一句话。']))
 
 # ---------------------------------------------------------------- 3 paper: first-page screenshot and the question
 body = f'''<div style="flex:1; display:flex; gap:72px; align-items:flex-start">
@@ -42,7 +42,7 @@ body = f'''<div style="flex:1; display:flex; gap:72px; align-items:flex-start">
     </div>
   </div>'''
 S['paper'] = slide('paper', 'Part 1 · The paper', '[Paper title]', body, 'Source: arXiv [id], [date]',
-                   note=script(['[讲稿] 数据来自哪里；论文要回答的问题。作者名不念。'], ['[Script] Where the data come from.', '[Script] The question the paper asks, read from the slide.']))
+                   note=script(['[Script] Where the data come from.', '[Script] The question the paper asks, read from the slide.'], ['[讲稿] 数据来自哪里；论文要回答的问题。作者名不念。']))
 
 # ---------------------------------------------------------------- 4 method: a distribution with the kept band
 heights = [360, 150, 59, 143, 91, 69, 103, 91, 78, 88, 135, 50, 74, 91, 40, 70, 72, 27, 67, 57]
@@ -51,7 +51,7 @@ axis = [(0, 80, '0%', 'left'), (457, 80, '30%', 'center'), (1127, 80, '70%', 'ce
 body = (histogram(heights, set(range(6, 14)), bands, axis)
         + f'\n  <p style="font-size:28px; color:{SOFT}">[What the x axis measures, over how many items]</p>\n  <div style="flex:1"></div>')
 S['method'] = slide('method', 'Part 1 · The paper', 'Method', body, 'Source: [paper]; [how the numbers were computed]',
-                    note=script(['[讲稿] 方法怎么做，图里每个颜色是什么，丢掉和保留的数量。'], ['[Script] The method, one step per line.', '[Script] What each color means, and how many items are kept.']))
+                    note=script(['[Script] The method, one step per line.', '[Script] What each color means, and how many items are kept.'], ['[讲稿] 方法怎么做，图里每个颜色是什么，丢掉和保留的数量。']))
 
 # ---------------------------------------------------------------- 5 results: fit plot and method comparison
 rng = random.Random(7)
@@ -80,7 +80,7 @@ body = f'''<div style="flex:1; display:flex; gap:72px">
     {right}
   </div>'''
 S['results'] = slide('results', 'Part 1 · The paper', 'Results', body, 'Source: [paper, table and figure]; left panel recomputed from the released data', gap=28,
-                     note=script(['[讲稿] 左图：横轴、纵轴、每个点是什么，ρ 和 R²。右图：几种方法各自的平均和最差。注意事项放这里。'], ['[Script] Left: the two axes, what each dot is, and rho.', "[Script] Right: each method's mean and worst case.", '[Script] One caveat, if it changes how to read the result.']))
+                     note=script(['[Script] Left: the two axes, what each dot is, and rho.', "[Script] Right: each method's mean and worst case.", '[Script] One caveat, if it changes how to read the result.'], ['[讲稿] 左图：横轴、纵轴、每个点是什么，ρ 和 R²。右图：几种方法各自的平均和最差。注意事项放这里。']))
 
 # ---------------------------------------------------------------- 6 concept: source figure plus a diverging bar chart
 rows = [('[Item A]', 0.42), ('[Item B]', 0.37), ('[Item C]', 0.35), ('[Item D]', 0.33), ('[Item E]', -0.26), ('[Item F]', -0.28), ('[Item G]', -0.35)]
@@ -97,7 +97,7 @@ body = f'''<div style="flex:1; display:flex; gap:64px; align-items:flex-start">
     </div>
   </div>'''
 S['concept'] = slide('concept', 'Part 2 · [Part name]', '[Source title, used as given]', body, 'Source: [author, venue, date]; figure [license]',
-                     note=script(['[讲稿] 左边是什么，右边的条是什么；原文的正负号约定写在这里，图上只画大小和方向。'], ['[Script] What the left figure shows.', "[Script] What the bars show, and the source's sign convention."]))
+                     note=script(['[Script] What the left figure shows.', "[Script] What the bars show, and the source's sign convention."], ['[讲稿] 左边是什么，右边的条是什么；原文的正负号约定写在这里，图上只画大小和方向。']))
 
 # ---------------------------------------------------------------- 7 index with a selection funnel, launch results and the official figure
 stages = [(6627, 'Candidate pool'), (1311, 'Difficulty: [rule]'), (307, '[Screen]'), (100, '[Review]'), (82, '[Final step]')]
@@ -120,7 +120,7 @@ body = f'''<div style="flex:1; display:flex; gap:64px; align-items:stretch">
     {image('[Official figure: what it shows]', 730, 645, extra='background:#0A0A0A; border-radius:12px')}
   </div>'''
 S['index-funnel'] = slide('index-funnel', 'Part 3 · [Part name]', '[Index A]', body, 'Source: [paper, table]; [site]; funnel bars on a log scale; Wilson 95% intervals',
-                          note=script(['[讲稿] 筛选流程每一步的规则；右边官网图的读法；排行榜的第一名和区间。最后一个好处、一个问题。'], ['[Script] The rule at each step of the funnel.', '[Script] How to read the official figure.', '[Script] The leader, and how wide the intervals are.', '[Script] One strength and one problem.']))
+                          note=script(['[Script] The rule at each step of the funnel.', '[Script] How to read the official figure.', '[Script] The leader, and how wide the intervals are.', '[Script] One strength and one problem.'], ['[讲稿] 筛选流程每一步的规则；右边官网图的读法；排行榜的第一名和区间。最后一个好处、一个问题。']))
 
 # ---------------------------------------------------------------- 8 index with category weights, graders and a leaderboard without intervals
 groups = [('[Category A] · 30%', [(15, INK), (10, GREY), (5, INK)], '[Eval A] 15 · [Eval B] 10 · [Eval C] 5'),
@@ -144,7 +144,7 @@ body = f'''<div style="flex:1; display:flex; gap:56px">
     {right}
   </div>'''
 S['index-graders'] = slide('index-graders', 'Part 3 · [Part name]', '[Index B] [version]', body, 'Source: [site], read [DD Mon YYYY]', gap=32,
-                           note=script(['[讲稿] 组成和权重；谁来判分；第一名，前五名怎么选的。最后一个好处、一个问题。'], ['[Script] What is in the index, and the weights.', '[Script] Who grades each share.', '[Script] The leader, and how the top five were picked.', '[Script] One strength and one problem.']))
+                           note=script(['[Script] What is in the index, and the weights.', '[Script] Who grades each share.', '[Script] The leader, and how the top five were picked.', '[Script] One strength and one problem.'], ['[讲稿] 组成和权重；谁来判分；第一名，前五名怎么选的。最后一个好处、一个问题。']))
 
 # ---------------------------------------------------------------- 9 index with a weight formula, a legend bar and a leaderboard with errors
 groups = [('[Sector A] · 54%', [(351, INK), (351, INK)], '[Benchmark A] · [Benchmark B]'),
@@ -166,7 +166,7 @@ body = f'''<div style="flex:1; display:flex; gap:56px">
     {right}
   </div>'''
 S['index-legend'] = slide('index-legend', 'Part 3 · [Part name]', '[Index C] [version]', body, 'Source: [site], read [DD Mon YYYY]', gap=32,
-                          note=script(['[讲稿] 权重公式；私有和公开；判分方式；前几名的误差带是否重叠。最后一个好处、一个问题。'], ['[Script] The weight formula, and how much is private.', '[Script] Who grades each share.', '[Script] The leaders, and whether their error bars overlap.', '[Script] One strength and one problem.']))
+                          note=script(['[Script] The weight formula, and how much is private.', '[Script] Who grades each share.', '[Script] The leaders, and whether their error bars overlap.', '[Script] One strength and one problem.'], ['[讲稿] 权重公式；私有和公开；判分方式；前几名的误差带是否重叠。最后一个好处、一个问题。']))
 
 # ---------------------------------------------------------------- 10 index fitted with a latent scale: curves, counts and intervals
 series = [('[Easy]', 111, 0.0757, GREY), ('[Middle]', 136, 0.0699, SOFT), ('[Hard]', 175, 0.1526, ACC)]
@@ -193,7 +193,7 @@ body = f'''<div style="flex:1; display:flex; gap:56px">
     </div>
   </div>'''
 S['index-curves'] = slide('index-curves', 'Part 3 · [Part name]', '[Index D]', body, 'Source: [site], read [DD Mon YYYY]', gap=32,
-                          note=script(['[讲稿] 模型怎么拟合；三条真实曲线各代表什么；刻度的锚点；前几名的区间是否重叠。最后一个好处、一个问题。'], ['[Script] How the model works, in two or three lines.', '[Script] What the three real curves show.', '[Script] The two anchors of the scale.', '[Script] Whether the top intervals overlap.', '[Script] One strength and one problem.']))
+                          note=script(['[Script] How the model works, in two or three lines.', '[Script] What the three real curves show.', '[Script] The two anchors of the scale.', '[Script] Whether the top intervals overlap.', '[Script] One strength and one problem.'], ['[讲稿] 模型怎么拟合；三条真实曲线各代表什么；刻度的锚点；前几名的区间是否重叠。最后一个好处、一个问题。']))
 
 # ---------------------------------------------------------------- 11 topic intro: pipeline cards, a real example, three scores of one run set
 cards = [card('Task', big('[600]'), '[public items, how they split]', sub('[how many more are private]')),
@@ -211,7 +211,7 @@ body = f'''{pipeline(cards)}
   </div>'''
 S['topic-intro'] = slide('topic-intro', 'Part 4 · [Benchmark] · [Maker, Month Year]', 'Tasks and grading', body,
                          'Sources: [paper]; [leaderboard]; example task [id] from the public [version] set', gap=32,
-                         note=script(['[讲稿] 流程四步；真实例子的检查，不念任务数据里的人名和团队名；同一批运行在三种算分下的结果。'], ['[Script] The four steps, one line each.', '[Script] The real task and its checks, without names from the task data.', '[Script] The same runs under three scoring rules.']))
+                         note=script(['[Script] The four steps, one line each.', '[Script] The real task and its checks, without names from the task data.', '[Script] The same runs under three scoring rules.'], ['[讲稿] 流程四步；真实例子的检查，不念任务数据里的人名和团队名；同一批运行在三种算分下的结果。']))
 
 # ---------------------------------------------------------------- 12 example with one output: prompt, rubric, the output that trips the check
 rub = rubric('Rubric for [the output]', [('Objective', 'body contains <b>[string]</b>'), ('Guardrail', f'body does not contain {hl("[string]")}')])
@@ -226,7 +226,7 @@ S['example-1'] = slide('example-1', 'Part 4 · [Benchmark] · Example 1', '[Task
     {left}
     {right}
   </div>''', 'Source: [task id], [benchmark version]; [where the runs come from]', gap=36,
-                       note=script(['[讲稿] prompt 要求什么，正确答案是什么，检查写了什么，哪几个运行因此失败。'], ['[Script] What the prompt asks, and the right answer.', '[Script] What the check tests, and which runs fail it.']))
+                       note=script(['[Script] What the prompt asks, and the right answer.', '[Script] What the check tests, and which runs fail it.'], ['[讲稿] prompt 要求什么，正确答案是什么，检查写了什么，哪几个运行因此失败。']))
 
 # ---------------------------------------------------------------- 13 example with several runs: context, rubric, what each run produced
 left = f'''<div style="width:780px; display:flex; flex-direction:column; gap:28px">{quote_card('Context', '[The fact in the task data that decides the right answer]', italic=False)}
@@ -238,12 +238,12 @@ S['example-2'] = slide('example-2', 'Part 4 · [Benchmark] · Example 2', '[Task
     {left}
     {right}
   </div>''', 'Source: [task id], [benchmark version]; [where the runs come from]', gap=36,
-                       note=script(['[讲稿] 数据里决定正确答案的那条信息；检查写了什么；每个运行写了什么、为什么被判错。'], ['[Script] The fact in the data that decides the answer.', '[Script] What the check tests.', '[Script] What the runs wrote, and why they failed.']))
+                       note=script(['[Script] The fact in the data that decides the answer.', '[Script] What the check tests.', '[Script] What the runs wrote, and why they failed.'], ['[讲稿] 数据里决定正确答案的那条信息；检查写了什么；每个运行写了什么、为什么被判错。']))
 
 # ---------------------------------------------------------------- 14 summary
 S['summary'] = summary('summary', [('The paper', '[What part 1 showed, one line]'), ('[Part 2]', '[What part 2 showed, one line]'),
                                    ('[Part 3]', '[What part 3 showed, one line]'), ('[Part 4]', '[What part 4 showed, one line]')],
-                       '[One closing line: what to report or do beyond the headline number]', note=script(['[讲稿] 每部分一句话，最后一句收尾。'], ['[Script] One sentence per part.', '[Script] One closing line.']))
+                       '[One closing line: what to report or do beyond the headline number]', note=script(['[Script] One sentence per part.', '[Script] One closing line.'], ['[讲稿] 每部分一句话，最后一句收尾。']))
 
 order = list(S)
 for sid, html in S.items():

@@ -24,6 +24,7 @@ The runtime files belong to the Slides type. Keep them out of any repository.
 | Chart labels in the wrong font or clipped | Fonts never load inside an SVG | Draw marks in the SVG and pin the labels as `<p>` over it |
 | The build refuses a host | More than 24 pinned children in one `div` | Split the chart into one host per row |
 | Two adjacent label columns read as one line | Column texts run to the column edge | Give each column's text a right padding, as `seg_bar` does |
+| The speaker notes show as one paragraph | The runtime reads `<aside>` like HTML text, so a raw newline becomes a space | Write each line break as `<br>` and two for a blank line; `deckkit.aside` does this and `lint.py` warns on raw line breaks. To see the notes as parsed, open the page, press the Speaker notes button and read the notes box; the edit view opens on the first slide, so put the slide first in a scratch copy of `deck.json` |
 
 ## Height budget
 
