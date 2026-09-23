@@ -87,22 +87,14 @@ sets thresholds from healthy runs, and decides for itself whether a script is wa
 ## `talk-slides` — talk decks as claude.ai Slides artifacts
 
 One skill for building, revising and auditing a talk deck in the claude.ai Slides artifact
-format: a paper presentation, a survey of benchmarks, reading-group slides. It carries the
-author's slide rules, distilled from one talk revised over 29 versions: noun titles, charts over
-tables, little text on the slide with the detail in a spoken English and Chinese script, no
-decorative visuals, official figures, and live numbers re-fetched on publish day. `deckkit.py`
-holds the design and the layout builders; `build_template.py` writes a 14-slide template from them.
+format. It carries the author's rules for the slides and the spoken script, layout builders with
+a template built from them, a static lint, and a render audit in the Slides runtime.
 
 ```bash
 python3 talk-slides/skills/talk-slides/scripts/build_template.py OUT
 python3 talk-slides/skills/talk-slides/scripts/lint.py DECK_DIR
 python3 talk-slides/skills/talk-slides/scripts/audit_render.py RUNTIME_DIR --out shots
 ```
-
-`lint.py` checks the file contract, the subset limits and the speaker-notes script.
-`audit_render.py` renders every slide in the Slides runtime with headless Chrome and reports
-shrunk text, overflow, margin breaks and overlapping labels, which a plain browser preview does
-not show.
 
 ## Install
 

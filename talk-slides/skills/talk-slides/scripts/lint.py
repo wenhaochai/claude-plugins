@@ -2,17 +2,14 @@
 
     python3 lint.py [deck_dir]      # deck_dir holds project/slides/*.html; default: current directory
 
-Checks the file contract (one section, id equals file name, notes last), the subset limits
+Errors: the file contract (one section, id equals file name, notes last), the subset limits
 (200 elements, 15 nested divs, 24 pinned children per host, SVG under 52 KB and without <text>),
-text at 24px or more, and the two runtime traps: a negative left/top, which the runtime clamps
-to 0, and an empty width-only div, which the runtime drops together with its gap. It also flags
-wording the author bans on slides: em dashes, the "X, not Y" pattern and the word campaign, and
-any [bracketed] placeholder left from the template, on the slide or in the notes. These wording
-hits are warnings to read: a verbatim quote or an interval such as [19%, 39%] may trip them.
-For the speaker notes it reads the text the way the runtime does, where a raw newline becomes a
-space and only <br> breaks a line. It enforces the 4,000-character limit and warns on raw line
-breaks, on notes that are not English lines, a blank line and then Chinese, on English sentences
-over 18 words, and on time words such as "yesterday" that go stale before the talk.
+text under 24px, a negative left/top, which the runtime clamps to 0, an empty width-only div,
+which the runtime drops with its gap, and notes over 4,000 characters.
+Warnings: em dashes, the "X, not Y" pattern, the word campaign, [bracketed] placeholders, raw
+line breaks in the notes, which the runtime turns into spaces, notes that are not English lines,
+a blank line and then Chinese, and English sentences over 18 words. A verbatim quote or an
+interval such as [19%, 39%] may trip a warning.
 """
 import html
 import os
@@ -125,11 +122,9 @@ def lint(deck_dir):
             if pat in visible:
                 warns.append(name)
         notes = ' '.join(d for in_aside, d in p.text if in_aside)
-        left = re.findall(r'\[[^\]\n]{1,60}\]', visible)
+        left = re.findall(r'\[[^\]\n]{1,60}\]', visible + ' ' + notes)
         if left:
             warns.append(f'{len(left)} placeholder(s) left, e.g. {left[0]}')
-        if '[讲稿]' in notes or '[Script]' in notes:
-            warns.append('template notes left')
         m = re.search(r'<aside>(.*?)</aside>', src, re.S)
         if m:
             parts = re.split(r'<br\s*/?>', m.group(1))
@@ -147,10 +142,6 @@ def lint(deck_dir):
                 long = [s for s in sents if len(s.split()) > 18]
                 if long:
                     warns.append(f'{len(long)} English sentence(s) over 18 words, e.g. "{long[0][:40]}..."')
-                stale = sorted({w.lower() for w in re.findall(
-                    r'\b(?:yesterday|tomorrow|the next day|last week|this week|this morning|tonight)\b', en, re.I)})
-                if stale:
-                    warns.append('time words that go stale: ' + ', '.join(stale))
         bad += bool(errs)
         tag = '!!' if errs else ('..' if warns else 'ok')
         print(f'{tag} {sid:16s} elements={p.n:3d} pinned_max={max(p.pinned.values()) if p.pinned else 0:2d} div_depth={p.max_div:2d}',

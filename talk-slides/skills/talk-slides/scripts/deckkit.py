@@ -3,10 +3,9 @@
 Every builder returns an HTML string in the Slides subset: inline styles, px units, text at
 24px or larger, and pinned children only inside a sized `position:relative` host. The geometry
 constants come from a deck that passed the runtime audit, so the defaults fit a 1920x1080 slide
-with a footer band. Change data freely; change widths only together with the budget comments.
+with a footer band: under a one-line title the body has 644px at gap 40 and 1664px of width.
 """
 import html as _html
-import math
 import re
 
 # ---------------------------------------------------------------- tokens
@@ -17,7 +16,6 @@ NIGHT, NIGHT_TEXT, NIGHT_SOFT, NIGHT_ACC, NIGHT_RULE = '#15141A', '#EDE9DE', '#B
 SERIF = "'Newsreader', Georgia, serif"
 SANS = "'Inter Tight', Arial, sans-serif"
 RED_STRIPE = 'repeating-linear-gradient(135deg, #7A1A1A 0px, #7A1A1A 9px, #A5544B 9px, #A5544B 18px)'
-MIX_STRIPE = 'repeating-linear-gradient(135deg, #7A1A1A 0px, #7A1A1A 9px, #2F5D8A 9px, #2F5D8A 18px)'
 FACES = {
     'newsreader': {'family': 'Newsreader',
                    'href': 'https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap'},
@@ -25,20 +23,14 @@ FACES = {
                     'href': 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap'},
 }
 
-CONTENT_W = 1664          # 1920 minus two 128px margins
-HEADER_H = 108            # eyebrow 34 + gap 12 + one-line title 62
-
-
-def body_budget(footer=True, gap=40):
-    """Height left for the body under a one-line title."""
-    return 1080 - 128 - (160 if footer else 128) - HEADER_H - gap
-
 
 def esc(text):
     return _html.escape(text, quote=False)
 
 
 # ---------------------------------------------------------------- slide shells
+
+
 def eyebrow(text, color=ACC):
     return f'<p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:{color}">{text}</p>'
 
@@ -61,21 +53,6 @@ def aside(note):
         return ''
     body = re.sub(r'<br>(?!<br>)', '<br>\n', esc(note).replace('\n', '<br>'))
     return f'\n  <aside>{body}</aside>'
-
-
-def script(en, zh, max_words=18):
-    """Speaker notes as the script the speaker reads aloud: the English lines, a blank line, then
-    the same content in Chinese.
-
-    en: one sentence per line, each at most max_words words. zh: Chinese paragraphs. Returns the
-    note text for the note argument of slide, cover, agenda and summary; aside() writes its line
-    breaks as <br>. Checks the 4,000-character limit of the Slides runtime.
-    """
-    long = [s for line in en for s in re.split(r'(?<=[.?!])\s+', line.strip()) if len(s.split()) > max_words]
-    assert not long, f'English sentences over {max_words} words: {long}'
-    note = '\n'.join(en) + '\n\n' + '\n'.join(zh)
-    assert len(note) <= 4000, f'notes are {len(note)} characters, the limit is 4,000'
-    return note
 
 
 def slide(sid, eyebrow_text, title_text, body, source=None, gap=40, note=''):
@@ -124,6 +101,8 @@ def agenda(sid, parts, note='', title='Four parts'):
 
 
 # ---------------------------------------------------------------- small parts
+
+
 def pin(x, top, w, text, style):
     """Pinned text. Keep x and top at 0 or more: the runtime clamps negative offsets to 0."""
     assert x >= 0 and top >= 0, 'negative offset is clamped to 0 by the runtime'
@@ -153,6 +132,8 @@ def swatch_legend(items):
 
 
 # ---------------------------------------------------------------- charts
+
+
 def composition(groups, px_per_unit, legend_items=None, width=820, gap=18, formula=None):
     """Weighted composition: one block per group, a bar split into member segments, member names below.
 
@@ -200,24 +181,6 @@ def seg_bar(segs, width=788, bracket=None, gap=4):
         </div>
         '''
     return out + f'<div style="display:flex; gap:{gap}px">{cols}\n        </div>'
-
-
-def legend_bar(segs, width=788, gap=4):
-    """A 100% bar with the percentages inside and a legend list below; use when some segments are too narrow for column labels.
-
-    segs: [(share, background, name, members)].
-    """
-    avail = width - gap * (len(segs) - 1)
-    ws = [round(avail * s[0]) for s in segs]
-    ws[-1] = avail - sum(ws[:-1])
-    bar = ''.join(f'<p style="width:{w}px; background:{bg}; color:{WHITE}; font-size:24px; font-weight:600; line-height:1.4; padding:6px 12px">{round(sh * 100)}%</p>'
-                  for w, (sh, bg, _, _) in zip(ws, segs))
-    rows = ''.join(f'''
-        <div style="display:flex; align-items:center; gap:12px">
-          <div style="width:24px; height:24px; flex:none; background:{bg}"></div>
-          <p style="flex:1; font-size:24px; line-height:1.3; color:{INK}"><b>{name}</b> <span style="color:{SOFT}">{members}</span></p>
-        </div>''' for _, bg, name, members in segs)
-    return f'<div style="display:flex; gap:{gap}px">{bar}</div>{rows}'
 
 
 def board(title, rows, a0, a1, ticks, NW=260, TW=482, RH=40, tick_fmt=str, caption=None):
@@ -326,78 +289,9 @@ def histogram(heights, kept, band_labels, axis_labels, width=1664, height=380, g
   </div>'''
 
 
-def diverging(rows, left_label, right_label, width=1120, row_h=50, max_len=300):
-    """Signed weights drawn as unsigned magnitudes; direction comes from the side and the end labels.
-
-    rows: [(name, value)] with value > 0 drawn right in the accent, value < 0 drawn left in grey.
-    Explain the source's sign convention in the speaker notes.
-    """
-    x0 = width / 2
-    px = max_len / max(abs(v) for _, v in rows)
-    out = ''
-    for name, v in rows:
-        L = abs(v) * px
-        if v > 0:
-            bar = f'<div style="position:absolute; left:{round(x0)}px; top:13px; width:{round(L)}px; height:24px; background:{ACC}"></div>'
-            lab = pin(0, 8, x0 - 16, name, f'font-size:24px; color:{INK}; text-align:right')
-            val = pin(x0 + L + 10, 8, 90, f'{abs(v):.2f}', f'font-size:24px; font-weight:600; color:{ACC}')
-        else:
-            bar = f'<div style="position:absolute; left:{round(x0 - L)}px; top:13px; width:{round(L)}px; height:24px; background:{GREY}"></div>'
-            lab = pin(x0 + 16, 8, x0 - 16, name, f'font-size:24px; color:{INK}')
-            val = pin(x0 - L - 100, 8, 90, f'{abs(v):.2f}', f'font-size:24px; font-weight:600; color:{SOFT}; text-align:right')
-        out += f'\n        <div style="position:relative; width:{width}px; height:{row_h}px">{bar}{lab}{val}</div>'
-    ends = (pin(0, 0, 520, left_label, f'font-size:28px; font-weight:600; color:{SOFT}')
-            + pin(width - 520, 0, 520, right_label, f'font-size:28px; font-weight:600; color:{ACC}; text-align:right'))
-    axis = f'<div style="position:absolute; left:{round(x0) - 1}px; top:0px; width:2px; height:{row_h * len(rows)}px; background:{INK}"></div>'
-    return (f'<div style="position:relative; width:{width}px; height:40px">{ends}</div>\n'
-            f'      <div style="position:relative; width:{width}px; display:flex; flex-direction:column">{axis}{out}\n      </div>')
-
-
-def funnel(stages, max_w=260, num_w=150):
-    """Selection funnel with bars on a log scale. stages: [(count, label)] from largest to smallest."""
-    lo, hi = math.log10(stages[-1][0]), math.log10(stages[0][0])
-    w_min = max_w * 60 / 340
-    W = lambda n: w_min + (max_w - w_min) * (math.log10(n) - lo) / (hi - lo)
-    rows = ''.join(f'''
-        <div style="display:flex; align-items:center; gap:24px">
-          <p style="width:{num_w}px; font-family:{SERIF}; font-size:52px; line-height:1; color:{INK}; text-align:right">{n:,}</p>
-          <div style="width:{max_w}px; display:flex"><div style="width:{round(W(n))}px; height:40px; background:{INK}"></div></div>
-          <p style="font-size:28px; font-weight:600; color:{INK}">{lab}</p>
-        </div>''' for n, lab in stages)
-    return f'<div style="display:flex; flex-direction:column; gap:14px">{rows}\n      </div>'
-
-
-def curves(series, x0, x1, ticks, anchors=(), labels=(), gl=70, pw=700, ph=280, top=18, aria='fitted curves'):
-    """Logistic curves on one shared x scale. series: [(name, midpoint, slope, color)].
-
-    anchors: [(x, caption)] or [(x, caption, width)] marked on the axis in the accent; size each caption box
-    to its text so neighbouring captions do not overlap. labels: [(x_data, y_px, width, html, color)]
-    place curve names in empty regions; check each one sits clear of every curve.
-    """
-    X = lambda v: (v - x0) / (x1 - x0) * pw
-    Y = lambda p: ph - p * ph
-    paths = ''
-    for _, mid, sl, col in series:
-        pts = ' '.join(f'{X(v):.1f},{Y(1 / (1 + math.exp(-sl * (v - mid)))):.1f}' for v in range(int(x0), int(x1) + 1))
-        paths += f'<polyline points="{pts}" fill="none" stroke="{col}" stroke-width="4" stroke-linejoin="round"/>'
-    marks = ''.join(f'<line x1="{X(a[0]):.1f}" y1="{ph - 12}" x2="{X(a[0]):.1f}" y2="{ph}" stroke="{ACC}" stroke-width="4"/>' for a in anchors)
-    svg = (f'<svg aria-label="{esc(aria)}" style="position:absolute; left:{gl}px; top:{top}px" width="{pw}" height="{ph}" viewBox="0 0 {pw} {ph}">'
-           f'{paths}{marks}<line x1="1" y1="0" x2="1" y2="{ph}" stroke="{INK}" stroke-width="2"/>'
-           f'<line x1="0" y1="{ph - 1}" x2="{pw}" y2="{ph - 1}" stroke="{INK}" stroke-width="2"/></svg>')
-    out = ''.join(pin(0, top + Y(p) - 17, gl - 14, f'{round(p * 100)}%', f'font-size:24px; color:{SOFT}; text-align:right') for p in (0, 0.5, 1))
-    anchors = [a if len(a) == 3 else (a[0], a[1], 200) for a in anchors]
-    anchor_x = {a[0] for a in anchors}
-    for v in ticks:
-        a = v in anchor_x
-        out += pin(gl + X(v) - 40, top + ph + 8, 80, str(v), f'font-size:24px; color:{ACC if a else SOFT}; text-align:center' + ('; font-weight:600' if a else ''))
-    for v, cap, w in anchors:
-        out += pin(gl + X(v) - w / 2, top + ph + 42, w, cap, f'font-size:24px; color:{ACC}; text-align:center')
-    for xv, ypx, w, text, col in labels:
-        out += pin(gl + X(xv), top + ypx, w, text, f'font-size:24px; font-weight:600; line-height:1.3; color:{col}')
-    return f'<div style="position:relative; width:{gl + pw + 50}px; height:{top + ph + 78}px">{svg}{out}</div>'
-
-
 # ---------------------------------------------------------------- cards and lists
+
+
 def card(eyebrow_text, big_html, caption, sub_html, width=368):
     return f'''<div style="width:{width}px; background:{CARD}; border:1px solid {RULE}; border-radius:12px; padding:24px; display:flex; flex-direction:column; gap:8px">
       <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:{ACC}">{eyebrow_text}</p>
@@ -494,19 +388,6 @@ def rubric(heading, rows):
 def hl(text):
     """Mark the string a check reacts to inside quoted output."""
     return f'<b><span style="color:{ACC}">{text}</span></b>'
-
-
-def outputs(heading, entries, closing):
-    """What several runs produced for the same check. entries: [(run name, quoted html)]; mark the tripped string with hl()."""
-    items = ''.join(f'''<div style="display:flex; flex-direction:column; gap:4px; border-top:1px solid {RULE}; padding:14px 0 0 0">
-          <p style="font-size:24px; font-weight:600; color:{SOFT}">{name}</p>
-          <p style="font-size:28px; line-height:1.45; color:{INK}">{quote}</p>
-        </div>''' for name, quote in entries)
-    return f'''<div style="flex:1; display:flex; flex-direction:column; gap:18px">{label(heading)}
-      <div style="display:flex; flex-direction:column; gap:14px">{items}
-      </div>
-      <p style="font-size:28px; line-height:1.4; color:{INK}">{closing}</p>
-    </div>'''
 
 
 def summary(sid, points, closing, note=''):
