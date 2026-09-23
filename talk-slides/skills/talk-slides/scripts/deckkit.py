@@ -203,7 +203,7 @@ def board(title, rows, a0, a1, ticks, NW=260, TW=482, RH=40, tick_fmt=str, capti
     """Leaderboard dot plot. rows: [(name, shown value, value, lo or None, hi or None)], best first.
 
     The leader is red; an interval draws as a light band, a missing one as a hairline.
-    Width = NW + 16 + TW + 30. Height = 34 + 6 + len(rows) * RH + 46 (+ caption).
+    Width = NW + 16 + TW + 30. Height = 39 + 6 + len(rows) * RH + 6 + 46, plus 37 for a caption.
     """
     X = lambda v: (v - a0) / (a1 - a0) * TW
     out = ''
@@ -288,7 +288,7 @@ def histogram(heights, kept, band_labels, axis_labels, width=1664, height=380, g
     """Distribution with a highlighted band. heights: bar heights in px; kept: indices drawn in the accent.
 
     band_labels: [(x, w, text, bold)] above the plot; axis_labels: [(x, w, text, align)] below it.
-    Dashed thresholds sit at the band edges; pass their x positions in band_labels order if needed.
+    The two dashed thresholds are drawn at the edges of the kept run of bars.
     """
     n = len(heights)
     bw = (width - gap * (n - 1)) / n
@@ -398,11 +398,6 @@ def pill(text, bg):
     return f'<p style="background:{bg}; color:{WHITE}; font-size:24px; font-weight:600; padding:2px 10px; border-radius:16px">{text}</p>'
 
 
-def icon_chip(name, bg=ACC):
-    return (f'<div style="width:64px; height:64px; border-radius:50%; background:{bg}; display:flex; align-items:center; justify-content:center">'
-            f'<x-icon name="{name}" style="color:{WHITE}; width:48px; height:48px"></x-icon></div>')
-
-
 def pipeline(cards):
     """Four 368px cards joined by arrows across the full content width."""
     arrow = (f'<div style="width:64px; display:flex; align-items:center; justify-content:center">'
@@ -478,6 +473,19 @@ def rubric(heading, rows):
 def hl(text):
     """Mark the string a check reacts to inside quoted output."""
     return f'<b><span style="color:{ACC}">{text}</span></b>'
+
+
+def outputs(heading, entries, closing):
+    """What several runs produced for the same check. entries: [(run name, quoted html)]; mark the tripped string with hl()."""
+    items = ''.join(f'''<div style="display:flex; flex-direction:column; gap:4px; border-top:1px solid {RULE}; padding:14px 0 0 0">
+          <p style="font-size:24px; font-weight:600; color:{SOFT}">{name}</p>
+          <p style="font-size:28px; line-height:1.45; color:{INK}">{quote}</p>
+        </div>''' for name, quote in entries)
+    return f'''<div style="flex:1; display:flex; flex-direction:column; gap:18px">{label(heading)}
+      <div style="display:flex; flex-direction:column; gap:14px">{items}
+      </div>
+      <p style="font-size:28px; line-height:1.4; color:{INK}">{closing}</p>
+    </div>'''
 
 
 def summary(sid, points, closing, note=''):

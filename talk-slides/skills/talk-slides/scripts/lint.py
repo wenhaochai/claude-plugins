@@ -6,8 +6,9 @@ Checks the file contract (one section, id equals file name, notes last), the sub
 (200 elements, 15 nested divs, 24 pinned children per host, SVG under 52 KB and without <text>),
 text at 24px or more, and the two runtime traps: a negative left/top, which the runtime clamps
 to 0, and an empty width-only div, which the runtime drops together with its gap. It also flags
-wording the author bans on slides: em dashes, the "X, not Y" pattern and the word campaign.
-Quoted source text may trip the wording checks; those hits are warnings to read, not errors.
+wording the author bans on slides: em dashes, the "X, not Y" pattern and the word campaign, and
+any [bracketed] placeholder left from the template, on the slide or in the notes. These wording
+hits are warnings to read: a verbatim quote or an interval such as [19%, 39%] may trip them.
 """
 import os
 import re
@@ -117,6 +118,12 @@ def lint(deck_dir):
         for pat, name in (('—', 'em dash'), (', not ', '"X, not Y" pattern'), ('campaign', 'the word campaign')):
             if pat in visible:
                 warns.append(name)
+        notes = ' '.join(d for in_aside, d in p.text if in_aside)
+        left = re.findall(r'\[[^\]\n]{1,60}\]', visible)
+        if left:
+            warns.append(f'{len(left)} placeholder(s) left, e.g. {left[0]}')
+        if '[讲稿]' in notes:
+            warns.append('template notes left')
         bad += bool(errs)
         tag = '!!' if errs else ('..' if warns else 'ok')
         print(f'{tag} {sid:16s} elements={p.n:3d} pinned_max={max(p.pinned.values()) if p.pinned else 0:2d} div_depth={p.max_div:2d}',

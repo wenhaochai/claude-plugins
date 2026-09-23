@@ -26,7 +26,7 @@ The Slides artifact type ships its own instructions for the file format and the 
 - A title is a noun label that names what the slide shows: "Method", "Results", "Harbor-Index", "Vals Index v2", "Tasks and grading", "Commission task". Titles carry no claims or conclusions.
 - A title the user gives verbatim stays as given, such as a source's own headline.
 - The eyebrow names the part, as in "Part 3 · Public indices", and never repeats the title.
-- Chart titles are short noun phrases as well. No headline is a comma-joined list of clipped phrases.
+- Chart titles are short labels that say what the chart shows and carry no conclusion either. No headline is a comma-joined list of clipped phrases.
 
 **Text**
 
@@ -40,7 +40,7 @@ The Slides artifact type ships its own instructions for the file format and the 
 - Show data as charts; a table becomes a chart. Show a headline number next to the figure that produced it, such as ρ beside its fit plot.
 - The paper part takes three slides: the first page with the question it asks, one method figure, one comparison figure. Redraw the paper's figures in the deck style; the first page is the only screenshot.
 - When a source publishes an official figure, use it as is.
-- Every mark must carry data. Leave out decorative icons, standalone big numerals, invented example distributions, side facts such as run cost or release counts, showcases of one model's numbers, aggregate categories with fuzzy edges, and categories whose meaning is unclear.
+- Every mark must carry data. Leave out decorative icons, big numerals with no quantity behind them, invented example distributions, side facts such as run cost or release counts, showcases of one model's numbers, aggregate categories with fuzzy edges, and categories whose meaning is unclear.
 - Draw signed weights as magnitudes and label the two directions at the ends. State the source's sign convention in the notes.
 - A leaderboard shows the top five with the uncertainty the source publishes, and the chart title names the interval. When the live board has fewer entries than the chart, say so under it.
 - After drawing, check each chart against its source: order, sign, direction, units, the date of the data.
@@ -72,7 +72,8 @@ The Slides artifact type ships its own instructions for the file format and the 
 | index-legend | weight formula, grader legend bar, leaderboard with errors | `composition`, `legend_bar`, `board` |
 | index-curves | fitted curves on one scale, counts, interval leaderboard | `curves`, `board` |
 | topic-intro | four-step pipeline, a real task's checks, three scores | `pipeline`, `card`, `checklist`, `hbars` |
-| example-1, example-2 | prompt, rubric, the output that trips a check | `quote_card`, `rubric`, `hl` |
+| example-1 | prompt, rubric, the one output that trips a check | `quote_card`, `rubric`, `hl` |
+| example-2 | the deciding context, rubric, what several runs produced | `quote_card`, `rubric`, `outputs`, `hl` |
 | summary | one point per part and a closing line | `summary` |
 
 The builders take data and return HTML in the Slides subset. `board` takes rows of name, shown value, value and an optional interval; `seg_bar` takes shares with labels and an optional bracket over a run of segments; `curves` takes logistic curves with their midpoints and slopes. Each docstring states the width and height a builder uses.
@@ -93,7 +94,7 @@ The Slides runtime lays out a slide differently from a plain browser. `reference
 
 Run this before each publish and after every round of changes:
 
-1. `lint.py` passes: file contract, subset limits, 24px text, no negative offsets, no dropped spacers. Read the wording warnings; a verbatim quote may trip them.
+1. `lint.py` passes: file contract, subset limits, 24px text, no negative offsets, no dropped spacers. Read every warning: a template placeholder left on a slide or in the notes, or banned wording; a verbatim quote may trip the wording check.
 2. `audit_render.py` passes on every changed slide: no shrink, no overflow, nothing outside the margins, no overlapping text.
 3. Every screenshot looks right: alignment, labels clear of curves and bars, legends matching colors.
 4. Every number on the slide matches the raw data, and live numbers were fetched today.

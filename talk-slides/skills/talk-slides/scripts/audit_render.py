@@ -14,7 +14,10 @@ screenshot, and reports what the runtime did to the slide:
   margin    a text box outside x 128..1792, or below y 920 on a slide with a footer band, 952 without
   overlap   two text boxes that intersect by more than 2px
 
-Exit status 1 when any slide has a finding. Screenshots and audit.json go to --out.
+The shrink check compares against the font sizes written in the slide file, so give every text
+element its own font-size, as the deckkit builders do; a size inherited from a parent shows up as
+a false shrink finding. Exit status 1 when any slide has a finding. Screenshots and audit.json go
+to --out.
 """
 import argparse
 import functools

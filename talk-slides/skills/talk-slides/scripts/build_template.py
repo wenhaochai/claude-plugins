@@ -62,7 +62,7 @@ for _ in range(80):
 host, xrow = scatter(pts, notes=[('ρ = [0.99]', f'font-size:32px; font-weight:600; color:{ACC}'), ('R² = [0.97]', f'font-size:24px; color:{SOFT}')],
                      aria='[Benchmark]: predicted versus full score, one dot per model')
 left = f'''<div style="width:700px; display:flex; flex-direction:column; gap:8px">
-      <p style="font-size:24px; font-weight:600; color:{INK}">[Benchmark], one dot per [unit]</p>
+      <p style="font-size:24px; font-weight:600; color:{INK}">One dot per [unit] on [Benchmark]</p>
       <p style="font-size:24px; color:{SOFT}; padding:8px 0 0 0">Predicted from the [n] kept items</p>
       {host}
       {xrow}
@@ -185,11 +185,11 @@ left = f'''<div style="width:820px; display:flex; flex-direction:column; gap:16p
       <div style="display:flex; gap:64px">{counts}</div>
     </div>'''
 erows = [('[Model A]', '166.6', 166.6, 163.0, 172.0), ('[Model B]', '165.0', 165.0, 161.6, 169.6), ('[Model C]', '163.6', 163.6, 160.6, 167.6),
-         ('[Model D]', '162.7', 162.7, 160.0, 166.5), ('[Model E]', '162.4', 162.4, 159.2, 166.6), ('[Model F]', '162.0', 162.0, 159.6, 165.9)]
+         ('[Model D]', '162.7', 162.7, 160.0, 166.5), ('[Model E]', '162.4', 162.4, 159.2, 166.6)]
 body = f'''<div style="flex:1; display:flex; gap:56px">
     {left}
     <div style="flex:1; display:flex; flex-direction:column; gap:28px">
-      {board('Top six models with 90% intervals', erows, 155, 175, (155, 160, 165, 170, 175), 250, 788 - 250 - 16 - 36, 54)}
+      {board('Top five models with 90% intervals', erows, 155, 175, (155, 160, 165, 170, 175), 250, 788 - 250 - 16 - 36, 54)}
     </div>
   </div>'''
 S['index-curves'] = slide('index-curves', 'Part 3 · [Part name]', '[Index D]', body, 'Source: [site], read [DD Mon YYYY]', gap=32,
@@ -198,9 +198,9 @@ S['index-curves'] = slide('index-curves', 'Part 3 · [Part name]', '[Index D]', 
 # ---------------------------------------------------------------- 11 topic intro: pipeline cards, a real example, three scores of one run set
 cards = [card('Task', big('[600]'), '[public items, how they split]', sub('[how many more are private]')),
          card('Agent', big('[47]'), '[what the agent works in]', sub('[the step or turn limit]')),
-         card('Grading', icon_chip('Database'), '[what the grader reads]', sub('[what it ignores]')),
+         card('Grading', big('[State]'), '[the only thing the grader reads]', sub('[what it ignores]')),
          card('Checks', big('[11]'), '[checks per task, median]', f'<div style="display:flex; flex-wrap:wrap; gap:8px">{pill("✓ objective", BLUE)}{pill("✕ guardrail", ACC)}</div>')]
-example = checklist('Example: [one real task in a few words]', '[where the rule the task depends on lives]',
+example = checklist('[One real task] and its checks', '[where the rule the task depends on lives]',
                     ['[Check that must hold]', '[Check that must hold, with the exact strings]', '[Check that must hold]'],
                     ['[Thing that must not happen]', '[Thing that must not happen]', '[Thing that must not happen]'])
 scores = hbars('[Model] on the same [n] runs', [('[Rule 1]', 90.4, GREY, '90%'), ('[Rule 2]', 69.5, ACC, '69.5%'), ('[Rule 3]', 41.2, INK, '41.2%')])
@@ -213,21 +213,32 @@ S['topic-intro'] = slide('topic-intro', 'Part 4 · [Benchmark] · [Maker, Month 
                          'Sources: [paper]; [leaderboard]; example task [id] from the public [version] set', gap=32,
                          note='[讲稿] 流程四步；真实例子的每条检查；同一批运行在三种算分下的结果。')
 
-# ---------------------------------------------------------------- 12 and 13 examples: prompt, rubric, the output that trips the check
-for sid, n in [('example-1', 1), ('example-2', 2)]:
-    left = f'''<div style="width:780px; display:flex; flex-direction:column; gap:28px">{quote_card('Prompt, excerpt', '“… [the sentence of the prompt that matters] …”')}
-      {rubric('Rubric for [the output]', [('Objective', 'body contains <b>[string]</b>'), ('Guardrail', f'body does not contain {hl("[string]")}')])}
+# ---------------------------------------------------------------- 12 example with one output: prompt, rubric, the output that trips the check
+rub = rubric('Rubric for [the output]', [('Objective', 'body contains <b>[string]</b>'), ('Guardrail', f'body does not contain {hl("[string]")}')])
+left = f'''<div style="width:780px; display:flex; flex-direction:column; gap:28px">{quote_card('Prompt, excerpt', '“… [the sentence of the prompt that matters] …”')}
+      {rub}
     </div>'''
-    out = quote_card('[Run], [output]', f'[Output text with the tripped string] {hl("[string]")} [rest of the output]', italic=False)
-    right = f'''<div style="flex:1; display:flex; flex-direction:column; gap:24px">{out}
+out = quote_card('[Run], [output]', f'[Output text with the tripped string] {hl("[string]")} [rest of the output]', italic=False)
+right = f'''<div style="flex:1; display:flex; flex-direction:column; gap:24px">{out}
       <p style="font-size:28px; line-height:1.4; color:{INK}">[How many runs failed on this check, and why the work was correct]</p>
     </div>'''
-    body = f'''<div style="flex:1; display:flex; gap:56px">
+S['example-1'] = slide('example-1', 'Part 4 · [Benchmark] · Example 1', '[Task name]', f'''<div style="flex:1; display:flex; gap:56px">
     {left}
     {right}
-  </div>'''
-    S[sid] = slide(sid, f'Part 4 · [Benchmark] · Example {n}', '[Task name]', body, 'Source: [task id], [benchmark version]; [where the runs come from]', gap=36,
-                   note='[讲稿] prompt 要求什么，正确答案是什么，检查写了什么，哪几个运行因此失败。')
+  </div>''', 'Source: [task id], [benchmark version]; [where the runs come from]', gap=36,
+                       note='[讲稿] prompt 要求什么，正确答案是什么，检查写了什么，哪几个运行因此失败。')
+
+# ---------------------------------------------------------------- 13 example with several runs: context, rubric, what each run produced
+left = f'''<div style="width:780px; display:flex; flex-direction:column; gap:28px">{quote_card('Context', '[The fact in the task data that decides the right answer]', italic=False)}
+      {rub}
+    </div>'''
+right = outputs('What the runs produced', [('[Run A]', f'“[quoted output with] {hl("[string]")} [in it]”'), ('[Run B]', f'“[quoted output with] {hl("[string]")} [in it]”')],
+                '[How the check scored these runs, and why the work was correct]')
+S['example-2'] = slide('example-2', 'Part 4 · [Benchmark] · Example 2', '[Task name]', f'''<div style="flex:1; display:flex; gap:56px">
+    {left}
+    {right}
+  </div>''', 'Source: [task id], [benchmark version]; [where the runs come from]', gap=36,
+                       note='[讲稿] 数据里决定正确答案的那条信息；检查写了什么；每个运行写了什么、为什么被判错。')
 
 # ---------------------------------------------------------------- 14 summary
 S['summary'] = summary('summary', [('The paper', '[What part 1 showed, one line]'), ('[Part 2]', '[What part 2 showed, one line]'),
@@ -237,11 +248,16 @@ S['summary'] = summary('summary', [('The paper', '[What part 1 showed, one line]
 order = list(S)
 for sid, html in S.items():
     open(os.path.join(SL, f'{sid}.html'), 'w').write(html)
-deck = {'v': 4, 'createdOnFiles': {'v': 1, 'at': _dt.datetime.now(_dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')},
+index = os.path.join(OUT, 'project', 'deck.json')
+try:
+    created = json.load(open(index))['createdOnFiles']      # a rebuild keeps the original creation record
+except (OSError, ValueError, KeyError):
+    created = {'v': 1, 'at': _dt.datetime.now(_dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}
+deck = {'v': 4, 'createdOnFiles': created,
         'title': '[Deck title]', 'order': order,
         'sections': {'s0': {'description': 'Title and outline', 'start': 'cover'}, 's1': {'description': 'The paper', 'start': 'paper'},
                      's2': {'description': '[Part 2]', 'start': 'concept'}, 's3': {'description': '[Part 3]', 'start': 'index-funnel'},
                      's4': {'description': '[Part 4]', 'start': 'topic-intro'}, 's5': {'description': 'Summary', 'start': 'summary'}},
         'faces': FACES, 'designSystems': []}
-json.dump(deck, open(os.path.join(OUT, 'project', 'deck.json'), 'w'), ensure_ascii=False, indent=2)
+json.dump(deck, open(index, 'w'), ensure_ascii=False, indent=2)
 print(f'wrote {len(order)} slides to {SL}')
