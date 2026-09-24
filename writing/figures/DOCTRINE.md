@@ -69,6 +69,10 @@ A protocol difference is a one-way arrow against a loop. A funnel is segments th
 Reach for a legend only when geometry cannot say it, and a figure that needs a legend to explain what
 its shapes mean is a figure that has not been designed yet.
 
+A legend that stays is one short row of names, one per mark the reader must match. Definitions,
+formulas and reading instructions, such as `δ: improvement over its parent` or `∝ exp(β·δ)`, go in the
+caption or the text, never in the legend. Five entries of mixed prose is a legend to delete.
+
 ## 8. The docstring states what the figure claims and where the numbers came from
 
 Every figure script opens with: what the figure shows, the data source by file path or run id, the
