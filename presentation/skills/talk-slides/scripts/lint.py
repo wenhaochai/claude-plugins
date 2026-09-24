@@ -7,8 +7,8 @@ Errors: the file contract (one section, id equals file name, notes last), the su
 text under 24px, a negative left/top, which the runtime clamps to 0, an empty width-only div,
 which the runtime drops with its gap, and notes over 4,000 characters.
 Warnings: em dashes, the "X, not Y" pattern, the word campaign, [bracketed] placeholders, raw
-line breaks in the notes, which the runtime turns into spaces, notes that are not English lines,
-a blank line and then Chinese, and English sentences over 18 words. A verbatim quote or an
+line breaks in the notes, which the runtime turns into spaces, notes that are not pairs of one
+English line and its Chinese line split by blank lines, and English sentences over 18 words. A verbatim quote or an
 interval such as [19%, 39%] may trip a warning.
 """
 import html
@@ -133,12 +133,11 @@ def lint(deck_dir):
             text = '\n'.join(re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', '', part))).strip() for part in parts)
             if len(text) > 4000:
                 errs.append(f'notes are {len(text)} characters, the limit is 4,000')
-            blocks = text.split('\n\n')
-            if len(blocks) != 2 or CJK.search(blocks[0]) or not CJK.search(blocks[1]):
-                warns.append('notes are not a script: English lines, a blank line, then the Chinese')
+            pairs = [b.split('\n') for b in text.strip().split('\n\n')]
+            if any(len(b) != 2 or CJK.search(b[0]) or not CJK.search(b[1]) for b in pairs):
+                warns.append('notes are not a script: pairs of one English line and its Chinese line, split by blank lines')
             else:
-                en = blocks[0]
-                sents = [s for line in en.splitlines() for s in re.split(r'(?<=[.?!])\s+', line.strip()) if s]
+                sents = [s for b in pairs for s in re.split(r'(?<=[.?!])\s+', b[0].strip()) if s]
                 long = [s for s in sents if len(s.split()) > 18]
                 if long:
                     warns.append(f'{len(long)} English sentence(s) over 18 words, e.g. "{long[0][:40]}..."')

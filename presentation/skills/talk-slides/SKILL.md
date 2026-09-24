@@ -31,7 +31,7 @@ The Slides artifact type's own instructions cover the file format and the Artifa
 
 ## Speaker notes
 
-The notes are the script the speaker reads aloud: the English lines, one blank line, then the same content in Chinese.
+The notes are the script the speaker reads aloud, sentence by sentence: each English line is followed by its Chinese line, and a blank line separates the pairs.
 
 - The speaker reads the English in a second language: one sentence per line, at most 18 words, common words.
 - Leave out names the speaker may not know how to say. Say "the author" or "one model", and keep only the names the audience needs, such as the leaders on a leaderboard.
