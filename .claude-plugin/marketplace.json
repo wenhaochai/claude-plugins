@@ -26,9 +26,9 @@
       "description": "Monitoring doctrine for pretraining runs, distilled from Chunyuan Deng's \"Reading a Pretraining Run\" (2026): nine first-screen signals, a 39-row metric table with cadence and priority, formulas, cross-rank reduction rules, a robust spike detector, the triage order, and the common mistakes. Text only; the agent decides how to implement it for its own stack."
     },
     {
-      "name": "talk-slides",
-      "source": "./talk-slides",
-      "description": "Build, revise and audit talk decks as claude.ai Slides artifacts: the author's rules for the slides and the spoken script, layout builders with a template, a static lint and a render audit in the Slides runtime."
+      "name": "presentation",
+      "source": "./presentation",
+      "description": "Talks and videos. talk-slides builds, revises and audits talk decks as claude.ai Slides artifacts, with the author's rules for slides and script, layout builders, a lint and a render audit; video makes a short explainer video from a page's own animations and data, with the author's design rules and a frame sink."
     }
   ]
 }

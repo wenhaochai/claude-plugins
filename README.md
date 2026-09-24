@@ -84,16 +84,19 @@ formulas, the cross-rank reduction rules, a robust spike detector, the fixed tri
 the common mistakes. The agent inventories what its stack already logs, fills the P0 gaps first,
 sets thresholds from healthy runs, and decides for itself whether a script is warranted.
 
-## `talk-slides` — talk decks as claude.ai Slides artifacts
+## `presentation` — talk decks and explainer videos
 
-One skill for building, revising and auditing a talk deck in the claude.ai Slides artifact
-format. It carries the author's rules for the slides and the spoken script, layout builders with
-a template built from them, a static lint, and a render audit in the Slides runtime.
+Two skills. `talk-slides` builds, revises and audits a talk deck in the claude.ai Slides artifact
+format: the author's rules for the slides and the spoken script, layout builders with a template, a
+static lint, and a render audit in the Slides runtime. `video` makes a short explainer video of a
+page from its own animations and data: the author's design rules for motion pieces, a director
+workflow, and a frame sink that collects the frames for ffmpeg.
 
 ```bash
-python3 talk-slides/skills/talk-slides/scripts/build_template.py OUT
-python3 talk-slides/skills/talk-slides/scripts/lint.py DECK_DIR
-python3 talk-slides/skills/talk-slides/scripts/audit_render.py RUNTIME_DIR --out shots
+python3 presentation/skills/talk-slides/scripts/build_template.py OUT
+python3 presentation/skills/talk-slides/scripts/lint.py DECK_DIR
+python3 presentation/skills/talk-slides/scripts/audit_render.py RUNTIME_DIR --out shots
+python3 presentation/skills/video/scripts/frame_sink.py FRAMES_DIR DIRECTOR_DIR
 ```
 
 ## Install
@@ -104,7 +107,7 @@ python3 talk-slides/skills/talk-slides/scripts/audit_render.py RUNTIME_DIR --out
 /plugin install anti-autoresearch@wenhaochai
 /plugin install kexue-fm@wenhaochai
 /plugin install training-monitor@wenhaochai
-/plugin install talk-slides@wenhaochai
+/plugin install presentation@wenhaochai
 ```
 
 Upgrading from `writing` 1.x: the 12 integrity-forensics skills moved out of `writing` into the new
