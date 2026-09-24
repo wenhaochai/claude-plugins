@@ -1,6 +1,6 @@
 {
   "name": "presentation",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Talks and videos. talk-slides builds, revises and audits talk decks as claude.ai Slides artifacts, with the author's rules for slides and script, layout builders, a lint and a render audit; video makes a short explainer video from a page's own animations and data, with the author's design rules and a frame sink.",
   "author": {
     "name": "Wenhao Chai",

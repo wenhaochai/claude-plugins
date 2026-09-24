@@ -15,7 +15,7 @@ A video of a piece of work runs about a minute and plays as one piece of motion 
 - The picture carries the story. No text column stays on screen: each statement is one short line placed next to the action it describes, on screen only for that moment, with its key words in the accent. Numbers and names sit on the visuals as direct labels, and the takeaway is the one full sentence, at the end.
 - Copy comes from the source. Titles, names and the takeaway are quoted verbatim, the video adds no summary lines of its own, and it never uses the middle dot (U+00B7).
 - Give it rhythm: when a beat repeats, play it slowly the first time and quickly after.
-- Explain a mechanism at least as clearly as its source by porting the source figure's beats, formulas and labels. Where the source shows single runs and their average, so does the video.
+- Explain a mechanism at least as clearly as its source by porting the source figure's beats and labels. Where the source shows single runs and their average, so does the video. No formulas on screen: a statement says the rule in words, and its numbers sit on the visuals as labels.
 - Introduce every named setup on screen before the scene that uses it, and show every option from one extreme to the other.
 - Show every comparison the source supports, each as a race on one clock, and make each result explicit: the winner gets an accent frame and its number, the loser dims, and a ranking closes the set.
 - Choose an example where the obvious option loses at least one race. Keep it typical: each option's run is the session closest to its mean over many sessions, and the video states only results that hold on most sessions.
