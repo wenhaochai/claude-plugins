@@ -8,8 +8,10 @@ text under 24px, a negative left/top, which the runtime clamps to 0, an empty wi
 which the runtime drops with its gap, and notes over 4,000 characters.
 Warnings: em dashes, the "X, not Y" pattern, the word campaign, [bracketed] placeholders, raw
 line breaks in the notes, which the runtime turns into spaces, notes that are not pairs of one
-English line and its Chinese line split by blank lines, English sentences over 18 words, and
-a count of [click] marks in the notes that differs from the slide's click builds. A verbatim quote or an
+English line and its Chinese line split by blank lines, English sentences over 18 words,
+a count of [click] marks in the notes that differs from the slide's click builds, and type off
+the scale: sans text at 24, 28 or 36px in regular or 600, serif at 56 or 120px in 400 or 500,
+nothing italic. A verbatim quote or an
 interval such as [19%, 39%] may trip a warning.
 """
 import html
@@ -19,6 +21,9 @@ import sys
 from html.parser import HTMLParser
 
 VOID = {'br', 'hr', 'img'}
+# the type scale: serif for titles (56, 500), cover and end (120) and big numbers (56, 400); sans for the rest
+SANS_SIZES, SERIF_SIZES = {24, 28, 36}, {56, 120}
+SANS_WEIGHTS, SERIF_WEIGHTS = {'400', '600', 'normal'}, {'400', '500', 'normal'}
 CJK = re.compile(r'[\u4e00-\u9fff]')
 PAINT = ('background', 'border', 'box-shadow')
 
@@ -29,6 +34,7 @@ class Parser(HTMLParser):
         self.stack, self.n, self.in_svg, self.svg_nodes = [], 0, False, 0
         self.issues, self.uid, self.max_div, self.pinned, self.text = [], 0, 0, {}, []
         self.in_aside, self.last_div, self.in_embed = False, None, False
+        self.type_off = set()
 
     def handle_starttag(self, tag, attrs):
         if self.in_embed:  # an <x-embed> is its own page: the runtime does not read it, nor does the lint
@@ -38,6 +44,8 @@ class Parser(HTMLParser):
         a = dict(attrs)
         st = (a.get('style') or '').replace(' ', '')
         self.last_div = None
+        if not self.in_svg:
+            self.check_type(st)
         if self.in_svg:
             self.svg_nodes += 1
             if tag == 'text':
@@ -71,6 +79,19 @@ class Parser(HTMLParser):
         if tag not in VOID:
             self.uid += 1
             self.stack.append((tag, 'position:relative' in st, self.uid) if tag != 'svg' else 'svg')
+
+    def check_type(self, st):
+        fam = re.search(r'font-family:([^;]*)', st)
+        serif = bool(fam) and 'serif' in fam.group(1) and 'sans-serif' not in fam.group(1)
+        face = 'serif' if serif else 'sans'
+        m = re.search(r'font-size:([\d.]+)px', st)
+        if m and float(m.group(1)) not in (SERIF_SIZES if serif else SANS_SIZES):
+            self.type_off.add(f'{face} {float(m.group(1)):g}px')
+        w = re.search(r'font-weight:(\w+)', st)
+        if w and w.group(1) not in (SERIF_WEIGHTS if serif else SANS_WEIGHTS):
+            self.type_off.add(f'{face} weight {w.group(1)}')
+        if 'font-style:italic' in st:
+            self.type_off.add('italic')
 
     def handle_startendtag(self, tag, attrs):
         if self.in_embed:
@@ -115,6 +136,8 @@ def lint(deck_dir):
         p = Parser()
         p.feed(src)
         errs, warns = list(p.issues), []
+        if p.type_off:
+            warns.append('type off the scale: ' + ', '.join(sorted(p.type_off)))
         if not re.match(rf'<section id="{re.escape(sid)}"', src.strip()):
             errs.append('section id differs from the file name')
         if src.count('<section') != 1:

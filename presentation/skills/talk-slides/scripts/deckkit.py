@@ -89,7 +89,7 @@ def agenda(sid, parts, title, note=''):
         rows += f'''
     <div style="display:flex; gap:48px; align-items:baseline; {border}; padding:44px 0">
       <p style="font-family:{SERIF}; font-size:56px; line-height:1; color:{ACC}; width:80px">{i + 1}</p>
-      <p style="font-size:36px; font-weight:600; color:{INK}; width:480px">{name}</p>
+      <p style="font-size:36px; color:{INK}; width:480px">{name}</p>
       <p style="font-size:28px; line-height:1.4; color:{SOFT}; width:1000px">{desc}</p>
     </div>'''
     return f'''<section id="{sid}" data-transition="fade" style="background:{PAPER}; color:{INK}; font-family:{SANS}; padding:128px; display:flex; flex-direction:column; gap:48px">
@@ -114,8 +114,9 @@ def ctitle(text):
     return f'<p style="font-size:28px; font-weight:600; color:{INK}">{text}</p>'
 
 
-def label(text, color=SOFT):
-    return f'<p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:{color}">{text}</p>'
+def label(text, color=INK):
+    """Panel heading: the same style as ctitle, 28px semibold."""
+    return f'<p style="font-size:28px; font-weight:600; color:{color}">{text}</p>'
 
 
 def image(alt, w, h, src='', extra=''):
@@ -164,7 +165,7 @@ def seg_bar(segs, width=788, bracket=None, gap=4):
     for w, (share, bg, name, detail) in zip(ws, segs):
         cols += f'''
           <div style="width:{w}px; display:flex; flex-direction:column; gap:8px">
-            <p style="background:{bg}; color:{WHITE}; font-size:24px; font-weight:600; line-height:1.4; padding:6px 12px">{round(share * 100)}%</p>
+            <p style="background:{bg}; color:{WHITE}; font-size:24px; line-height:1.4; padding:6px 12px">{round(share * 100)}%</p>
             <p style="font-size:24px; font-weight:600; color:{INK}; padding:0 16px 0 0">{name}</p>
             <p style="font-size:24px; line-height:1.3; color:{SOFT}; padding:0 16px 0 0">{detail}</p>
           </div>'''
@@ -174,7 +175,7 @@ def seg_bar(segs, width=788, bracket=None, gap=4):
         x = sum(ws[:a]) + gap * a
         bw = sum(ws[a:b + 1]) + gap * (b - a)
         out += f'''<div style="position:relative; width:{width}px; height:46px">
-          {pin(x, 0, bw, text, f'font-size:24px; font-weight:600; color:{ACC}; text-align:center')}
+          {pin(x, 0, bw, text, f'font-size:24px; color:{ACC}; text-align:center')}
           <div style="position:absolute; left:{x}px; top:34px; width:{bw}px; height:12px; border:2px solid {ACC}; border-bottom:none"></div>
         </div>
         '''
@@ -225,11 +226,11 @@ def range_rows(rows, lo_v=0.5, hi_v=1.0, ticks=(0.5, 0.6, 0.7, 0.8, 0.9, 1.0), N
         mid = RH // 2 + 14
         out += f'''
         <div style="display:flex; align-items:center; gap:24px">
-          <p style="width:{NW}px; font-size:28px; font-weight:600; color:{col}; text-align:right">{name}</p>
+          <p style="width:{NW}px; font-size:28px; color:{col}; text-align:right">{name}</p>
           <div style="position:relative; width:{TW}px; height:{RH}px">
             <div style="position:absolute; left:{round(R(worst))}px; top:{mid - 4}px; width:{round(R(best) - R(worst))}px; height:8px; border-radius:4px; background:{LGREY}"></div>
             <div style="position:absolute; left:{round(R(mean)) - 15}px; top:{mid - 15}px; width:30px; height:30px; border-radius:50%; background:{col}; border:3px solid {PAPER}"></div>
-            {pin(R(mean) - 50, mid - 50, 100, fmt.format(mean), f'font-size:28px; font-weight:600; color:{col}; text-align:center')}
+            {pin(R(mean) - 50, mid - 50, 100, fmt.format(mean), f'font-size:28px; color:{col}; text-align:center')}
             {pin(R(worst) - 66, mid - 17, 58, fmt.format(worst), f'font-size:24px; color:{MUTED}; text-align:right')}
             {pin(R(best) + 8, mid - 17, 58, fmt.format(best), f'font-size:24px; color:{MUTED}')}
           </div>
@@ -278,7 +279,7 @@ def histogram(heights, kept, band_labels, axis_labels, width=1664, height=380, g
     lo, hi = min(kept), max(kept)
     xs = [round(lo * (bw + gap) - gap / 2), round((hi + 1) * (bw + gap) - gap / 2)]
     dashes = ''.join(f'<div style="position:absolute; left:{x}px; top:0px; width:2px; height:{height}px; border-left:2px dashed #828589"></div>' for x in xs)
-    top = ''.join(pin(x, 0, w, t, f'font-size:24px;{" font-weight:600;" if b else ""} color:{ACC if b else SOFT}; text-align:center') for x, w, t, b in band_labels)
+    top = ''.join(pin(x, 0, w, t, f'font-size:24px; color:{ACC if b else SOFT}; text-align:center') for x, w, t, b in band_labels)
     bottom = ''.join(pin(x, 0, w, t, f'font-size:24px; color:{SOFT}; text-align:{a}') for x, w, t, a in axis_labels)
     return f'''<div style="display:flex; flex-direction:column; gap:12px">
     <div style="position:relative; width:{width}px; height:34px">{top}</div>
@@ -292,7 +293,7 @@ def histogram(heights, kept, band_labels, axis_labels, width=1664, height=380, g
 
 def card(eyebrow_text, big_html, caption, sub_html, width=368):
     return f'''<div style="width:{width}px; background:{CARD}; border:1px solid {RULE}; border-radius:12px; padding:24px; display:flex; flex-direction:column; gap:8px">
-      <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:{ACC}">{eyebrow_text}</p>
+      <p style="font-size:28px; font-weight:600; color:{INK}">{eyebrow_text}</p>
       {big_html}
       <p style="font-size:24px; line-height:1.3; color:{INK}">{caption}</p>
       {sub_html}
@@ -300,7 +301,7 @@ def card(eyebrow_text, big_html, caption, sub_html, width=368):
 
 
 def big(text):
-    return f'<p style="font-family:{SERIF}; font-size:64px; line-height:1; color:{INK}">{text}</p>'
+    return f'<p style="font-family:{SERIF}; font-size:56px; line-height:1; color:{INK}">{text}</p>'
 
 
 def sub(text):
@@ -353,15 +354,15 @@ def hbars(title, rows, max_w=500):
         out += f'''
         <div style="display:flex; flex-direction:column; gap:4px">
           <p style="font-size:24px; color:{SOFT}">{lab}</p>
-          <div style="display:flex; align-items:center; gap:12px"><div style="width:{round(max_w * v / 100)}px; height:30px; background:{col}"></div><p style="font-size:28px; font-weight:600; color:{SOFT if col == GREY else col}">{shown}</p></div>
+          <div style="display:flex; align-items:center; gap:12px"><div style="width:{round(max_w * v / 100)}px; height:30px; background:{col}"></div><p style="font-size:28px; color:{SOFT if col == GREY else col}">{shown}</p></div>
         </div>'''
     return f'''<div style="flex:1; display:flex; flex-direction:column; gap:14px">
       {ctitle(title)}{out}
     </div>'''
 
 
-def quote_card(heading, text, italic=True):
-    font = f"font-family:{SERIF}; font-style:italic; " if italic else ''
+def quote_card(heading, text):
+    font = ''
     return f'''<div style="display:flex; flex-direction:column; gap:10px; background:{CARD}; border:1px solid {RULE}; border-radius:12px; padding:24px 28px">
         {label(heading)}
         <p style="{font}font-size:28px; line-height:1.4; color:{INK}">{text}</p>
@@ -385,7 +386,7 @@ def rubric(heading, rows):
 
 def hl(text):
     """Mark the string a check reacts to inside quoted output."""
-    return f'<b><span style="color:{ACC}">{text}</span></b>'
+    return f'<span style="color:{ACC}">{text}</span>'
 
 
 def summary(sid, points, closing, note=''):
@@ -395,7 +396,7 @@ def summary(sid, points, closing, note=''):
       <p style="font-family:{SERIF}; font-size:56px; line-height:1; color:{ACC}; width:48px">{i + 1}</p>
       <div style="flex:1; display:flex; flex-direction:column; gap:6px">
         {label(lab)}
-        <p style="font-size:30px; line-height:1.35; color:{INK}">{txt}</p>
+        <p style="font-size:28px; line-height:1.35; color:{INK}">{txt}</p>
       </div>
     </div>''' for i, (lab, txt) in enumerate(points))
     body = f'''<div style="display:flex; flex-direction:column; gap:14px; width:1560px">{items}

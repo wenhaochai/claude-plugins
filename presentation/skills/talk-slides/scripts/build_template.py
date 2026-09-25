@@ -54,7 +54,7 @@ S['method'] = slide('method', 'Part 1 · The paper', 'Method', body, 'Source: [p
 # ---------------------------------------------------------------- results: fit plot and method comparison
 rng = random.Random(7)
 pts = [(x, min(max(x + rng.gauss(0, 0.035), 0.0), 0.8)) for x in (rng.uniform(0.03, 0.76) for _ in range(80))]
-host, xrow = scatter(pts, notes=[('ρ = [0.99]', f'font-size:32px; font-weight:600; color:{ACC}'), ('R² = [0.97]', f'font-size:24px; color:{SOFT}')],
+host, xrow = scatter(pts, notes=[('ρ = [0.99]', f'font-size:24px; color:{ACC}'), ('R² = [0.97]', f'font-size:24px; color:{SOFT}')],
                      aria='[Benchmark]: predicted versus full score, one dot per model')
 comp = [('Ours', 0.94, 0.99, 0.87, True), ('Method A', 0.92, 0.98, 0.83, False), ('Method B', 0.88, 0.99, 0.54, False),
         ('Method C', 0.88, 0.98, 0.68, False), ('Method D', 0.86, 0.99, 0.56, False)]
@@ -116,8 +116,8 @@ S['topic-intro'] = slide('topic-intro', 'Part 3 · [Topic] · [Maker, Month Year
                          note='[Script] The four steps, one line each.\n[Script] The real task and its checks.\n[Script] The same runs under three scoring rules.\n\n[讲稿] 流程四步；真实例子的检查；同一批运行的三种算分。')
 
 # ---------------------------------------------------------------- example: prompt, rubric, the output that trips the check
-rub = rubric('Rubric for [the output]', [('Objective', 'body contains <b>[string]</b>'), ('Guardrail', f'body does not contain {hl("[string]")}')])
-out = quote_card('[Run], [output]', f'[Output text with the tripped string] {hl("[string]")} [rest of the output]', italic=False)
+rub = rubric('Rubric for [the output]', [('Objective', 'body contains [string]'), ('Guardrail', f'body does not contain {hl("[string]")}')])
+out = quote_card('[Run], [output]', f'[Output text with the tripped string] {hl("[string]")} [rest of the output]')
 body = f'''<div style="flex:1; display:flex; gap:56px">
     <div style="width:780px; display:flex; flex-direction:column; gap:28px">{quote_card('Prompt, excerpt', '“… [the sentence of the prompt that matters] …”')}
       {rub}
