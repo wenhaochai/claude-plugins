@@ -27,7 +27,7 @@ The Slides artifact type's own instructions cover the file format and the Artifa
 - A paper takes three slides: its first page with the question, one method figure, one comparison figure.
 - One slide per method, index or example. The first slide of a new topic says what it is and how it works, with one real example.
 - An index slide shows its composition and principles; strengths and weaknesses go in the notes.
-- An animation the user asks for is one continuous scene in an `<x-embed>`: a canvas drawn as a function of time, each phase as long as the note lines said over it. Click builds only reveal parts of a still slide.
+- A slide shows everything at once, so the speaker clicks once per slide. A click build is kept for a reveal that is the point, such as the answer to a question the audience first guesses. A sequence is drawn as one still picture, such as the start faint under the end. Animate only when the user asks: the animation is then one continuous scene in an `<x-embed>`, a canvas drawn as a function of time, each phase as long as the note lines said over it.
 - A leaderboard shows the top five with the uncertainty the source publishes, and its title names the interval.
 - The cover states title, author and date. The agenda lists the parts, and the summary gives one point per part and a closing line.
 
