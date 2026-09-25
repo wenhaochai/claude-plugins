@@ -37,6 +37,7 @@ The notes are the script the speaker reads aloud, sentence by sentence: each Eng
 - Leave out names the speaker may not know how to say. Say "the author" or "one model", and keep only the names the audience needs, such as the leaders on a leaderboard.
 - About a minute per slide: first what the slide shows, then one strength and one problem, in the author's words when the author gave them.
 - Numbers printed on the slide are said exactly; the rest are rounded.
+- A slide with builds marks each click in the notes: `[click] ` starts the English line said as that build appears, one mark per build order, so the script and the builds keep the same timeline. The lint counts them.
 
 ## Runtime
 

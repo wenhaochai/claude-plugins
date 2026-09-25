@@ -8,7 +8,8 @@ text under 24px, a negative left/top, which the runtime clamps to 0, an empty wi
 which the runtime drops with its gap, and notes over 4,000 characters.
 Warnings: em dashes, the "X, not Y" pattern, the word campaign, [bracketed] placeholders, raw
 line breaks in the notes, which the runtime turns into spaces, notes that are not pairs of one
-English line and its Chinese line split by blank lines, and English sentences over 18 words. A verbatim quote or an
+English line and its Chinese line split by blank lines, English sentences over 18 words, and
+a count of [click] marks in the notes that differs from the slide's click builds. A verbatim quote or an
 interval such as [19%, 39%] may trip a warning.
 """
 import html
@@ -122,7 +123,7 @@ def lint(deck_dir):
             if pat in visible:
                 warns.append(name)
         notes = ' '.join(d for in_aside, d in p.text if in_aside)
-        left = re.findall(r'\[[^\]\n]{1,60}\]', visible + ' ' + notes)
+        left = [x for x in re.findall(r'\[[^\]\n]{1,60}\]', visible + ' ' + notes) if x != '[click]']
         if left:
             warns.append(f'{len(left)} placeholder(s) left, e.g. {left[0]}')
         m = re.search(r'<aside>(.*?)</aside>', src, re.S)
@@ -137,10 +138,14 @@ def lint(deck_dir):
             if any(len(b) != 2 or CJK.search(b[0]) or not CJK.search(b[1]) for b in pairs):
                 warns.append('notes are not a script: pairs of one English line and its Chinese line, split by blank lines')
             else:
-                sents = [s for b in pairs for s in re.split(r'(?<=[.?!])\s+', b[0].strip()) if s]
+                sents = [s for b in pairs for s in re.split(r'(?<=[.?!])\s+', b[0].removeprefix('[click]').strip()) if s]
                 long = [s for s in sents if len(s.split()) > 18]
                 if long:
                     warns.append(f'{len(long)} English sentence(s) over 18 words, e.g. "{long[0][:40]}..."')
+                clicks = sum(b[0].startswith('[click]') for b in pairs)
+                builds = set(re.findall(r'data-build-in="[a-z]+ (\d+)(?! auto)', src))
+                if clicks != len(builds):
+                    warns.append(f'{clicks} [click] mark(s) in the notes for {len(builds)} click build(s)')
         bad += bool(errs)
         tag = '!!' if errs else ('..' if warns else 'ok')
         print(f'{tag} {sid:16s} elements={p.n:3d} pinned_max={max(p.pinned.values()) if p.pinned else 0:2d} div_depth={p.max_div:2d}',
