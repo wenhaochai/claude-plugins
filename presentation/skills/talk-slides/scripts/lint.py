@@ -28,9 +28,13 @@ class Parser(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.stack, self.n, self.in_svg, self.svg_nodes = [], 0, False, 0
         self.issues, self.uid, self.max_div, self.pinned, self.text = [], 0, 0, {}, []
-        self.in_aside, self.last_div = False, None
+        self.in_aside, self.last_div, self.in_embed = False, None, False
 
     def handle_starttag(self, tag, attrs):
+        if self.in_embed:  # an <x-embed> is its own page: the runtime does not read it, nor does the lint
+            return
+        if tag == 'x-embed':
+            self.in_embed = True
         a = dict(attrs)
         st = (a.get('style') or '').replace(' ', '')
         self.last_div = None
@@ -69,6 +73,8 @@ class Parser(HTMLParser):
             self.stack.append((tag, 'position:relative' in st, self.uid) if tag != 'svg' else 'svg')
 
     def handle_startendtag(self, tag, attrs):
+        if self.in_embed:
+            return
         if self.in_svg:
             self.svg_nodes += 1
             return
@@ -77,6 +83,9 @@ class Parser(HTMLParser):
             self.stack.pop()
 
     def handle_endtag(self, tag):
+        if self.in_embed and tag != 'x-embed':
+            return
+        self.in_embed = False
         if tag in VOID:
             return
         if tag == 'div' and self.last_div is not None:
@@ -92,7 +101,7 @@ class Parser(HTMLParser):
     def handle_data(self, data):
         if data.strip():
             self.last_div = None
-        if not self.in_svg:
+        if not self.in_svg and not self.in_embed:
             self.text.append((self.in_aside, data))
 
 
