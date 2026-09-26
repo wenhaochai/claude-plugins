@@ -35,7 +35,7 @@ from matplotlib.transforms import ScaledTranslation
 FONT_DIR = Path(__file__).resolve().parent / 'fonts'
 FACE = 'Instrument Sans'
 
-# Sizes match Epoch's exported charts at the arxiv width, measured off 2400 px exports. Words match on
+# Sizes match Epoch's 2400 px exports scaled to WIDTH_TEXT, the width they were measured at. Words match on
 # the lowercase (x-height and width): at equal capitals Instrument Sans's lowercase runs about 5% smaller
 # than Messina Sans's. The title splits x-height (12.4) and width (12.0), so it breaks where Epoch's
 # does. Tick values, mostly digits, which run wider in Instrument Sans, match on the capitals. Weight,
@@ -47,9 +47,9 @@ FACE = 'Instrument Sans'
 #   TICK     7    regular  tick values, point labels
 TITLE_PT, SUB_PT, TEXT_PT, TICK_PT = 12.2, 9.3, 7.35, 7.0
 
-# Canvas widths, placed at 1:1: a paper's single column and full width, the arxiv template's
-# \linewidth (457 pt), and a post (a 1600 px PNG).
-WIDTH_1COL, WIDTH_FULL, WIDTH_ARXIV, WIDTH_POST = 5.5, 7.6, 6.32, 4.4
+# Canvas widths, placed at 1:1: a 5.5 in text width (NeurIPS, ICML, ICLR), a one-column paper with
+# narrower margins (6.32 in, 457 pt), a full two-column spread, and a post (a 1600 px PNG).
+WIDTH_1COL, WIDTH_TEXT, WIDTH_FULL, WIDTH_POST = 5.5, 6.32, 7.6, 4.4
 POST_PX = 1600
 
 # --- Colour: Google's GM2 tones, nothing computed ---------------------------------------------------
@@ -84,7 +84,7 @@ GRID = GREY_200       # grid lines, both directions
 AXIS = GREY_700       # the baseline axis, the one spine drawn
 MARK = GREY_500       # tick marks (ticks='left'), frames, leader lines
 
-# --- Layout, inches (measured off Epoch AI's 2400 px exports scaled to WIDTH_ARXIV) ----------------
+# --- Layout, inches (measured off Epoch AI's 2400 px exports scaled to WIDTH_TEXT) -----------------
 M_SIDE, M_TOP, M_BOTTOM = 0.19, 0.19, 0.24   # Epoch's exports keep 0.19 in clear on three sides
 TITLE_LINESPACING = 1.37     # a wrapped title's baselines 0.21 in apart
 GAP_SUBTITLE = 0.13          # title's last line to the subtitle
@@ -264,7 +264,7 @@ def _legend_row(fig, legend, x, y, align='left'):
         x += t.get_window_extent(rend).width / fig.dpi + ITEM_GAP
 
 
-def canvas(rows=1, cols=1, width=WIDTH_ARXIV, panel_height=1.5, title=None, subtitle=None,
+def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subtitle=None,
            legend=None, legend_loc='row', legend_title=None, quantity=None, xlabel=None, note=None,
            note_style='normal', ticks='above', extra=(0, 0, 0, 0), gap_rows=GAP_ROWS, title_pt=TITLE_PT,
            subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE):
@@ -624,4 +624,4 @@ __all__ = ['apply_style', 'canvas', 'nice_y', 'y_values', 'room', 'panel_label',
            'MEDIUM', 'SOFT', 'WORDS', 'BLUE', 'LIGHT', 'GREY', 'BLUE_RAMP', 'GREY_50', 'GREY_100', 'GREY_200',
            'GREY_300', 'GREY_400', 'GREY_500', 'GREY_600', 'GREY_700', 'GREY_800', 'GREY_900', 'INK', 'TICK',
            'MUTED', 'GRID', 'AXIS', 'MARK', 'TITLE_PT', 'SUB_PT', 'TEXT_PT', 'TICK_PT', 'WIDTH_1COL',
-           'WIDTH_FULL', 'WIDTH_ARXIV', 'WIDTH_POST']
+           'WIDTH_TEXT', 'WIDTH_FULL', 'WIDTH_POST']

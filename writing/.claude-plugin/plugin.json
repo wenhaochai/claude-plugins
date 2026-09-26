@@ -1,6 +1,6 @@
 {
   "name": "writing",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Publication-prep tools for academic and public-facing writing. Three skills: style (17 canonical English-prose rules, 19 page-cap additions, 2 audit-time rules), preflight (deterministic pre-submission checks on a LaTeX tree), and plot (one matplotlib style for posts and papers after Epoch AI's charts: Instrument Sans at Epoch's measured sizes, light grid, baseline axis only, Google GM2 tones by mark size; style.py plus one example). The integrity-forensics suite is the separate anti-autoresearch plugin.",
   "author": {
     "name": "Wenhao Chai",

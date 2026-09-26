@@ -11,7 +11,7 @@ both, plus `fonts/`, next to your script, and start from the example.
 ```python
 from style import *
 apply_style()
-fig, axes = canvas(rows, cols, width=WIDTH_ARXIV, panel_height=1.35, title=None,
+fig, axes = canvas(rows, cols, width=WIDTH_TEXT, panel_height=1.35, title=None,
                    legend=[('Model A', BLUE), ('Model B', LIGHT)], quantity='Throughput (MB/s)')
 ax.plot(...)                      # or ax.step / ax.bar
 nice_y(ax, lo, hi)                # the y range, round steps, the values on their grid lines
@@ -50,7 +50,7 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    what the run kept, never going down, changing at integer ticks, with a tick and grid line at every
    step so each corner sits on one. Bars start at 0. A categorical axis has no grid lines.
 5. **One face at Epoch's sizes.** Instrument Sans (SIL OFL, bundled) is the closest free face to Epoch's
-   Messina Sans. The sizes were measured off Epoch's 2400 px exports at the arxiv width, matched on the
+   Messina Sans. The sizes were measured off Epoch's 2400 px exports scaled to 6.32 in, matched on the
    lowercase and on where titles break: title 12.2 pt semibold, subtitle 9.3, every other word 7.35,
    tick values 7. Weight tells the roles apart: the quantity and axis names medium, the rest regular.
    Charts that Epoch sets on its narrower web canvas take a title near 9.2 pt and ticks at text size.
@@ -67,9 +67,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    and the top. The title spans the width between the margins at one size; a one-word last line warns,
    and the fix is to rephrase.
 9. **Placement width, never cropped.** Draw at the width the figure is placed at and include it at
-   natural size: `WIDTH_ARXIV` 6.32 in for the arxiv template's full width, `WIDTH_1COL` 5.5 or
-   `WIDTH_FULL` 7.6 in for other venues, `WIDTH_POST` 4.4 in for a post (a 1600 px PNG). Never
-   `bbox_inches='tight'`.
+   natural size: `WIDTH_1COL` 5.5 in (NeurIPS, ICML, ICLR text width), `WIDTH_TEXT` 6.32 in (a
+   one-column paper with narrower margins), `WIDTH_FULL` 7.6 in, `WIDTH_POST` 4.4 in for a post (a
+   1600 px PNG). Never `bbox_inches='tight'`.
 10. **A colour means one thing, and every colour is Google's.** Every colour is a GM2 tone
     (`tone(hue, grade)`); none is computed. Neutrals come from the GM2 grey ramp.
 
