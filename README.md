@@ -4,8 +4,7 @@ Personal Claude Code plugin marketplace by [Wenhao Chai](https://wenhaochai.com)
 
 ## `writing` — publication-prep tools
 
-Four skills, all auto-loading by context match. One shared figure design system under
-`writing/figures/`.
+Three skills, all auto-loading by context match.
 
 ### `style` — default English-prose standards
 
@@ -26,25 +25,13 @@ undefined citations and overfull boxes, leftover placeholders and `\textcolor{re
 correspondence-problem density per file, and `.bib` hygiene. Exit status 1 on any failure, so it chains
 into a larger gate.
 
-### `plot` — matplotlib chart templates
+### `plot` — one chart style for posts and papers
 
-18 drop-in templates: grouped and highlighted bars, boxplots, curve grids, broken axes, IsoFLOPs and
-labelled-frontier scatter, quadrant plots, stacked share areas, alluvial ribbons, and sparse-group
-DAGs. Every one carries the same header: a left-aligned Lato Heavy title with one Lato Regular legend
-row above the axes, never inside them, spaced by measurement rather than by eye. Labels ship
-pre-genericized; replace them before saving.
-
-### `concept` — matplotlib schematics
-
-Diagrams with no data axes: node flows, boundary and contract diagrams, jigsaw treemaps. Lato type, a
-fixed five-size scale, colour that encodes which side a node belongs to, and an overflow check that
-raises rather than being eyeballed.
-
-### `writing/figures/` — the shared design system
-
-`style.py` (Google palette, venue-matched serif, the `header` / `fig_header` / `finalize_headers`
-contract, measured spacing), `concept.py` (the five-size scale and the overflow check), `jigsaw.py`
-(squarified treemap), and `DOCTRINE.md`, the eleven rules every figure in this plugin follows.
+`style.py` and one worked example. The look follows Epoch AI's charts: Instrument Sans (bundled, SIL
+OFL), a light grid in both directions, only the baseline axis, values sitting just above their grid
+lines, the quantity above each column, panel names inside the panels, the Google palette, and a layout
+set in inches so every figure has the same rhythm. `SKILL.md` holds the twelve rules, starting with
+"minimal first": no labels, notes, or reference lines until the owner asks for them.
 
 ## `anti-autoresearch` — integrity forensics for paper output
 

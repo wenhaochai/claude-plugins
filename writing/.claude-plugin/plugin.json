@@ -1,7 +1,7 @@
 {
   "name": "writing",
-  "version": "2.1.3",
-  "description": "Publication-prep tools for academic and public-facing writing. Four skills: style (17 canonical English-prose rules, 19 page-cap additions, 2 audit-time rules), preflight (deterministic pre-submission checks on a LaTeX tree), plot (18 matplotlib chart templates) and concept (3 schematic templates), the two figure skills sharing one design system under figures/: Google palette, venue-matched fonts, one header format, and the eleven-rule DOCTRINE.md. The integrity-forensics suite is the separate anti-autoresearch plugin.",
+  "version": "3.0.0",
+  "description": "Publication-prep tools for academic and public-facing writing. Three skills: style (17 canonical English-prose rules, 19 page-cap additions, 2 audit-time rules), preflight (deterministic pre-submission checks on a LaTeX tree), and plot (one matplotlib style for posts and papers after Epoch AI's charts: Instrument Sans, light grid, baseline axis only, Google palette; style.py plus one example). The integrity-forensics suite is the separate anti-autoresearch plugin.",
   "author": {
     "name": "Wenhao Chai",
     "url": "https://wenhaochai.com"
