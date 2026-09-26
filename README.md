@@ -27,11 +27,14 @@ into a larger gate.
 
 ### `plot` — one chart style for posts and papers
 
-`style.py` and one worked example. The look follows Epoch AI's charts: Instrument Sans (bundled, SIL
-OFL), a light grid in both directions, only the baseline axis, values sitting just above their grid
-lines, the quantity above each column, panel names inside the panels, the Google palette, and a layout
-set in inches so every figure has the same rhythm. `SKILL.md` holds the twelve rules, starting with
-"minimal first": no labels, notes, or reference lines until the owner asks for them.
+`style.py` and one worked example. The look follows Epoch AI's charts, with type sizes, margins and
+gaps measured off Epoch's exports: Instrument Sans (bundled, SIL OFL), a light grid in both directions,
+only the baseline axis, values sitting just above their grid lines, the quantity above each column,
+panel names inside the panels, and a layout set in inches so every figure has the same rhythm. Every
+colour is one of Google's GM2 tones, lighter as the inked area grows. Epoch's other forms (subtitles,
+footnotes, legend columns, export ticks, callouts, direct labels) are options of the same calls.
+`SKILL.md` holds the twelve rules, starting with "minimal first": no labels, notes, or reference lines
+until the owner asks for them.
 
 ## `anti-autoresearch` — integrity forensics for paper output
 

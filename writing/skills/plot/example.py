@@ -30,7 +30,7 @@ def best_so_far(start, gains):
     return levels
 
 
-fig, axes = canvas(rows=2, cols=2, width=WIDTH_POST, panel_height=1.35,
+fig, axes = canvas(rows=2, cols=2, width=WIDTH_POST, panel_height=1.3,
                    title='Title in the owner\'s words, full width, one size',
                    legend=[(name, color) for name, color, _ in RUNS],
                    quantity='Throughput (MB/s)')
@@ -40,11 +40,12 @@ for k, (ax, setting) in enumerate(zip(axes.flat, SETTINGS)):
     for name, color, last in RUNS[::-1]:
         gains = rng.normal(0.08 if color == BLUE else 0.04, 0.1, last)
         levels = best_so_far(start, gains)
-        ax.step(range(last + 1), levels, where='post', color=color, zorder=3)
+        # every corner on an integer tick; the last level runs half a round so it shows
+        ax.step([*range(last + 1), last + 0.5], [*levels, levels[-1]], where='post', color=color, zorder=3)
         top = max(top, max(levels))
     ax.set_xticks(range(0, 11), [str(t) for t in range(0, 11)])
-    ax.set_xlim(0, 10)
-    room(ax, left=0.14, right=0.04)
-    nice_y(ax, start, top)
+    ax.set_xlim(0, 10.5)
+    nice_y(ax, start, top)          # the values first: room() measures them
+    room(ax)
     panel_label(ax, setting)
 save(fig, HERE / 'example')
