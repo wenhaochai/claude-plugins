@@ -21,7 +21,7 @@ A video of a piece of work runs about a minute and plays as one piece of motion 
 - Choose an example where the obvious option loses at least one race. Keep it typical: each option's run is the session closest to its mean over many sessions, and the video states only results that hold on most sessions.
 - Full frame at 1920×1080 and 60 fps, in the source's palette and fonts, with light grain added at encoding. Type stays restrained and the same throughout: a few sizes, each kept for one role, semibold only for headings, emphasis by color, no italics. Nothing overlaps: no text on graphics, and a caption or label leaves before the next one enters.
 - The site's own mark, its logo and name as in the page header, sits small in the bottom-right corner for the whole video, and no other corner carries text such as a URL. Every scene, the opening included, uses the full height and sits centered in the space above the mark.
-- Wording and figures follow the `writing` plugin: `style` for the prose and `figures/DOCTRINE.md` for marks and legends.
+- Wording and figures follow the `writing` plugin: `style` for the prose and the `plot` skill's rules (`skills/plot/SKILL.md`) for marks and legends.
 
 ## Workflow
 
