@@ -50,9 +50,9 @@ FACE = 'Instrument Sans'
 TITLE_PT, SUB_PT, TEXT_PT, TICK_PT = 12.2, 9.3, 7.35, 7.0
 
 # Canvas widths, placed at 1:1: a 5.5 in text width (NeurIPS, ICML, ICLR), a one-column paper with
-# narrower margins (6.32 in, 457 pt), a full two-column spread, and a post (a 1600 px PNG). A post is
-# 16:9 landscape by default: WIDTH_WIDE at ASPECT_WIDE, a 1600 x 900 PNG, the shape X and slides show
-# uncropped. WIDTH_POST, narrower and as tall as its panels need, is for a post with several rows.
+# narrower margins (6.32 in, 457 pt), a full two-column spread, and a post (a 1600 px PNG). A data
+# chart's height follows its panels. WIDTH_WIDE at ASPECT_WIDE (a 1600 x 900 PNG) is for a cover or
+# other artistic image, never a data chart: a 16:9 panel is too short to read.
 WIDTH_1COL, WIDTH_TEXT, WIDTH_FULL, WIDTH_POST, WIDTH_WIDE = 5.5, 6.32, 7.6, 4.4, 5.6
 ASPECT_WIDE = 16 / 9
 POST_PX = 1600

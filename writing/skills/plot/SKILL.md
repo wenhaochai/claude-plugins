@@ -32,7 +32,7 @@ Epoch's other forms are options of the same calls; their docstrings give the det
 | Annotation | `callout(ax, text_xy, target_xy, lines)`: a note with a curved arrow |
 | Direct labels | `end_labels(ax, [(y_end, name, colour), ...])`: line names at their ends, spread apart |
 | Web-canvas charts | `title_pt`, `tick_pt`, `note_pt`, `side=0.10` (see rule 5) |
-| 16:9 post | `canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE, legend_loc='inline', ...)`: panels fill what the header leaves, a 1600 x 900 PNG (see rule 9) |
+| 16:9 cover | `canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE, ...)`: panels fill what the header leaves, a 1600 x 900 PNG; covers and artistic images only (see rule 9) |
 | Logo markers | `logo(ax, x, y, path)`: an organisation's logo on a white disc at the point (see rule 10) |
 
 ## Rules
@@ -76,13 +76,13 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    and the fix is to rephrase.
 9. **Placement width, never cropped.** Draw at the width the figure is placed at and include it at
    natural size: `WIDTH_1COL` 5.5 in (NeurIPS, ICML, ICLR text width), `WIDTH_TEXT` 6.32 in (a
-   one-column paper with narrower margins), `WIDTH_FULL` 7.6 in, `WIDTH_WIDE` 5.6 in for a post (a
-   1600 x 900 PNG). Never `bbox_inches='tight'`. A chart to be looked at as an image (a post, a chat, a
-   slide, an animation) is 16:9 landscape, `canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE)`, with the
-   web-canvas settings of rule 5 and the legend `'inline'` so the panels keep their height, unless the
-   owner names a paper. `aspect` sets the panel height from the width; when it raises (too many rows),
-   use `WIDTH_POST` 4.4 in and let the height follow the panels. Keep x-axis captions and labels short
-   enough for a landscape panel: the width is spare, the height is not.
+   one-column paper with narrower margins), `WIDTH_FULL` 7.6 in, `WIDTH_POST` 4.4 in for a post (a
+   1600 px PNG). Never `bbox_inches='tight'`. A chart to be looked at as an image (a post, a chat, a
+   slide, an animation) is `WIDTH_POST` with the web-canvas settings of rule 5, its height following
+   its panels, unless the owner names a paper. Never force a data chart to 16:9: the owner tried it on
+   a scatter and a 16:9 panel came out too short, the points crowded and the labels collided. 16:9
+   (`canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE)`, 1600 x 900) is for a cover or a more artistic
+   image, where the picture matters more than reading values.
    Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
    kind of text on its own, so every size keeps its ratio to the others.
 10. **A colour means one thing, and every colour is Google's.** Every colour is a GM2 tone
