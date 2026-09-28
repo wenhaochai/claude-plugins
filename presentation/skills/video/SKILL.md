@@ -10,7 +10,7 @@ A video of a piece of work runs about a minute and plays as one piece of motion 
 ## Design
 
 - One continuous piece. Objects carry from scene to scene: a node becomes an agent, agents regroup, a chart grows out of what was on screen. No cuts between static cards and no heading-plus-figure layouts.
-- Open on the work itself: the source's mechanism runs from the first frame, and the title comes into focus alone in the clear space above it. Then the title leaves and that picture carries into the first chapter. The opening has no kicker, author or date line, or tagline.
+- Open on the work itself. The first frame is a cover, the title over the source's key picture, so a feed's thumbnail shows the work. The picture then clears to a blank frame, the mechanism builds in from nothing over the first seconds, and the title stays alone in the clear space above it. Then the title leaves and that picture carries into the first chapter. The opening has no kicker, author or date line, or tagline.
 - The camera stays still: motion comes from the objects themselves, and nothing zooms or pans the whole frame.
 - The picture carries the story. No text column stays on screen: each statement is one short line placed next to the action it describes, on screen only for that moment, with its key words in the accent. Numbers and names sit on the visuals as direct labels, and the takeaway is the one full sentence, at the end.
 - Copy comes from the source. Titles, names and the takeaway are quoted verbatim, the video adds no summary lines of its own, and it never uses the middle dot (U+00B7).
@@ -19,7 +19,7 @@ A video of a piece of work runs about a minute and plays as one piece of motion 
 - Introduce every named setup on screen before the scene that uses it, and show every option from one extreme to the other.
 - Show every comparison the source supports, each as a race on one clock, and make each result explicit: the winner gets an accent frame and its number, the loser dims, and a ranking closes the set.
 - Choose an example where the obvious option loses at least one race. Keep it typical: each option's run is the session closest to its mean over many sessions, and the video states only results that hold on most sessions.
-- Full frame at 1920×1080 and 60 fps, in the source's palette and fonts, with light grain added at encoding. Type stays restrained and the same throughout: a few sizes, each kept for one role, semibold only for headings, emphasis by color, no italics. Nothing overlaps: no text on graphics, and a caption or label leaves before the next one enters.
+- Full frame at 1920×1080 and 60 fps, in the source's palette and fonts, with light grain added at encoding. Type stays restrained and the same throughout: a few sizes, each kept for one role, semibold only for headings, emphasis by color, no italics. Nothing overlaps: no text on graphics, and a caption or label leaves before the next one enters. Every object stays inside the frame.
 - The site's own mark, its logo and name as in the page header, sits small in the bottom-right corner for the whole video, and no other corner carries text such as a URL. A team's work carries no personal name: the corner holds the marks the owner picks for the team, such as its institutions' emblems. Every scene, the opening included, uses the full height and sits centered in the space above the mark.
 - Wording and figures follow the `writing` plugin: `style` for the prose and the `plot` skill's rules (`skills/plot/SKILL.md`) for marks and legends.
 
