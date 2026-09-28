@@ -270,9 +270,10 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
            subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE):
     """The figure and its panels, laid out top down in inches.
 
-    title       the owner's wording (a draft is marked as one until confirmed), wrapped between the
-                side margins; a one-word last line warns, and the fix is to rephrase it.
-    subtitle    a muted line under the title (what the numbers are, when the title makes a claim).
+    title       names what is plotted, never a conclusion (SKILL.md rule 3); the owner's wording (a
+                draft is marked as one until confirmed), wrapped between the side margins; a one-word
+                last line warns, and the fix is to rephrase it.
+    subtitle    a muted line under the title: what the numbers are (units, source, sample).
     legend      [(name, colour), ...] or [(name, colour, kind), ...], kind one of 'line' (default),
                 'dash', 'dot', 'ring', 'box', 'ci'.
     legend_loc  'row' a row under the title, left aligned; 'right' the same row, right aligned;

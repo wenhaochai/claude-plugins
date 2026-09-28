@@ -42,10 +42,13 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    series names, each panel's identity. In the caption: the statistic (fastest of 5 runs), transforms
    (best so far), the workload, exclusions, caveats. "Best MB/s so far, TinyLlama" is a caption written
    on an axis.
-3. **The words are the owner's or the data's.** The title is the owner's sentence; until there is one,
-   no title, or a draft that is called a draft. Axes use the data's own numbering (iterations 2 to 10,
-   schemes 1 to 76, gaps kept). Renumber or relabel only on the owner's decision, and say so in the
-   caption.
+3. **The words are the owner's or the data's.** The title names what is plotted and never states a
+   conclusion: `Vals Index cost-accuracy frontier`, not `Six models set the Vals Index cost-accuracy
+   frontier`; `Throughput by setting`, not `Model A is fastest`. No count of winners, no verb of
+   outcome, no comparative: what to take away goes in the caption. The wording is the owner's; until
+   there is one, no title, or a draft that is called a draft. Axes use the data's own numbering
+   (iterations 2 to 10, schemes 1 to 76, gaps kept). Renumber or relabel only on the owner's decision,
+   and say so in the caption.
 4. **The chart type follows the data.** A best-so-far chart is a step chart: the running maximum of
    what the run kept, never going down, changing at integer ticks, with a tick and grid line at every
    step so each corner sits on one. Bars start at 0. A categorical axis has no grid lines.
