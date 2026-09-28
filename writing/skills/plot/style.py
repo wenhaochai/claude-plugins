@@ -22,10 +22,12 @@ import warnings
 from pathlib import Path
 
 import matplotlib.colors as mc
+import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import font_manager
 from matplotlib.lines import Line2D
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from matplotlib.patches import Rectangle
 from matplotlib.transforms import ScaledTranslation
 
@@ -495,6 +497,24 @@ def dots(ax, x, y, color, size=18, alpha=0.5, **kw):
                       linewidth=0.6, **kw)
 
 
+def logo(ax, x, y, image, size=7.5, disc=10.5, ring=BLUE, zorder=5):
+    """An organisation's logo as the marker of the point (x, y), for the few points a chart is about.
+
+    A white disc `disc` pt across, ringed in `ring`, hides the lines behind the logo; the logo (a path
+    or an RGBA array) is cropped to its visible ink and scaled so its longer side is `size` pt, so a
+    glyph with wide transparent margins comes out as large as a filled mark. Neither is clipped at the
+    panel's edge. Draw the other points above `zorder` so a neighbour next to a disc stays visible, and
+    set the name beside it with ax.annotate, clear of the disc."""
+    img = mpimg.imread(image) if isinstance(image, (str, Path)) else np.asarray(image)
+    if img.ndim == 3 and img.shape[2] == 4:
+        rows, cols = np.nonzero(img[..., 3] > 0.05)
+        img = img[rows.min():rows.max() + 1, cols.min():cols.max() + 1]
+    ax.scatter([x], [y], s=disc ** 2, facecolor='white', edgecolor=ring, linewidth=0.8, zorder=zorder - 1,
+               clip_on=False)
+    ax.add_artist(AnnotationBbox(OffsetImage(img, zoom=size / max(img.shape[:2])), (x, y), frameon=False,
+                                 pad=0, zorder=zorder, annotation_clip=False))
+
+
 def stack(ax, xy, lines, styles=None, ha='left', va='center', size=TEXT_PT, color=INK, **kw):
     """Several lines set as one block, each with its own weight or colour ({'weight': 'medium'},
     {'color': MUTED}). Line i is drawn as the whole block with the other lines blanked, so the lines
@@ -620,8 +640,8 @@ def save(fig, stem, png_px=POST_PX):
     fig.savefig(stem.with_suffix('.png'), dpi=png_px / fig.get_size_inches()[0])
 
 
-__all__ = ['apply_style', 'canvas', 'nice_y', 'y_values', 'room', 'panel_label', 'dots', 'stack', 'callout',
-           'end_labels', 'fit', 'check', 'save', 'tone', 'family_4', 'GM2', 'GRADES', 'ORDER', 'STRONG',
+__all__ = ['apply_style', 'canvas', 'nice_y', 'y_values', 'room', 'panel_label', 'dots', 'logo', 'stack',
+           'callout', 'end_labels', 'fit', 'check', 'save', 'tone', 'family_4', 'GM2', 'GRADES', 'ORDER', 'STRONG',
            'MEDIUM', 'SOFT', 'WORDS', 'BLUE', 'LIGHT', 'GREY', 'BLUE_RAMP', 'GREY_50', 'GREY_100', 'GREY_200',
            'GREY_300', 'GREY_400', 'GREY_500', 'GREY_600', 'GREY_700', 'GREY_800', 'GREY_900', 'INK', 'TICK',
            'MUTED', 'GRID', 'AXIS', 'MARK', 'TITLE_PT', 'SUB_PT', 'TEXT_PT', 'TICK_PT', 'WIDTH_1COL',

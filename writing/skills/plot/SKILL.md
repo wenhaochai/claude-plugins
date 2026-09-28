@@ -32,6 +32,7 @@ Epoch's other forms are options of the same calls; their docstrings give the det
 | Annotation | `callout(ax, text_xy, target_xy, lines)`: a note with a curved arrow |
 | Direct labels | `end_labels(ax, [(y_end, name, colour), ...])`: line names at their ends, spread apart |
 | Web-canvas charts | `title_pt`, `tick_pt`, `note_pt`, `side=0.10` (see rule 5) |
+| Logo markers | `logo(ax, x, y, path)`: an organisation's logo on a white disc at the point (see rule 10) |
 
 ## Rules
 
@@ -40,7 +41,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    shading until the owner asks, one at a time.
 2. **The chart shows; the caption explains.** On the chart: the quantity and unit (`Throughput (MB/s)`),
    series names, each panel's identity. In the caption: the statistic (fastest of 5 runs), transforms
-   (best so far), the workload, exclusions, caveats. "Best MB/s so far, TinyLlama" is a caption written
+   (best so far), the workload, exclusions, caveats, and for a cost axis how the cost was counted (list
+   prices; cached input at its discount or not). "Best MB/s so far, TinyLlama" is a caption written
    on an axis.
 3. **The words are the owner's or the data's.** The title names what is plotted and never states a
    conclusion: `Vals Index cost-accuracy frontier`, not `Six models set the Vals Index cost-accuracy
@@ -51,7 +53,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    and say so in the caption.
 4. **The chart type follows the data.** A best-so-far chart is a step chart: the running maximum of
    what the run kept, never going down, changing at integer ticks, with a tick and grid line at every
-   step so each corner sits on one. Bars start at 0. A categorical axis has no grid lines.
+   step so each corner sits on one. A Pareto frontier is the same running maximum taken over cost:
+   sort by cost, step up at each optimal point, and run flat past the last one. Bars start at 0. A
+   categorical axis has no grid lines.
 5. **One face at Epoch's sizes.** Instrument Sans (SIL OFL, bundled) is the closest free face to Epoch's
    Messina Sans. The sizes were measured off Epoch's 2400 px exports scaled to 6.32 in, matched on the
    lowercase and on where titles break: title 12.2 pt semibold, subtitle 9.3, every other word 7.35,
@@ -72,7 +76,10 @@ Epoch's other forms are options of the same calls; their docstrings give the det
 9. **Placement width, never cropped.** Draw at the width the figure is placed at and include it at
    natural size: `WIDTH_1COL` 5.5 in (NeurIPS, ICML, ICLR text width), `WIDTH_TEXT` 6.32 in (a
    one-column paper with narrower margins), `WIDTH_FULL` 7.6 in, `WIDTH_POST` 4.4 in for a post (a
-   1600 px PNG). Never `bbox_inches='tight'`.
+   1600 px PNG). Never `bbox_inches='tight'`. A chart to be looked at as an image (a post, a chat, a
+   slide) is `WIDTH_POST` with the web-canvas settings of rule 5, unless the owner names a paper.
+   Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
+   kind of text on its own, so every size keeps its ratio to the others.
 10. **A colour means one thing, and every colour is Google's.** Every colour is a GM2 tone
     (`tone(hue, grade)`); none is computed. Neutrals come from the GM2 grey ramp.
 
@@ -89,6 +96,14 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     FiveThirtyEight and Datawrapper do. Yellow lines and words take 900, the only Google yellow at 3:1
     on white. Context behind a highlight steps down a set or goes grey, and stacked neighbours are split
     by thin white edges. Hold each series' colour across a piece; the legend names every colour.
+
+    Logos are the one exception to GM2. The few points a chart is about (the Pareto-optimal models,
+    the method a post introduces) may be drawn as their organisation's logo at the data point with
+    `logo()`: a white disc ringed in the series' colour hides the lines behind it, the logo is sized by
+    its visible ink, and the name sits beside it. Every other point stays a dot, drawn above the discs
+    so a close neighbour is never hidden. Logos come from vector sources (lobehub
+    `@lobehub/icons-static-png`, simple-icons filled with its brand hex), never cropped from a
+    screenshot.
 11. **The docstring says where the numbers came from:** what the chart shows, the data source by path or
     run id, the formula for any derived quantity, the output. An example without measured data says
     `contains no measured results` in its first line.
