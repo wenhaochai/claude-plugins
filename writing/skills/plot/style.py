@@ -50,9 +50,13 @@ FACE = 'Instrument Sans'
 TITLE_PT, SUB_PT, TEXT_PT, TICK_PT = 12.2, 9.3, 7.35, 7.0
 
 # Canvas widths, placed at 1:1: a 5.5 in text width (NeurIPS, ICML, ICLR), a one-column paper with
-# narrower margins (6.32 in, 457 pt), a full two-column spread, and a post (a 1600 px PNG).
-WIDTH_1COL, WIDTH_TEXT, WIDTH_FULL, WIDTH_POST = 5.5, 6.32, 7.6, 4.4
+# narrower margins (6.32 in, 457 pt), a full two-column spread, and a post (a 1600 px PNG). A post is
+# 16:9 landscape by default: WIDTH_WIDE at ASPECT_WIDE, a 1600 x 900 PNG, the shape X and slides show
+# uncropped. WIDTH_POST, narrower and as tall as its panels need, is for a post with several rows.
+WIDTH_1COL, WIDTH_TEXT, WIDTH_FULL, WIDTH_POST, WIDTH_WIDE = 5.5, 6.32, 7.6, 4.4, 5.6
+ASPECT_WIDE = 16 / 9
 POST_PX = 1600
+MIN_PANEL = 0.8     # inches: an `aspect` that leaves less for each panel raises
 
 # --- Colour: Google's GM2 tones, nothing computed ---------------------------------------------------
 # Every colour in a chart is one of these, grades 50 to 900.
@@ -269,7 +273,7 @@ def _legend_row(fig, legend, x, y, align='left'):
 def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subtitle=None,
            legend=None, legend_loc='row', legend_title=None, quantity=None, xlabel=None, note=None,
            note_style='normal', ticks='above', extra=(0, 0, 0, 0), gap_rows=GAP_ROWS, title_pt=TITLE_PT,
-           subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE):
+           subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE, aspect=None):
     """The figure and its panels, laid out top down in inches.
 
     title       names what is plotted, never a conclusion (SKILL.md rule 3); the owner's wording (a
@@ -300,6 +304,9 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
     note_pt     the footnote's size; Epoch's web charts set it at TICK_PT.
     side        inches kept clear left and right of all text; Epoch's web charts run nearly to the
                 edge (0.10).
+    aspect      width / height of the whole canvas, e.g. ASPECT_WIDE for a 16:9 post. The panels take
+                whatever height the header and footer leave, and `panel_height` is ignored; raises
+                when that is under MIN_PANEL (fewer rows, an 'inline' legend, or a wider canvas).
     Returns (fig, axes) with axes a rows x cols array.
     """
     fig = plt.figure(figsize=(width, 4))
@@ -351,6 +358,10 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
                            default=0.0))
         right_edge -= column_w + GAP_LEGEND_COLUMN
 
+    if aspect:
+        panel_height = (width / aspect - header - bottom - (rows - 1) * gap_rows) / rows
+        if panel_height < MIN_PANEL:
+            raise ValueError(f'aspect {aspect:.3g} leaves {panel_height:.2f} in per panel')
     W, H = width, header + rows * panel_height + (rows - 1) * gap_rows + bottom
     fig.set_size_inches(W, H)
     left_edge = side + extra[3]
@@ -645,4 +656,4 @@ __all__ = ['apply_style', 'canvas', 'nice_y', 'y_values', 'room', 'panel_label',
            'MEDIUM', 'SOFT', 'WORDS', 'BLUE', 'LIGHT', 'GREY', 'BLUE_RAMP', 'GREY_50', 'GREY_100', 'GREY_200',
            'GREY_300', 'GREY_400', 'GREY_500', 'GREY_600', 'GREY_700', 'GREY_800', 'GREY_900', 'INK', 'TICK',
            'MUTED', 'GRID', 'AXIS', 'MARK', 'TITLE_PT', 'SUB_PT', 'TEXT_PT', 'TICK_PT', 'WIDTH_1COL',
-           'WIDTH_TEXT', 'WIDTH_FULL', 'WIDTH_POST']
+           'WIDTH_TEXT', 'WIDTH_FULL', 'WIDTH_POST', 'WIDTH_WIDE', 'ASPECT_WIDE', 'POST_PX']
