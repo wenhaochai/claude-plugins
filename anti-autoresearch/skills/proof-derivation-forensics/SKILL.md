@@ -1,6 +1,6 @@
 ---
 name: proof-derivation-forensics
-description: "Family-G proof & derivation integrity forensics: does a THIRD PARTY's written proof/derivation actually establish its theorem, or does it skip an obligation, assume its own conclusion, take an invalid step, drift a symbol's meaning, or smuggle an unstated assumption? Decides from the WRITTEN proof/derivation — verdict-bearing at L1 (the LaTeX source; PDF-extracted math is unreliable, so an L0 PDF-only run surfaces info only) — never asserts 'fabricated', only that the step shown does not hold. A fresh cross-model reviewer reads the theorem/proof + an extraction-only obligation scaffold and proposes per-obligation findings, each span-anchored to the evidence ledger (claims.json); reviewer≠adjudicator. Emits proof-derivation-forensics.findings.json; NEVER computes the verdict. dimension=proof, can be critical. Triggers: \"proof forensics\", \"check this proof\", \"derivation integrity\", \"audit the math\", \"证明审计\", \"推导有没有漏洞\"."
+description: "Detect-only check that a third party's written proofs and derivations establish their theorems: gaps, circularity, invalid steps, symbol drift, smuggled assumptions. Needs the evidence ledger; verdicts need LaTeX source (PDF-only: info). Triggers: \"check this proof\", \"audit the math\", \"证明审计\", \"推导有没有漏洞\"."
 argument-hint: [paper-dir | claims.json]
 allowed-tools: Bash(*), Read, Write, mcp__codex__codex
 ---

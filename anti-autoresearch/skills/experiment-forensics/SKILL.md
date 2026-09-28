@@ -1,6 +1,6 @@
 ---
 name: experiment-forensics
-description: "Audit experiment integrity against the evidence ledger. At L2 (repo + result files present) a fresh cross-model reviewer reads the eval code line-by-line for fake/derived ground truth, score self-normalization, phantom results (a paper number with no backing file/key), dead/uncalled metric code, verified-scope inflation, method-described ≠ method-evaluated drift, synthesized-looking results, placeholder/fake data still wired into a released result, code-output ≠ reported-number mismatch, and missing reproducibility artifacts (an empirical/agent/LLM paper shipping neither code nor the prompts/configs its results need) — every finding span-anchored to a ledger claim_id. At L0/L1 (PDF / source only) the same patterns are surfaced as info-level 'could-not-verify' signals where the ledger gives an anchor (observability_level_required:2) — NEVER a fraud verdict from a PDF. The reviewer PROPOSES findings; tools/adjudicate_findings.py computes the verdict. Detect-only. Triggers: \"experiment forensics\", \"audit the results\", \"check the eval code\", \"实验诚实度\"."
+description: "Checks paper numbers and method against released code and results: fake ground truth, self-normalized scores, phantom or too-clean results, placeholder data, missing code/prompts. Needs evidence-ledger first; without repo + results, info notes only. Triggers: \"audit the results\", \"check the eval code\", \"实验诚实度\"."
 argument-hint: [paper-dir | repo-dir]
 allowed-tools: Bash(*), Read, Write, Grep, Glob, mcp__codex__codex
 ---

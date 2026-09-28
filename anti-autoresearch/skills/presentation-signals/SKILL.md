@@ -1,6 +1,6 @@
 ---
 name: presentation-signals
-description: "Checkable-ish surface presentation signals a reviewer notices first — duplicate/near-identical tables, leftover pipeline/template strings, too-few or LLM-looking figures, and page-padding. AUXILIARY ONLY and weak by design: a deterministic pass (tools/check_presentation.py — dup-table + pipeline-artifact) plus a fresh cross-model GROSS-cases-only semantic pass (thin-float, LLM-figure, page-padding), every above-info finding span-anchored to the evidence ledger (claims.json). The adjudicator CAPS everything at minor (SURFACE_ONLY_SKILLS + SURFACE_PATTERNS) — these contribute at most SOFT_FLAGS, never a HARD verdict — default false_positive_risk:high. NOTE: the pure AI writing-STYLE impressions (AI-flavor prose, defensive 'not-X-but-Y' hedging, narrative-arc, jargon-stuffing, invented codenames) MOVED to the zero-verdict-weight AIS track — for those use skills/ai-style-impressions, NOT this. Emits presentation-signals.findings.json; NEVER computes the verdict. Triggers: \"presentation signals\", \"surface check\", \"duplicate tables\", \"排版信号\"."
+description: "Flags surface tells in a paper: duplicate tables, leftover chatbot/pipeline/template strings, too few or LLM-looking figures, page padding. Auxiliary, capped at minor; AI prose style goes to ai-style-impressions. Run after evidence-ledger. Triggers: \"presentation signals\", \"surface check\", \"duplicate tables\", \"排版信号\"."
 argument-hint: [paper-dir | claims.json]
 allowed-tools: Bash(*), Read, Write, mcp__codex__codex
 ---

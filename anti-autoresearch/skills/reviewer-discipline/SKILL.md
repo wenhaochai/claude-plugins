@@ -1,6 +1,6 @@
 ---
 name: reviewer-discipline
-description: "Venue norms for writing a paper critique: the six CVPR reviewer errors, nine phrasings a review must never contain, the ARR vague-to-specific rewrite table, the COLM single-dimension and compute-fairness guards, and the TMLR no-SOTA guard. Run every drafted weakness through it before writing the report. Use when drafting reviewer comments, a self-review of your own draft, a meta-review, or a rebuttal reply. Triggers: \"review this paper\", \"reviewer comments\", \"weakness list\", \"是不是审稿意见写太虚\", \"审稿\"."
+description: "Filters an already-drafted weakness list through venue norms (CVPR reviewer errors, banned vague phrasings, ARR rewrites, COLM/TMLR guards); finds no weaknesses itself. For reviews, self-reviews, meta-reviews, rebuttals. Triggers: \"reviewer comments\", \"weakness list\", \"审稿\", \"是不是审稿意见写太虚\"."
 ---
 
 # Reviewer Discipline

@@ -1,6 +1,6 @@
 ---
 name: evidence-ledger
-description: "Build the deterministic evidence ledger (artifact_manifest.json + claims.json) that every other Anti-Autoresearch auditor reads. One pass inventories artifacts, derives the observability level (L0 PDF-only / L1 +LaTeX / L2 +repo+results) by fixed rule, and extracts span-anchored, hashed, checkable claims (numbers, comparisons, scope, method, baselines, citations, captions, table cells) into claims.json. An OPTIONAL additive cross-model pass ADDS span-anchored semantic claims — method, theorem statements with their assumptions, definitions, proof/derivation steps and equations, scope, baselines, conclusions, the motivation span, and reproducibility-artifact references (the proof, derivation, and structure anchors the family B/D/G auditors need) — it never invents a number, emits a finding, or computes a verdict. Run FIRST, before any audit skill. Triggers: \"build the ledger\", \"extract claims\", \"prep for integrity audit\", \"evidence ledger\", \"建证据账本\"."
+description: "Builds the evidence ledger every other Anti-Autoresearch auditor reads: from a paper dir, PDF or arXiv id, derives the observability level and extracts span-anchored, hashed claims (claims.json). No findings or verdict; run FIRST. Triggers: \"build the ledger\", \"extract claims\", \"prep for integrity audit\", \"建证据账本\"."
 argument-hint: [paper-dir | arxiv-id | pdf-path]
 allowed-tools: Bash(*), Read, Write, Grep, Glob, mcp__codex__codex
 ---

@@ -1,6 +1,6 @@
 ---
 name: consistency-audit
-description: "Flagship intra-paper self-consistency forensics: does the paper contradict ITSELF across abstract/intro/tables/body/appendix, and does the method DESCRIBED match the method EVALUATED? Needs no external ground truth — works PDF-only (L0). Runs a deterministic arithmetic pass + a fresh cross-model semantic pass, every finding span-anchored to the evidence ledger (claims.json), reviewer≠adjudicator. Emits consistency-audit.findings.json; NEVER computes the verdict. Triggers: \"consistency audit\", \"check the paper against itself\", \"self-consistency\", \"内部自洽\"."
+description: "Checks a paper against itself: numbers clashing across sections, miscomputed gains, impossible p-values/SDs, best seed shown as the mean, described vs evaluated method, overclaims, causal leaps, unisolated ablations. Works from the PDF alone; run evidence-ledger first. Triggers: \"self-consistency\", \"内部自洽\"."
 argument-hint: [paper-dir | claims.json]
 allowed-tools: Bash(*), Read, Write, mcp__codex__codex
 ---

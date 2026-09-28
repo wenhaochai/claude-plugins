@@ -1,6 +1,6 @@
 ---
 name: citation-forensics
-description: "Citation-integrity forensics: is every reference real, correctly attributed, and used in a context the cited work actually supports? Catches hallucinated references (no paper at the claimed arXiv id/DOI/venue, fabricated authors/year), metadata drift (wrong year/venue/version), and wrong-context citations (a real paper cited for a claim it never makes — or argues against). A hot zone for machine-generated papers. Decidable at L0 (text + canonical sources). Span-anchored to the evidence ledger (claims.json); the executor gathers canonical facts (DBLP / arXiv / DOI), then one FRESH cross-model thread per cited key proposes findings; reviewer != adjudicator. Emits citation-forensics.findings.json; NEVER computes the verdict. Triggers: \"citation forensics\", \"check the references\", \"hallucinated citations\", \"wrong-context citation\", \"verify references\", \"引用核对\"."
+description: "Checks each cited reference against DBLP/arXiv/DOI: exists, metadata right, not retracted, supports the citing sentence. Run after evidence-ledger on LaTeX source; a PDF-only ledger has no citations. Triggers: \"check the references\", \"verify references\", \"hallucinated citations\", \"wrong-context citation\", \"引用核对\"."
 argument-hint: [paper-dir | claims.json]
 allowed-tools: Bash(*), Read, Write, Grep, Glob, WebSearch, WebFetch, mcp__codex__codex, mcp__mcp-dblp__search, mcp__mcp-dblp__fuzzy_title_search, mcp__mcp-dblp__get_venue_info
 ---

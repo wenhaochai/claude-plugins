@@ -1,6 +1,6 @@
 ---
 name: adversarial-case-builder
-description: "Synthesize the single strongest EVIDENCE-BOUND reviewer case to reject a paper, built ONLY from the evidence ledger (claims.json) + the other auditors' confirmed findings — never free-floating LLM critique. Two fresh cross-model codex threads: an attack writes the ~200-word rejection paragraph (every accusation tagged to an existing claim_id/finding_id), a defense decomposes it and rules each point against the anchored evidence. MEMO-ONLY: emits adversarial-case-builder.memo.md (fed to the adjudicator via --memo) and carries NO verdict weight — tools/adjudicate_findings.py lists it in MEMO_ONLY_SKILLS and caps it at info. Honest-null allowed (the paper may survive). Run LAST. Detect-only. Adapted from ARIS kill-argument. Triggers: \"adversarial case\", \"strongest objection\", \"rejection memo\", \"kill argument\", \"最强拒稿点\"."
+description: "Builds the strongest rejection argument only from the evidence ledger and other auditors' findings, then tests each point; the paper may survive. Memo-only, no verdict weight (the adjudicator decides); run last. Triggers: \"strongest objection\", \"rejection memo\", \"kill argument\", \"最强拒稿点\"."
 argument-hint: [paper-dir | claims.json]
 allowed-tools: Bash(*), Read, Write, mcp__codex__codex
 ---
