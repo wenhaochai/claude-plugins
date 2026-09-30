@@ -89,6 +89,20 @@ python3 presentation/skills/talk-slides/scripts/audit_render.py RUNTIME_DIR --ou
 python3 presentation/skills/video/scripts/frame_sink.py FRAMES_DIR DIRECTOR_DIR
 ```
 
+## `who-ate-my-flops` — PyTorch job performance
+
+Makes one PyTorch training or inference job faster without changing what it computes.
+`/who-ate-my-flops:init` pins down the job, the goal and the correctness checks with you and writes
+them to `contract.md`. `/who-ate-my-flops:diagnose` profiles the job, names the one thing it loses the
+most time to, and proposes a single fix with a measured number. `/who-ate-my-flops:optimize` repeats
+profile, edit and correctness check until nothing worth doing is left, then hands back one clean
+branch. Six supporting skills cover the baseline, torch.profiler analysis, the computation graph, a
+benchmark script, the final branch, and a PR description that goes to a file and is never pushed.
+Records land in `workspace-who-ate-my-flops/` inside the target repo.
+
+Vendored unchanged from [OpenPerfAgent/who-ate-my-flops](https://github.com/OpenPerfAgent/who-ate-my-flops)
+at `20577a5`; the Codex manifest and `assets/` are left out.
+
 ## Install
 
 ```
@@ -98,6 +112,7 @@ python3 presentation/skills/video/scripts/frame_sink.py FRAMES_DIR DIRECTOR_DIR
 /plugin install kexue-fm@wenhaochai
 /plugin install training-monitor@wenhaochai
 /plugin install presentation@wenhaochai
+/plugin install who-ate-my-flops@wenhaochai
 ```
 
 Upgrading from `writing` 1.x: the 12 integrity-forensics skills moved out of `writing` into the new
@@ -110,4 +125,5 @@ agent were removed; their mechanical checks became `preflight` and their venue n
 MIT for plugin code. `writing/skills/style/SKILL.md` redistributes rules from
 [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0, attribution preserved in that
 file. `anti-autoresearch/support/` carries its upstream MIT license in `LICENSE.upstream`.
-`kexue-fm/data/kexue.sqlite` holds third-party content under CC BY-NC-SA.
+`kexue-fm/data/kexue.sqlite` holds third-party content under CC BY-NC-SA. `who-ate-my-flops/` keeps
+its upstream Apache-2.0 license (© 2026 Impossible, Inc.) in `who-ate-my-flops/LICENSE`.
