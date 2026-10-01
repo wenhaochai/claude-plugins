@@ -38,7 +38,7 @@
     {
       "name": "della-gpu",
       "source": "./della-gpu",
-      "description": "Della PLI GPU band above the prompt (running/pending GPUs, rank, free H100s; shared 90 s squeue cache) and a /fleet pane for a controller session (tmux sessions, jobs per workdir, group quota). Della-specific."
+      "description": "Della PLI GPU band above the prompt (running/pending GPUs, rank, free H100s; shared 90 s squeue cache). Della-specific."
     }
   ]
 }

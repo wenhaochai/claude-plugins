@@ -1,7 +1,7 @@
 {
   "name": "della-gpu",
-  "version": "0.1.2",
-  "description": "Della PLI GPU band above the prompt (my running/pending GPUs, rank, free H100s) and a /fleet pane for the controller (tmux sessions, jobs per project, group quota).",
+  "version": "0.1.3",
+  "description": "Della PLI GPU band above the prompt (my running/pending GPUs, rank, free H100s) and /gpu, which replies in text and opens a pane, so Remote Control surfaces see it too.",
   "types": "./types/index.d.ts",
   "author": {
     "name": "Wenhao Chai"

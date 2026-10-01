@@ -88,7 +88,6 @@ async function refreshFleet($: EngineInterface) {
 export const register: Register = on => {
 
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'fleet', description: 'Open the Della fleet pane: tmux sessions, jobs per project, quota' })
     await $.command.register({ name: 'gpu', description: 'Della GPU status now, in a pane every surface shows (phone and desktop included)' })
     void refreshStatus($)
     $.clock.every(POLL_MS, () => {
@@ -96,24 +95,6 @@ export const register: Register = on => {
       if (isFleetWanted) void refreshFleet($)
     })
     return next(e)
-  })
-
-  on('command.run', { command: 'fleet' }, async $ => {
-    isFleetWanted = true
-    await Promise.all([refreshStatus($), refreshFleet($)])
-    await $.ui.open({ id: PANE, title: 'Della fleet' })
-    const s = await read($, status)
-    const f = await read($, fleet)
-    const lines: string[] = []
-    if (s) lines.push(`GPU: ${s.mine} running, ${s.pendJobs} pending jobs (${s.pendGpus} GPUs), rank ${s.rank}/${s.users}, pli-c ${s.used}/${s.total}, free ${s.free}`)
-    if (f) {
-      lines.push('Sessions:')
-      for (const one of f.sessions) lines.push(`  ${one.name}: ${one.last || '-'}`)
-      lines.push('Jobs by workdir (running GPUs / pending GPU jobs):')
-      for (const one of f.jobs) lines.push(`  ${one.dir}: ${one.runGpus} / ${one.pendJobs}`)
-      if (f.quota) lines.push(`Quota: ${f.quota}`)
-    }
-    return { text: lines.length ? lines.join('\n') : 'Fleet unavailable.' }
   })
 
   on('command.run', { command: 'gpu' }, async $ => {
