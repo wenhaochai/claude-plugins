@@ -103,14 +103,6 @@ Records land in `workspace-who-ate-my-flops/` inside the target repo.
 Vendored unchanged from [OpenPerfAgent/who-ate-my-flops](https://github.com/OpenPerfAgent/who-ate-my-flops)
 at `20577a5`; the Codex manifest and `assets/` are left out.
 
-## `della-gpu` — Della GPU band
-
-A mod for Princeton's Della cluster. A band above the prompt shows your running and pending GPUs on
-the PLI H100 nodes, your rank among users, and how many GPUs are free; it refreshes every two minutes
-from a 90-second `squeue`/`sinfo` cache on `/scratch`, so several sessions share one query. `/gpu`
-opens the same numbers in a pane, which remote surfaces (phone, desktop over Remote Control) also
-show, since the band above the prompt is drawn on the local terminal only. Paths and the `KARTHIKN` fileset are hardcoded.
-
 ## Install
 
 ```
@@ -121,7 +113,6 @@ show, since the band above the prompt is drawn on the local terminal only. Paths
 /plugin install training-monitor@wenhaochai
 /plugin install presentation@wenhaochai
 /plugin install who-ate-my-flops@wenhaochai
-/plugin install della-gpu@wenhaochai
 ```
 
 Upgrading from `writing` 1.x: the 12 integrity-forensics skills moved out of `writing` into the new
