@@ -89,7 +89,7 @@ export const register: Register = on => {
 
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'fleet', description: 'Open the Della fleet pane: tmux sessions, jobs per project, quota' })
-    await $.command.register({ name: 'gpu', description: 'Refresh the Della GPU band now (and show it if hidden)' })
+    await $.command.register({ name: 'gpu', description: 'Della GPU status now, in a pane every surface shows (phone and desktop included)' })
     void refreshStatus($)
     $.clock.every(POLL_MS, () => {
       void refreshStatus($)
@@ -107,7 +107,9 @@ export const register: Register = on => {
 
   on('command.run', { command: 'gpu' }, async $ => {
     await update($, isHidden, () => false)
-    await refreshStatus($)
+    isFleetWanted = true
+    await Promise.all([refreshStatus($), refreshFleet($)])
+    await $.ui.open({ id: PANE, title: 'Della GPU' })
     const s = await read($, status)
     return { text: s ? `GPU: ${s.mine} running, ${s.pendJobs} pending jobs (${s.pendGpus} GPUs), rank ${s.rank}/${s.users}, pli-c ${s.used}/${s.total}, free ${s.free}` : 'GPU status unavailable (no squeue here?).' }
   })

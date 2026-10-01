@@ -108,7 +108,8 @@ at `20577a5`; the Codex manifest and `assets/` are left out.
 A mod for Princeton's Della cluster. A band above the prompt shows your running and pending GPUs on
 the PLI H100 nodes, your rank among users, and how many GPUs are free; it refreshes every two minutes
 from a 90-second `squeue`/`sinfo` cache on `/scratch`, so several sessions share one query. `/gpu`
-refreshes it now; `/fleet` opens a pane with every tmux session's current state, jobs per working
+opens the same numbers in a pane, which remote surfaces (phone, desktop over Remote Control) also
+show, since the band above the prompt is drawn on the local terminal only; `/fleet` opens a pane with every tmux session's current state, jobs per working
 directory, and the group's scratch quota. Paths and the `KARTHIKN` fileset are hardcoded.
 
 ## Install
