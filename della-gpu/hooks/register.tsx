@@ -103,7 +103,7 @@ export const register: Register = on => {
     await Promise.all([refreshStatus($), refreshFleet($)])
     await $.ui.open({ id: PANE, title: 'Della GPU' })
     const s = await read($, status)
-    return { text: s ? `GPU: ${s.mine} running, ${s.pendJobs} pending jobs (${s.pendGpus} GPUs), rank ${s.rank}/${s.users}, pli-c ${s.used}/${s.total}, free ${s.free}` : 'GPU status unavailable (no squeue here?).' }
+    return { text: s ? `[pli-c]\nrunning:  ${s.mine} GPUs\npending:  ${s.pendJobs} Jobs\nrank:     ${s.rank}/${s.users}` : 'GPU status unavailable (no squeue here?).' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
