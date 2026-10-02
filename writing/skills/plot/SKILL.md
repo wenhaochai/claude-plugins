@@ -56,7 +56,12 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    what the run kept, never going down, changing at integer ticks, with a tick and grid line at every
    step so each corner sits on one. A Pareto frontier is the same running maximum taken over cost:
    sort by cost, step up at each optimal point, and run flat past the last one. Bars start at 0. A
-   categorical axis has no grid lines.
+   categorical axis has no grid lines. A quantity spanning orders of magnitude (compute, tokens,
+   parameters) goes on a log axis with ticks at powers of ten; loss against compute is log-log, the
+   scaling-law convention. When the claim rests on where runs end (each run's final loss), the
+   trajectories are context: draw them faint (alpha about 0.3) and mark each run's last point with a
+   dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
+   comparison.
 5. **One face at Epoch's sizes.** Instrument Sans (SIL OFL, bundled) is the closest free face to Epoch's
    Messina Sans. The sizes were measured off Epoch's 2400 px exports scaled to 6.32 in, matched on the
    lowercase and on where titles break: title 12.2 pt semibold, subtitle 9.3, every other word 7.35,
@@ -84,14 +89,17 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    (`canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE)`, 1600 x 900) is for a cover or a more artistic
    image, where the picture matters more than reading values.
    Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
-   kind of text on its own, so every size keeps its ratio to the others.
+   kind of text on its own, so every size keeps its ratio to the others. At `WIDTH_POST` two columns of
+   panels leave under 2 in each: category labels over about ten characters collide there, so stack the
+   panels in one column instead.
 10. **A colour means one thing, and every colour is Google's.** Every colour is a GM2 tone
     (`tone(hue, grade)`); none is computed. Neutrals come from the GM2 grey ramp.
 
     | Use | Colours |
     |---|---|
     | A compared pair; a third series | `BLUE`, `LIGHT` (blue 600, 300); `GREY` |
-    | An ordered set | `family_4(hue)` (grades 300, 500, 700, 900) |
+    | An ordered set, up to four series that stay apart | `family_4(hue)` (grades 300, 500, 700, 900) |
+    | An ordered set whose lines cross or bunch, or more than four | `STRONG` in order, then `GREY_900` |
     | Distinct categories: lines, points, small marks | `STRONG` (600) |
     | Distinct categories: bars | `MEDIUM` (400) |
     | Distinct categories: stacked areas, treemap cells | `SOFT` (300) |
@@ -101,6 +109,13 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     FiveThirtyEight and Datawrapper do. Yellow lines and words take 900, the only Google yellow at 3:1
     on white. Context behind a highlight steps down a set or goes grey, and stacked neighbours are split
     by thin white edges. Hold each series' colour across a piece; the legend names every colour.
+    Shades of one hue only separate series that never touch: six blue grades for six layers whose
+    curves overlap read as one band (the owner could not tell them apart), so order goes into the
+    legend and the hues change.
+
+    A line style means something too. A baseline run is a series like the others: solid, told apart
+    by its colour (grey). Dashes mark a different kind of quantity (an extrapolation, a projection, a
+    bound), never "this one is the baseline".
 
     Logos are the one exception to GM2. The few points a chart is about (the Pareto-optimal models,
     the method a post introduces) may be drawn as their organisation's logo at the data point with
