@@ -21,6 +21,7 @@ to --out.
 """
 import argparse
 import functools
+import glob
 import hashlib
 import http.server
 import json
@@ -32,7 +33,11 @@ import sys
 import threading
 import time
 
-CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+# Chrome for Testing first: every headless launch of the regular Chrome leaves a 1.4G copy of the app in
+# $TMPDIR/../X/com.google.Chrome.code_sign_clone. `npx playwright install chromium` installs it.
+CFT = sorted(glob.glob(os.path.expanduser('~/Library/Caches/ms-playwright/chromium-*/chrome-mac*/'
+                                          'Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing')))
+CHROME = CFT[-1] if CFT else '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 CT = {'.html': 'text/html', '.json': 'application/json', '.js': 'text/javascript', '.css': 'text/css', '.md': 'text/markdown',
       '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml'}
 INJECT = r'''<script>
