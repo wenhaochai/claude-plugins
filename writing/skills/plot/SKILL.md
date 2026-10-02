@@ -64,11 +64,10 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    comparison. When those endpoints run along an ordered variable (depth, size), draw a fitted curve
    through them, not straight segments (the owner), over their own range only, the fitted form in the
    docstring and caption (for loss against compute, L = E + A·C^-α); its own legend entry: that curve is
-   the result. A fit goes on the chart only if it describes the points: check the residual signs
-   before showing it. An asymptote is fixed from an outside reference (a lab's published anchor), not
-   fitted freely to a handful of points, and when the points then bend off the fixed-asymptote form
-   (residuals + at both ends, − in the middle), drop the curve and show the points: the bend is the
-   finding (the owner, on per-layer endpoints under an anchored E). The endpoint dots all take that curve's one colour: a colour per dot repeats what the
+   the result. The curve describes the points, it is not a scaling claim: fit E freely and check the
+   residual signs before showing it. Forcing an outside asymptote onto a form the points do not follow
+   (residuals + at both ends, − in the middle) gives a line that misses them; the owner tried an
+   anchored E, rejected the result and went back to the free fit. The endpoint dots all take that curve's one colour: a colour per dot repeats what the
    x position already says, so the ramp stays on the faint trajectories only (the owner: changing dot
    colours carry no information), and the legend names that line, not its
    members (the owner: "final loss by layer" is the entry; listing L1, L6 beside it adds nothing). A
