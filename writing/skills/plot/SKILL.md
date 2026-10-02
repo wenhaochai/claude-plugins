@@ -59,7 +59,7 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    categorical axis has no grid lines. A quantity spanning orders of magnitude (compute, tokens,
    parameters) goes on a log axis with ticks at powers of ten; loss against compute is log-log, the
    scaling-law convention. When the claim rests on where runs end (each run's final loss), the
-   trajectories are context: draw them faint (alpha about 0.3) and mark each run's last point with a
+   trajectories are context: draw them faint (alpha about 0.15; the owner found 0.3 too strong) and mark each run's last point with a
    dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
    comparison. When those endpoints run along an ordered variable (depth, size), join them with a
    line, its own legend entry: that line is the result, and the legend names that line, not its
