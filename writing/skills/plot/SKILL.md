@@ -61,8 +61,12 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    scaling-law convention. When the claim rests on where runs end (each run's final loss), the
    trajectories are context: draw them faint (alpha about 0.15; the owner found 0.3 too strong) and mark each run's last point with a
    dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
-   comparison. When those endpoints run along an ordered variable (depth, size), join them with a
-   line, its own legend entry: that line is the result, and the legend names that line, not its
+   comparison. When those endpoints run along an ordered variable (depth, size), draw a fitted curve
+   through them, not straight segments (the owner), over their own range only, the fitted form in the
+   docstring and caption (for loss against compute, L = E + A·C^-α); its own legend entry: that curve is
+   the result. The endpoint dots all take that curve's one colour: a colour per dot repeats what the
+   x position already says, so the ramp stays on the faint trajectories only (the owner: changing dot
+   colours carry no information), and the legend names that line, not its
    members (the owner: "final loss by layer" is the entry; listing L1, L6 beside it adds nothing). A
    reference run then appears at the same granularity and only where it is matched: its own final
    point, nothing more. The owner tried the reference's final points across sizes joined into a line,
