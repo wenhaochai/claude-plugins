@@ -67,7 +67,10 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    reference run then appears at the same granularity and only where it is matched: its own final
    point, nothing more. The owner tried the reference's final points across sizes joined into a line,
    then cut it back to the one same-size point. After dropping points, re-derive both ranges from what
-   is left (rule 7). Dots are solid fills with no white ring;
+   is left (rule 7). When many such curves converge at their ends, frame the endpoints: set the range
+   from the spread of the final points with a little context above, and draw trajectories for every
+   other member while keeping every final point (the owner: five curves read apart, eleven over a
+   full-range axis "糊在一起", blurred together). Dots are solid fills with no white ring;
    the owner found the halo ugly.
 5. **One face at Epoch's sizes.** Instrument Sans (SIL OFL, bundled) is the closest free face to Epoch's
    Messina Sans. The sizes were measured off Epoch's 2400 px exports scaled to 6.32 in, matched on the
