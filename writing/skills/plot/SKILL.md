@@ -74,7 +74,11 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    is left (rule 7). When many such curves converge at their ends, frame the endpoints: set the range
    from the spread of the final points with a little context above, and draw trajectories for every
    other member while keeping every final point (the owner: five curves read apart, eleven over a
-   full-range axis "糊在一起", blurred together). Dots are solid fills with no white ring;
+   full-range axis "糊在一起", blurred together). Derive the view from the endpoints, never type it in
+   per figure: x from the smallest final point's value / 4 to the largest × 2 on a log axis, y from just
+   below the lowest final point (reference included) to about 15% above the highest; the early part of
+   every trajectory is cut, which is the point ("we are serving the ends", the owner). Leave no tick
+   value just under the top edge, where the panel name sits. Dots are solid fills with no white ring;
    the owner found the halo ugly.
 5. **One face at Epoch's sizes.** Instrument Sans (SIL OFL, bundled) is the closest free face to Epoch's
    Messina Sans. The sizes were measured off Epoch's 2400 px exports scaled to 6.32 in, matched on the
