@@ -61,7 +61,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    scaling-law convention. When the claim rests on where runs end (each run's final loss), the
    trajectories are context: draw them faint (alpha about 0.3) and mark each run's last point with a
    dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
-   comparison.
+   comparison. When those endpoints run along an ordered variable (depth, size), join them with a
+   line, its own legend entry: that line is the result. Dots are solid fills with no white ring; the
+   owner found the halo ugly.
 5. **One face at Epoch's sizes.** Instrument Sans (SIL OFL, bundled) is the closest free face to Epoch's
    Messina Sans. The sizes were measured off Epoch's 2400 px exports scaled to 6.32 in, matched on the
    lowercase and on where titles break: title 12.2 pt semibold, subtitle 9.3, every other word 7.35,
@@ -100,7 +102,7 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     | A compared pair; a third series | `BLUE`, `LIGHT` (blue 600, 300); `GREY` |
     | An ordered set, up to four series that stay apart | `family_4(hue)` (grades 300, 500, 700, 900) |
     | An ordered set of five or six whose lines cross, each read on its own | `STRONG` in order, then `GREY_900` |
-    | A long ordered set where the order is the message (depth, size, step) | one hue ramped from grade 200 to 900, labelled directly |
+    | A long ordered set where the order is the message (depth, size, step) | one hue ramped from grade 200 to 900; the legend lists first, middle, last |
     | Distinct categories: lines, points, small marks | `STRONG` (600) |
     | Distinct categories: bars | `MEDIUM` (400) |
     | Distinct categories: stacked areas, treemap cells | `SOFT` (300) |
@@ -115,7 +117,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     legend and the hues change. Past six the hues turn into noise instead (the owner, on eleven layers):
     when the reader needs the trend across the set rather than any one member, ramp one hue light to
     dark (`LinearSegmentedColormap` between `tone(hue, 200)` and `tone(hue, 900)`, the one place a tone
-    is interpolated), drop the legend, and name the first, a middle and the last series where they end.
+    is interpolated) and keep the legend, listing only the first, a middle and the last member. Never
+    write series names on the chart instead (rule 1): the owner rejected name labels at curve ends as
+    clutter, twice.
 
     A line style means something too. A baseline run is a series like the others: solid, told apart
     by its colour (grey). Dashes mark a different kind of quantity (an extrapolation, a projection, a
