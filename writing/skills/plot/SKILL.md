@@ -64,10 +64,10 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    comparison. When those endpoints run along an ordered variable (depth, size), join them with a
    line, its own legend entry: that line is the result, and the legend names that line, not its
    members (the owner: "final loss by layer" is the entry; listing L1, L6 beside it adds nothing). A
-   reference run then appears at the same granularity: its final points, across every size that
-   exists, joined into its own line, not its training curve, and only inside the x range of what it is
-   compared with: a reference point past the compared runs' compute compares nothing (the owner).
-   After dropping points, re-derive both ranges from what is left (rule 7). Dots are solid fills with no white ring;
+   reference run then appears at the same granularity and only where it is matched: its own final
+   point, nothing more. The owner tried the reference's final points across sizes joined into a line,
+   then cut it back to the one same-size point. After dropping points, re-derive both ranges from what
+   is left (rule 7). Dots are solid fills with no white ring;
    the owner found the halo ugly.
 5. **One face at Epoch's sizes.** Instrument Sans (SIL OFL, bundled) is the closest free face to Epoch's
    Messina Sans. The sizes were measured off Epoch's 2400 px exports scaled to 6.32 in, matched on the
