@@ -99,7 +99,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     |---|---|
     | A compared pair; a third series | `BLUE`, `LIGHT` (blue 600, 300); `GREY` |
     | An ordered set, up to four series that stay apart | `family_4(hue)` (grades 300, 500, 700, 900) |
-    | An ordered set whose lines cross or bunch, or more than four | `STRONG` in order, then `GREY_900` |
+    | An ordered set of five or six whose lines cross, each read on its own | `STRONG` in order, then `GREY_900` |
+    | A long ordered set where the order is the message (depth, size, step) | one hue ramped from grade 200 to 900, labelled directly |
     | Distinct categories: lines, points, small marks | `STRONG` (600) |
     | Distinct categories: bars | `MEDIUM` (400) |
     | Distinct categories: stacked areas, treemap cells | `SOFT` (300) |
@@ -111,7 +112,10 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     by thin white edges. Hold each series' colour across a piece; the legend names every colour.
     Shades of one hue only separate series that never touch: six blue grades for six layers whose
     curves overlap read as one band (the owner could not tell them apart), so order goes into the
-    legend and the hues change.
+    legend and the hues change. Past six the hues turn into noise instead (the owner, on eleven layers):
+    when the reader needs the trend across the set rather than any one member, ramp one hue light to
+    dark (`LinearSegmentedColormap` between `tone(hue, 200)` and `tone(hue, 900)`, the one place a tone
+    is interpolated), drop the legend, and name the first, a middle and the last series where they end.
 
     A line style means something too. A baseline run is a series like the others: solid, told apart
     by its colour (grey). Dashes mark a different kind of quantity (an extrapolation, a projection, a
