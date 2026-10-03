@@ -12,13 +12,7 @@ it point-by-point. Emit `adversarial-case-builder.memo.md`. Run **LAST**, AFTER
 `/evidence-ledger` (so `claims.json` exists) and AFTER the auditor skills (so the
 merged `*.findings.json` exist).
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It runs
-> LAST and synthesizes the ledger + the other auditors' findings into one memo. Even
-> though it is **memo-only** (the adjudicator caps it at `info`, so it adds no verdict
-> weight), the no-new-signal cadence rule still applies: its output changes only when
-> the **ledger / the findings / the paper** change, never with the wall clock.
-> Schedule the *work that precedes it* — ledger + auditors done → run this **once**.
-> (Mirrors ARIS's external-cadence doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the ledger, the auditors' findings or the paper change.
 
 > Adapted from ARIS `kill-argument`, with **one deliberate downgrade: memo-only.** In
 > a forensics pipeline the headline-attack is most useful as a *synthesis of

@@ -25,12 +25,7 @@ proposes **no integrity finding** and computes **no verdict**.
 > with an `fp_case`. For authorship detection use a dedicated tool (Pangram / GPTZero /
 > Binoculars) — that is out of scope here, by design.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> report-input — it proposes the impressions the deterministic adjudicator renders in
-> the zero-weight AIS section. Re-firing it on a wall-clock timer adds no signal: its
-> output changes only when the **paper / ledger** changes, not with the clock. Schedule
-> the *external wait that precedes it* — ledger built → check **once**. (Mirrors ARIS's
-> external-cadence doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper or the ledger changes.
 
 ## Why this exists
 

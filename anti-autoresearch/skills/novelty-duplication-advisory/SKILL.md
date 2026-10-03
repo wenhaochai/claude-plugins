@@ -15,15 +15,7 @@ contribution, and emit `novelty-duplication-advisory.memo.md`. Run AFTER `/evide
 (so `claims.json` exists). This skill **decides nothing** — it never rules "trivial" or
 "duplicate", and the deterministic adjudicator caps it at `info`.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It retrieves
-> external prior work once and synthesizes it into one advisory memo. Even though it is
-> **memo-only** (the adjudicator caps it at `info`, so it adds no verdict weight), the
-> no-new-signal cadence rule still applies: its output changes only when the **ledger / the
-> paper / the literature** change, never with the wall clock. It is tempting to re-fire on a
-> timer "to catch newly-posted prior work," but a wall-clock loop burns real DBLP + web +
-> cross-model budget on every tick for a paper that has not changed. Schedule the *work that
-> precedes it* — ledger built → run this **once**. (Mirrors ARIS's external-cadence doctrine:
-> `/loop`·`/schedule` are fire-control, not a judge.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the ledger, the paper or the literature changes.
 
 > Adapted from ARIS `novelty-check`, with **one deliberate reframing and one deliberate
 > downgrade.** The reframing: ARIS `novelty-check` asks *"is MY idea novel — should I PROCEED

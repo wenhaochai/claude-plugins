@@ -11,13 +11,7 @@ Audit experiment integrity for: **$ARGUMENTS** (a paper-dir or repo-dir; use an
 ABSOLUTE path — it is referred to as `TARGET` below). Emit span-anchored
 `experiment-forensics.findings.json`.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> verdict-bearing input — it proposes the findings the deterministic adjudicator
-> turns into the report. Re-firing it on a wall-clock timer adds no signal: what
-> unlocks new conclusions is a higher **observability level** (a repo / result
-> files arriving → L2), not elapsed time. Schedule the *external wait that precedes
-> it* — artifacts released → run **once** at the new level. (Mirrors ARIS's
-> external-cadence doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the observability level rises (a repo or result files arrive → L2).
 
 > Adapted from ARIS `experiment-audit` (#57/#131), reframed for the reviewer side.
 > The original audits *your own* experiment before you claim results; this audits a

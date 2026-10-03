@@ -11,13 +11,7 @@ Audit evaluation-design and reporting validity for: **$ARGUMENTS** (requires
 `claims.json` from `/evidence-ledger`). Emit span-anchored
 `eval-design-forensics.findings.json`. This skill computes **no verdict**.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> verdict-bearing input — it proposes the findings the deterministic adjudicator
-> turns into the report. Re-firing it on a wall-clock timer adds no signal: its
-> output changes only when the **paper / ledger** changes (or a repo arrives,
-> raising the observability level), not with the clock. Schedule the *external wait
-> that precedes it* — ledger built (or artifacts released → L2) → audit **once**.
-> (Mirrors ARIS's external-cadence doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper or the ledger changes, or a repo arrives and raises the level to L2.
 
 > Adapted from the ML-evaluation-methodology literature — the leakage taxonomy of
 > Kapoor & Narayanan (2023), the LLM-as-judge validity work (MT-Bench

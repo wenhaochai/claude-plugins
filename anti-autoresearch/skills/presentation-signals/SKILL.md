@@ -21,12 +21,7 @@ skill computes **no verdict**.
 > substantive findings and look closer"* context. See
 > `references/hack-pattern-taxonomy.md` §F.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> verdict-bearing input — it proposes the surface findings the deterministic
-> adjudicator turns into the report. Re-firing it on a wall-clock timer adds no
-> signal: its output changes only when the **paper / ledger** changes, not with the
-> clock. Schedule the *external wait that precedes it* — ledger built → check **once**.
-> (Mirrors ARIS's external-cadence doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper or the ledger changes.
 
 ## Why this exists
 

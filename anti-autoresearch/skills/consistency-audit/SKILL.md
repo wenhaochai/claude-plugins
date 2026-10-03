@@ -11,12 +11,7 @@ Audit intra-paper self-consistency for: **$ARGUMENTS** (requires `claims.json`
 from `/evidence-ledger`). Emit span-anchored `consistency-audit.findings.json`;
 the deterministic adjudicator — not this skill — computes the verdict.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> verdict-bearing input — it proposes the findings the deterministic adjudicator
-> turns into the report. Re-firing it on a wall-clock timer adds no signal: its
-> output changes only when the **paper / ledger** changes, not with the clock.
-> Schedule the *external wait that precedes it* — ledger built → audit **once**.
-> (Mirrors ARIS's external-cadence doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper or the ledger changes.
 
 > The flagship instrument. Internal contradiction is the single most defensible
 > thing you can check on an unknown submission: it needs no external GT, runs at L0

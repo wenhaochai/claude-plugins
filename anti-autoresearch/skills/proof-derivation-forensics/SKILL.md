@@ -13,12 +13,7 @@ theorem/proof and proposes span-anchored findings; this skill writes
 `proof-derivation-forensics.findings.json`. The deterministic adjudicator — not this
 skill — computes the verdict.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> verdict-bearing input — it proposes the findings the deterministic adjudicator
-> turns into the report. Re-firing it on a wall-clock timer adds no signal: its
-> output changes only when the **paper / ledger** changes, not with the clock.
-> Schedule the *external wait that precedes it* — ledger built → audit **once**.
-> (Mirrors ARIS's external-cadence doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper or the ledger changes.
 
 > Broken math is the single most-cited "obviously machine-written" tell in real
 > reviews ("过不去的步骤用文字糊弄", "车轱辘话复述当证明", "关键公式符号用反"). Unlike the

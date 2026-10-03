@@ -11,14 +11,7 @@ Audit citation integrity for: **$ARGUMENTS** (requires `claims.json` from
 `/evidence-ledger`; reasons over its `type:"citation"` claims). Emit span-anchored
 `citation-forensics.findings.json`. This skill computes **no verdict**.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> verdict-bearing input — it proposes the citation findings the deterministic
-> adjudicator turns into the report. Re-firing it on a wall-clock timer adds no
-> signal: its output changes only when the **paper / ledger / bibliography**
-> changes, not with the clock, and each run spends real cross-model + lookup budget
-> per cited key. Schedule the *external wait that precedes it* — bibliography
-> finalized → ledger rebuilt → audit **once**. (Mirrors ARIS's external-cadence
-> doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper, the ledger or the bibliography changes (bibliography finalized → ledger rebuilt → audit once).
 
 > Adapted from ARIS `citation-audit`, re-wired onto this repo's evidence ledger and
 > the reviewer≠adjudicator contract, and reframed from "audit + **rewrite** the bib"

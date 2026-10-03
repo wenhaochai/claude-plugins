@@ -11,13 +11,7 @@ Audit baseline-comparison integrity for: **$ARGUMENTS** (requires `claims.json`
 from `/evidence-ledger`). Emit span-anchored `baseline-comparison-audit.findings.json`.
 This skill computes **no verdict**.
 
-> 🔒 **Do not wrap this skill in `/loop`, `/schedule`, or `CronCreate`.** It is
-> verdict-bearing input — it proposes the findings the deterministic adjudicator
-> turns into the report. Re-firing it on a wall-clock timer adds no signal: its
-> output changes only when the **paper / ledger** (or the live leaderboard it
-> cross-checks) changes, not with the clock. Schedule the *external wait that
-> precedes it* — ledger built → audit **once**. (Mirrors ARIS's external-cadence
-> doctrine.)
+> 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper, the ledger or the live leaderboard it cross-checks changes.
 
 > Adapted from ARIS `paper-claim-audit` — its **scope-overclaim** and
 > **delta-arithmetic** checks, reframed from "paper vs result files" to **"is the
