@@ -13,6 +13,23 @@ their own evidence. This is the reusable IP of Anti-Autoresearch: it is curated 
 the maintainers of an autoresearch system (ARIS), i.e. by people who have watched
 these failures occur **from the generator's side**.
 
+## Contents
+
+- How to read / use this file
+- A. Numeric self-consistency: HP-NUM-INFLATE, HP-DELTA-ERROR, HP-AGG-DRIFT, HP-DENOM-DRIFT, HP-UNIT-DIR-MISMATCH, HP-CAPTION-MISMATCH, HP-APPENDIX-CONTRA, HP-GRANULARITY-IMPOSSIBLE, HP-VARIANCE-IMPOSSIBLE, HP-STAT-INCONSISTENCY
+- B. Method & scope: HP-METHOD-DRIFT, HP-RESOURCE-IDENTITY-MISMATCH, HP-ABLATION-ATTRIB, HP-SCOPE-INFLATE, HP-THEOREM-SCOPE-DRIFT, HP-ARGUMENT-CHAIN-BREAK, HP-CAUSAL-EVIDENCE-LEAP, HP-ACRONYM-DRIFT
+- C. Baseline integrity: HP-MISSING-BASELINE, HP-WEAK-BASELINE, HP-SIG-OVERLAP
+- D. Experiment integrity (L2): HP-FAKE-GT, HP-SELF-NORM, HP-PHANTOM-RESULT, HP-DEAD-METRIC, HP-SUSPICIOUS-REGULARITY, HP-PLACEHOLDER-DATA, HP-RESULT-ARTIFACT-MISMATCH, HP-MISSING-REPRO-ARTIFACT
+- E. Citation integrity: HP-CITE-HALLUC, HP-CITE-CONTEXT, HP-CITE-RETRACTED
+- F. Presentation & surface signals (auxiliary): HP-DUP-TABLE, HP-PIPELINE-ARTIFACT, HP-THIN-FLOAT, HP-LLM-FIGURE, HP-PAGE-PADDING
+- G. Proof & derivation integrity (L1): HP-PROOF-OBLIGATION-GAP, HP-PROOF-CIRCULARITY, HP-DERIVATION-INVALID, HP-SYMBOL-SEMANTIC-DRIFT, HP-ASSUMPTION-SMUGGLE, HP-UNDEFINED-NOTATION
+- H. Evaluation design & reporting validity: HP-EVAL-LEAKAGE, HP-JUDGE-VALIDITY, HP-SELECTIVE-REPORTING
+- AI writing-style impressions (AIS, zero weight): AIS-NARRATIVE-ARC-BREAK, AIS-LLM-PHRASE-TICS, AIS-DEFENSIVE-HEDGE, AIS-JARGON-STUFF, AIS-INVENTED-CODENAME, AIS-CLAUSE-FORMULA-WALL, AIS-GRATUITOUS-PSEUDOCODE, AIS-BULLET-LIST-OVERUSE, AIS-BOLD-MODULE-SPAM, AIS-RESTATE-OVERCLAIM, AIS-FOCUS-DRIFT, AIS-SINGLE-STYLE-FIGURES, AIS-APPENDIX-DUMPING-GROUND
+- Advisory signals (zero weight)
+- Contributing a pattern
+
+Search one pattern: `grep -n "^### HP-CITE" hack-pattern-taxonomy.md`.
+
 ## How to read / use this file
 
 The taxonomy is a **post-hoc mapping layer**, not a detector (see
