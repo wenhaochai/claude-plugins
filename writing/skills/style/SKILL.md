@@ -1,6 +1,6 @@
 ---
 name: style
-description: "Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 19 page-capped additions (RULE-P1..P19) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission. Treat canonical and page-capped rules as peer constraints applied at generation time; audit rules trigger at final-pass review, not during drafting."
+description: "Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 19 page-capped additions (RULE-P1..P19) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission."
 ---
 
 # Writing Style
