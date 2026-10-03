@@ -405,7 +405,7 @@ Then write the orchestrator's run trace with the script in `reference/review-tra
 
 ## Deterministic-only fallback (no model in the loop)
 
-When no cross-model reviewer is available (offline / no codex), follow `reference/fallbacks.md` (section "Deterministic-only fallback"): with `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}"` exported first; deterministic tools only, and the report's limitations must say the semantic / code-level dimensions were not run.
+When no cross-model reviewer is available (offline / no codex), follow `reference/fallbacks.md` (section "Deterministic-only fallback"): with `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}"` exported first; deterministic tools only, and the report's limitations must say the semantic / code-level dimensions were not run. Then write the orchestrator's run trace with the script in `reference/review-tracing.md`, as Step 5 does.
 
 ## Output contract
 
