@@ -7,7 +7,7 @@ description: "One matplotlib style for charts in posts and papers, after Epoch A
 
 `style.py` (with `fonts/`) and two examples: `example.py`, a 2x2 grid of best-so-far step charts, and
 `example_card.py`, Epoch's 4:5 social card (a log-log line with a scenario band, labelled points and
-ranges, a footnote and a footer). Copy `style.py`, `fonts/` and the closer example next to your script,
+ranges). Copy `style.py`, `fonts/` and the closer example next to your script,
 and start from the example.
 
 ```python
@@ -36,8 +36,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
 | Web-canvas charts | `title_pt`, `tick_pt`, `note_pt`, `side=0.10` (see rule 5) |
 | 16:9 cover | `canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE, ...)`: panels fill what the header leaves, a 1600 x 900 PNG; covers and artistic images only (see rule 9) |
 | Logo markers | `logo(ax, x, y, path)`: an organisation's logo on a white disc at the point (see rule 10) |
-| 4:5 card | `canvas(card=True, footer=(maker, site), ...)`: 3.8 in at 4:5 on grey, a 1600 x 2000 PNG; one chart for a social post (see rule 9) |
-| Point labels | `callout(..., arrow=False, relpos=...)`: name and value with a bare curved leader, leaving the label's box where `relpos` says |
+| 4:5 card | `canvas(card=True, ...)`: 3.8 in at 4:5 on grey, a 1600 x 2000 PNG; one chart for a social post (see rule 9) |
+| Point labels | `callout(ax, (dx, dy), target, [name, value], arrow=False, points=True, relpos=...)`: the label offset in points, a bare curved leader from where `relpos` says on its box to 4 pt short of the point; offsets clear any band |
 | Log axes | `ax.set_xscale('log')`, ticks at 1, 3, 10, then `y_values(ax, ticks, fmt)` and `room(ax)`, which widens in log space |
 
 ## Rules
@@ -116,7 +116,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    image, where the picture matters more than reading values. A chart posted as an image on its own
    (X, LinkedIn) can take the card: `canvas(card=True)` is Epoch's 1200 x 1500 export measured off
    the source, every size the web canvas's at 3.8 in, 0.30 in clear on all four sides, the legend
-   wrapping into rows, and a footer naming who made it.
+   wrapping into rows. The card is the chart alone: Epoch's footnote, sources and logo footer go in
+   the post's text (the owner).
    Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
    kind of text on its own, so every size keeps its ratio to the others. At `WIDTH_POST` two columns of
    panels leave under 2 in each: category labels over about ten characters collide there, so stack the

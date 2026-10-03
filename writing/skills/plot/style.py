@@ -58,7 +58,7 @@ TITLE_PT, SUB_PT, TEXT_PT, TICK_PT = 12.2, 9.3, 7.35, 7.0
 # other artistic image, never a data chart: a 16:9 panel is too short to read.
 WIDTH_1COL, WIDTH_TEXT, WIDTH_FULL, WIDTH_POST, WIDTH_WIDE = 5.5, 6.32, 7.6, 4.4, 5.6
 ASPECT_WIDE = 16 / 9
-# A card: Epoch's 1200 x 1500 social image, one chart on a grey ground with a footer. Measured off it,
+# A card: Epoch's 1200 x 1500 social image, one chart on a grey ground. Measured off it,
 # every size is the web canvas's (title 9.2, text 7.35, ticks 7) once the canvas is 3.8 in wide, and the
 # margin is 0.30 in on all four sides.
 WIDTH_CARD, ASPECT_CARD, M_CARD = 3.8, 4 / 5, 0.30
@@ -109,7 +109,6 @@ GAP_SUBTITLE = 0.13          # title's last line to the subtitle
 GAP_TITLE_LEGEND = 0.235     # title (or subtitle) to the top of the legend row or the quantity
 LEGEND_H = 0.10              # the legend row
 LEGEND_PITCH = 0.19          # a wrapped legend's rows
-GAP_FOOTER = 0.11            # a footnote's last line to the footer
 GAP_LEGEND_QUANTITY = 0.16   # legend row's bottom to the top of the quantity
 QUANTITY_H = 0.10            # the quantity above each column
 GAP_QUANTITY_PANEL = 0.24    # quantity's bottom to the panel's top grid line; the top value sits between
@@ -301,8 +300,7 @@ def _legend_row(fig, legend, x, y, align='left'):
 def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subtitle=None,
            legend=None, legend_loc='row', legend_title=None, quantity=None, xlabel=None, note=None,
            note_style='normal', ticks='above', extra=(0, 0, 0, 0), gap_rows=GAP_ROWS, title_pt=TITLE_PT,
-           subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE, aspect=None, card=False,
-           footer=None):
+           subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE, aspect=None, card=False):
     """The figure and its panels, laid out top down in inches.
 
     title       names what is plotted, never a conclusion (SKILL.md rule 3); the owner's wording (a
@@ -339,13 +337,12 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
     card        Epoch's 4:5 social image: WIDTH_CARD at ASPECT_CARD on CARD_BG, M_CARD clear on all
                 four sides, the web canvas's sizes (title 9.2, subtitle and ticks at text size, note
                 6.5). It overrides width, aspect, side and those sizes.
-    footer      (left, right): a line at the very bottom, muted, the left part semibold (who made
-                it, a licence), the right part regular (a site). Either may be ''.
     Returns (fig, axes) with axes a rows x cols array.
     """
-    top, edge, gap_subtitle, gap_title_legend = M_TOP, M_EDGE, GAP_SUBTITLE, GAP_TITLE_LEGEND
+    top, edge, m_bottom, gap_subtitle, gap_title_legend = M_TOP, M_EDGE, M_BOTTOM, GAP_SUBTITLE, GAP_TITLE_LEGEND
     if card:
         width, aspect, side, top, edge = WIDTH_CARD, ASPECT_CARD, M_CARD, M_CARD, M_CARD
+        m_bottom = TICKS_BELOW + M_CARD
         gap_subtitle, gap_title_legend = 0.07, 0.17
         title_pt, subtitle_pt, tick_pt, note_pt = 9.2, TEXT_PT, TICK_PT, 6.5
     fig = plt.figure(figsize=(width, 4))
@@ -382,22 +379,14 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
         header += 0.14 if ticks == 'above' else 0.08
     header += extra[0]
 
-    bottom = M_BOTTOM + (GAP_XLABEL if xlabel else 0) + extra[2]
-    footer_texts = []
-    if footer:
-        for part, weight in zip(footer, ('semibold', 'normal')):
-            footer_texts.append(fig.text(0, 0, part, fontsize=TEXT_PT, weight=weight, color=GREY_600,
-                                         ha='left', va='baseline'))
-        footer_y = edge + 0.03                                        # the baseline, descenders below
-        edge = footer_y + _height(fig, footer_texts[0]) + GAP_FOOTER
+    bottom = m_bottom + (GAP_XLABEL if xlabel else 0) + extra[2]
     note_text = None
     if note:
         note_text = fig.text(0, 0, _wrap(fig, note, full, note_pt, 'normal', note_style, warn=False),
                              fontsize=note_pt, color=MUTED, style=note_style, ha='left', va='bottom',
                              linespacing=1.35)
-    if note or footer:
         bottom = (TICKS_BELOW + (XLABEL_BELOW if xlabel else 0) + extra[2] + GAP_NOTE
-                  + (_height(fig, note_text) if note else 0) + edge)
+                  + _height(fig, note_text) + edge)
 
     right_edge = width - side - extra[1]
     column_w = 0.0
@@ -432,10 +421,6 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
         t.set_position((side / W, 1 - top / H))
     if note_text is not None:
         note_text.set_position((side / W, edge / H))
-    if footer_texts:
-        footer_texts[0].set_position((side / W, footer_y / H))
-        footer_texts[1].set_position(((W - side) / W, footer_y / H))
-        footer_texts[1].set_ha('right')
 
     panel_top = H - header + extra[0]
     if legend and legend_loc in ('row', 'right'):
@@ -600,19 +585,27 @@ def stack(ax, xy, lines, styles=None, ha='left', va='center', size=TEXT_PT, colo
 
 
 def callout(ax, xy, target, lines, color=INK, ha='left', va='center', rad=0.3, relpos=(0.5, 0.5),
-            styles=None, size=TEXT_PT, arrow_color=None, arrow=True):
+            styles=None, size=TEXT_PT, arrow_color=None, arrow=True, points=False):
     """A note at `xy` with a curved arrow to `target` (both data coordinates): the first line medium,
-    the rest regular unless `styles` says otherwise. The arrow leaves the text's box at its edge.
-    arrow=False draws Epoch's point label instead: a bare curved leader stopping short at both ends."""
+    the rest regular unless `styles` says otherwise. The arrow leaves the text's box at `relpos`
+    ((0, 0) its bottom left, (1, 1) its top right).
+    arrow=False draws Epoch's point label instead: a bare leader from the box's edge that stops 4 pt
+    short of the point. points=True reads `xy` as an offset in points from `target`, so every leader
+    keeps its length whatever the axis scale (Epoch's run about 13 pt)."""
     lines = [lines] if isinstance(lines, str) else list(lines)
     styles = styles or [{'weight': 'medium'}] + [{}] * (len(lines) - 1)
-    ax.annotate('\n'.join(lines), xy=target, xytext=xy, ha=ha, va=va, multialignment=ha, fontsize=size,
-                linespacing=1.25, color='none', weight='medium', zorder=5,
+    ax.annotate('\n'.join(lines), xy=target, xytext=xy, textcoords='offset points' if points else 'data',
+                ha=ha, va=va, multialignment=ha, fontsize=size, linespacing=1.25, color='none',
+                weight='medium', zorder=5,
                 arrowprops=dict(arrowstyle='-|>,head_length=0.32,head_width=0.16' if arrow else '-',
                                 connectionstyle=f'arc3,rad={rad}', color=arrow_color or color,
-                                linewidth=0.8, shrinkA=2 if arrow else 1.5, shrinkB=2.5,
+                                linewidth=0.8, shrinkA=2 if arrow else 1, shrinkB=2.5 if arrow else 4,
                                 relpos=relpos, mutation_scale=10))
-    return stack(ax, xy, lines, styles, ha=ha, va=va, size=size, color=color, zorder=5)
+    kw = {}
+    if points:
+        kw['transform'] = ax.transData + ScaledTranslation(xy[0] / 72, xy[1] / 72, ax.figure.dpi_scale_trans)
+        xy = target
+    return stack(ax, xy, lines, styles, ha=ha, va=va, size=size, color=color, zorder=5, **kw)
 
 
 def end_labels(ax, items, x=None, pad_pt=10, gap_in=0.14, size=TEXT_PT):

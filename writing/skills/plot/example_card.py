@@ -4,7 +4,7 @@ same hardware to support more agents" (CC-BY), redrawn here as the card form's w
 A 4:5 card: one log-log panel, a grey band of scenarios around a central line, open models as points,
 closed models as ranges (a thick bar under the line between two points), each named by a label with a
 bare leader. Concurrent agents = K / cost per agent-hour, K = 3.1e8 read off the central line; the band
-is that line x/÷ 1.6.
+is that line x/÷ 1.6. Epoch's footnote, sources and footer are left out; they belong in the post.
 Output: example_card.pdf and example_card.png (1600 x 2000).
 """
 from pathlib import Path
@@ -18,13 +18,13 @@ apply_style()
 
 K, SPREAD = 3.1e8, 1.6
 OPEN, CLOSED = tone('cyan', 700), tone('pink', 600)
-# name, agents (one value, or the low and high ends of a range), label position (cost, agents), the point
-# of the label's box the leader leaves from, its bend
-MODELS = [('DeepSeek V4 Pro', (1.9e9,), (0.21, 4.8e9), (0, 0.1), 0.2),
-          ('GLM-5.2', (5.71e8,), (0.27, 1.15e8), (0.6, 1), 0.3),
-          ('Kimi K3', (2.4e8,), (0.94, 1.1e9), (0.45, 0), 0.3),
-          ('GPT-5.6 Sol', (9.7e7, 1.95e8), (0.93, 2.85e7), (0.5, 1), 0.3),
-          ('Claude Fable 5', (3.0e7, 6.0e7), (4.2, 2.15e8), (0.55, 0), 0.3)]
+# name, agents (one value, or the low and high ends of a range), the label's offset from the point in
+# points, clear of the band, where the leader leaves the label's box, the leader's bend
+MODELS = [('DeepSeek V4 Pro', (1.9e9,), (12, 17), (0, 0.5), 0.3),
+          ('GLM-5.2', (5.71e8,), (-34, -32), (0.44, 1), 0.3),
+          ('Kimi K3', (2.4e8,), (-12, 24), (0.48, 0), 0.3),
+          ('GPT-5.6 Sol', (9.7e7, 1.95e8), (-40, -34), (0.46, 1), 0.3),
+          ('Claude Fable 5', (3.0e7, 6.0e7), (-22, 27), (0.53, 0), 0.3)]
 
 
 def si(v):
@@ -52,20 +52,15 @@ fig, axes = canvas(card=True,
                    subtitle='Potential capacity from memory shipped during 2025–27, assuming full deployment '
                             'for the selected workload',
                    legend=[('Open models (benchmarked)', OPEN, 'box'), ('Closed models (inferred)', CLOSED, 'box'),
-                           ('Hardware scenarios', GREY_300, 'box'), ('Central estimate', INK, 'line')],
-                   quantity='Potential concurrent agents', xlabel='Reference serving cost per agent-hour (US$)',
-                   note='Model labels use the central hardware assumption. Models differ in capability, workload, '
-                        'and how agent-hours are measured. Shipment years do not indicate deployment dates. '
-                        'M = million; B = billion. Both axes use logarithmic scales.\n'
-                        'Sources: TrendForce, SemiAnalysis InferenceX/AgentX, TraceLab',
-                   footer=('Redrawn from Epoch AI | CC-BY', 'epoch.ai'))
+                           ('Hardware scenarios', GREY_400, 'box'), ('Central estimate', INK, 'line')],
+                   quantity='Potential concurrent agents', xlabel='Reference serving cost per agent-hour (US$)')
 ax = axes[0, 0]
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.minorticks_off()
 
 cost = np.geomspace(0.1, 20, 50)
-ax.fill_between(cost, K / cost / SPREAD, K / cost * SPREAD, color=GREY_300, linewidth=0, zorder=1)
+ax.fill_between(cost, K / cost / SPREAD, K / cost * SPREAD, color=GREY_400, linewidth=0, zorder=1)
 ax.plot(cost, K / cost, color=INK, linewidth=1.1, zorder=3)
 for name, agents, at, leave, rad in MODELS:
     x = [K / a for a in agents]
@@ -75,7 +70,7 @@ for name, agents, at, leave, rad in MODELS:
     ax.scatter(x, agents, s=22, color=color, edgecolor=INK, linewidth=0.6, zorder=4)
     mid = 10 ** np.mean(np.log10(agents))
     callout(ax, at, (K / mid, mid), [name, amount(agents)], arrow=False, rad=rad,
-            relpos=leave)
+            relpos=leave, points=True)
 
 ax.set_ylim(7e6, 1e10)
 y_values(ax, [1e7, 3e7, 1e8, 3e8, 1e9, 3e9, 1e10], si)
