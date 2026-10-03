@@ -66,9 +66,11 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    categorical axis has no grid lines. A quantity spanning orders of magnitude (compute, tokens,
    parameters) goes on a log axis with ticks at powers of ten; loss against compute is log-log, the
    scaling-law convention. When the claim rests on where runs end (each run's final loss), the
-   trajectories are context: draw them faint (alpha about 0.15; the owner found 0.3 too strong) and mark each run's last point with a
+   trajectories are context: draw them faint (alpha about 0.15 in a static figure, where the owner found 0.3 too strong;
+   about 0.45 when the chart sits on a web page's tinted paper, where the owner found 0.15 too faint) and mark each run's last point with a
    dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
-   comparison. When those endpoints run along an ordered variable (depth, size), draw a fitted curve
+   comparison. When the curves themselves are the comparison (a few setups over training), draw them nearly solid
+   (alpha about 0.85; the owner: "loss的线有点太淡了"). When those endpoints run along an ordered variable (depth, size), draw a fitted curve
    through them, not straight segments (the owner), over their own range only, the fitted form in the
    docstring only (for loss against compute, L = E + A·C^-α). The legend and caption name the series,
    never the fit: no ", fit" in a label and no word about fitting in the caption (the owner: "拟合这事情这个
