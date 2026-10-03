@@ -1,6 +1,6 @@
 ---
 name: kexue
-description: 科学空间 kexue.fm（苏剑林博客）全站本地库。用户提到苏剑林、科学空间、kexue.fm，或想查这些文章讲过的主题（RoPE、线性Attention、扩散模型、Muon、MuP、MoE、最大熵、VAE 等），或给出 kexue.fm/archives/<id> 链接时使用。离线读本地 SQLite。
+description: 科学空间 kexue.fm（苏剑林博客）全站本地库。用户提到苏剑林、科学空间、kexue.fm，或想查这些文章讲过的主题（RoPE、线性Attention、扩散模型、Muon、MuP、MoE、最大熵、VAE 等），或给出 kexue.fm/archives/{id} 链接时使用。离线读本地 SQLite。
 ---
 
 # kexue
