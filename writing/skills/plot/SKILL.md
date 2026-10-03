@@ -106,9 +106,12 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    latencies, bars); otherwise a round value just below the data. Round steps (1, 1.5, 2, 2.5, 3, 5 x
    10^k), 3 or more bands, each tall enough for the panel's name to clear the next value.
 8. **Layout in inches, top down.** Title, legend row, quantity, panels and gaps are fixed distances
-   measured off Epoch's exports, so every figure has the same rhythm, with 0.19 in clear at both sides
-   and the top. The title spans the width between the margins at one size; a one-word last line warns,
-   and the fix is to rephrase.
+   measured off Epoch's exports, so every figure has the same rhythm. A standalone image (a post, a
+   card, a slide) keeps 0.19 in clear at both sides and the top, since nothing else frames it. A paper
+   figure has no white border: the page and the caption frame it, so `canvas(side=0)` puts the panels
+   against both side edges and `save(fig, stem, flush=True)` cuts the top and bottom to the ink (the
+   owner, 2026-10-03). The title spans the width between the margins at one size; a one-word last
+   line warns, and the fix is to rephrase.
 9. **Placement width, never cropped.** Draw at the width the figure is placed at and include it at
    natural size: `WIDTH_1COL` 5.5 in (NeurIPS, ICML, ICLR text width), `WIDTH_TEXT` 6.32 in (a
    one-column paper with narrower margins), `WIDTH_FULL` 7.6 in, `WIDTH_POST` 4.4 in for a post (a

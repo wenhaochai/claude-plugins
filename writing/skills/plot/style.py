@@ -695,12 +695,21 @@ def check(fig):
             raise ValueError(f'text off the canvas: {t.get_text()!r}')
 
 
-def save(fig, stem, png_px=POST_PX):
+def save(fig, stem, png_px=POST_PX, flush=False):
     """stem.pdf (the paper's artifact) and stem.png, `png_px` wide (a post's artifact), after fit() and
-    check()."""
+    check(). flush=True is for a paper figure (rule 8): the top and bottom are cut to the ink, plus a
+    0.02 in hairline so no glyph is shaved, at the full canvas width; pair it with canvas(side=0)."""
     fit(fig)
     check(fig)
     stem = Path(stem)
+    if flush:
+        from matplotlib.transforms import Bbox
+        tb = fig.get_tightbbox(_renderer(fig))
+        W = fig.get_size_inches()[0]
+        box = Bbox([[0, tb.y0 - 0.02], [W, tb.y1 + 0.02]])
+        fig.savefig(stem.with_suffix('.pdf'), bbox_inches=box, pad_inches=0)
+        fig.savefig(stem.with_suffix('.png'), dpi=png_px / W * (1 + 1e-9), bbox_inches=box, pad_inches=0)
+        return
     fig.savefig(stem.with_suffix('.pdf'))
     # a hair over the exact dpi: Agg floors pixel sizes, and 4.75 in x 1600/3.8 comes out as 1999.99
     fig.savefig(stem.with_suffix('.png'), dpi=png_px / fig.get_size_inches()[0] * (1 + 1e-9))
