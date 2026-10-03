@@ -1,6 +1,6 @@
 ---
 name: convert-to-benchmark-script
-description: Turn the script a user really runs into a benchmark script an optimization loop can run over and over. Same shape as the real job, a few minutes long, repeatable, and leaving nothing behind. It produces the script and a table of what changed, and it does not run it.
+description: "Turn the script a user really runs into a benchmark script an optimization loop can run over and over. Same shape as the real job, a few minutes long, repeatable, and leaving nothing behind. It produces the script and a table of what changed, and it does not run it. Use when init or optimize needs a short repeatable benchmark of the user's real PyTorch training or inference script, or when the user asks to turn a job into a benchmark."
 ---
 
 # convert-to-benchmark-script

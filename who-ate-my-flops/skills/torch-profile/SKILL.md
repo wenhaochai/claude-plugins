@@ -1,6 +1,6 @@
 ---
 name: torch-profile
-description: Profile a PyTorch job, training or inference, with torch.profiler. Analyse the profile, read the surface symptoms, chase each root cause down to a file:line, and hand back a diagnosis. This skill produces no patch.
+description: "Profile a PyTorch job, training or inference, with torch.profiler. Analyse the profile, read the surface symptoms, chase each root cause down to a file:line, and hand back a diagnosis. This skill produces no patch. Use when a PyTorch job is slow (low MFU, slow steps, idle GPU) and the user wants to know where the time goes, before any fix is attempted."
 ---
 
 How is the time distributed? Where is the bottleneck? What is not the problem?

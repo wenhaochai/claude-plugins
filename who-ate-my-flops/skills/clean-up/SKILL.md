@@ -1,6 +1,6 @@
 ---
 name: clean-up
-description: Deliver a finished optimization run as a branch the user can merge. Cherry-pick the commits that changed the workload onto the base, hardcode the A/B flags, re-verify on the shipped code, strip the checkpoint calls in a last commit, and leave the user standing on that branch with a handover.
+description: "Deliver a finished optimization run as a branch the user can merge. Cherry-pick the commits that changed the workload onto the base, hardcode the A/B flags, re-verify on the shipped code, strip the checkpoint calls in a last commit, and leave the user standing on that branch with a handover. Use when an optimize campaign has finished and its result must become a branch the user can merge, or when the user asks to package the campaign's surviving commits."
 ---
 
 # Deliver the branch

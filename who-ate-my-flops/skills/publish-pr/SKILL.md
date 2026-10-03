@@ -1,6 +1,6 @@
 ---
 name: publish-pr
-description: Write the pull request description and one issue for a finished campaign into proposed-pr-description.md and proposed-issue.md, for the user to review and post. Says what the PR may claim, what goes in each section and in what order, and how it is worded. Fills template/pr-description.md and template/issue.md; the filled examples are the .example.md files next to them. It pushes nothing and opens nothing.
+description: "Write the pull request description and one issue for a finished campaign into proposed-pr-description.md and proposed-issue.md, for the user to review and post. Says what the PR may claim, what goes in each section and in what order, and how it is worded. Fills template/pr-description.md and template/issue.md; the filled examples are the .example.md files next to them. It pushes nothing and opens nothing. Use after clean-up has delivered a campaign's branch, when the user wants the upstream PR description and issue drafted."
 ---
 
 # Draft the PR description and the issue

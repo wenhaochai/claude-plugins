@@ -1,6 +1,6 @@
 ---
 name: extract-computation-graph
-description: Read a PyTorch job's code into two files in the workspace’s records/ directory. records/computation_graph.json says what is computed: the module tree down to op level, with a code anchor and a repeat count on every entry. records/execution_schedule.json says when and where it is computed and what moves between devices: phases, the data path onto the GPU, host to device copies and their sync points, the collectives between GPUs, and which overlaps are intended. It reads code and runs nothing. Use it to build either file, and to rebuild one when the code has moved under it.
+description: "Read a PyTorch job's code into two files in the workspace’s records/ directory. records/computation_graph.json says what is computed: the module tree down to op level, with a code anchor and a repeat count on every entry. records/execution_schedule.json says when and where it is computed and what moves between devices: phases, the data path onto the GPU, host to device copies and their sync points, the collectives between GPUs, and which overlaps are intended. It reads code and runs nothing. Use it to build either file, and to rebuild one when the code has moved under it. Use from setup-baseline, or when the user asks what a PyTorch job computes, where it runs, or which host-to-device copies and collectives it makes."
 ---
 
 # extract-computation-graph

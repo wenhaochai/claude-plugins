@@ -1,6 +1,6 @@
 ---
 name: setup-baseline
-description: Build the starting point both diagnose and optimize measure everything else against: a worktree, a workspace, the computation graph and execution schedule, and the base commit measured for speed, memory and correctness and profiled in full. It arms nothing, so the caller decides what happens next.
+description: "Build the starting point both diagnose and optimize measure everything else against: a worktree, a workspace, the computation graph and execution schedule, and the base commit measured for speed, memory and correctness and profiled in full. It arms nothing, so the caller decides what happens next. Use at the start of diagnose or optimize, or when the user asks to measure or profile the base commit of a PyTorch job before any change."
 ---
 
 # setup-baseline
