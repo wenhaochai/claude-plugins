@@ -65,7 +65,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    sort by cost, step up at each optimal point, and run flat past the last one. Bars start at 0. A
    categorical axis has no grid lines. A quantity spanning orders of magnitude (compute, tokens,
    parameters) goes on a log axis with ticks at powers of ten; loss against compute is log-log, the
-   scaling-law convention. When the claim rests on where runs end (each run's final loss), the
+   scaling-law convention. When the losses compared sit close together, map the loss axis as log(loss − c) with c below every
+   value, 2 nats for these runs, and keep the raw loss values as tick labels and the view on the data (the owner:
+   "下限设到2来算对数，但实际上不是到2", for more log separation); the quantity names the offset. When the claim rests on where runs end (each run's final loss), the
    trajectories are context: draw them faint (alpha about 0.15 in a static figure, where the owner found 0.3 too strong;
    about 0.45 when the chart sits on a web page's tinted paper, where the owner found 0.15 too faint) and mark each run's last point with a
    dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
