@@ -67,7 +67,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    parameters) goes on a log axis with ticks at powers of ten; loss against compute is log-log, the
    scaling-law convention. When the losses compared sit close together, map the loss axis as log(loss − c) with c below every
    value, 2 nats for these runs, and keep the raw loss values as tick labels and the view on the data (the owner:
-   "下限设到2来算对数，但实际上不是到2", for more log separation); the quantity names the offset. When the claim rests on where runs end (each run's final loss), the
+   "下限设到2来算对数，但实际上不是到2", for more log separation); the quantity says only "log scale", not the
+   offset (the owner: "不用写"). When the claim rests on where runs end (each run's final loss), the
    trajectories are context: draw them faint (alpha about 0.15 in a static figure, where the owner found 0.3 too strong;
    about 0.45 when the chart sits on a web page's tinted paper, where the owner found 0.15 too faint) and mark each run's last point with a
    dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
@@ -90,7 +91,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    from the spread of the final points with a little context above, and draw trajectories for every
    other member while keeping every final point (the owner: five curves read apart, eleven over a
    full-range axis "糊在一起", blurred together). Derive the view from the endpoints, never type it in
-   per figure: x from the smallest final point's value / 4 to the largest × 2 on a log axis, y from just
+   per figure: x from the smallest final point's value / 4 to the largest × 2 on a log axis, (a chart of final points with no trajectories instead starts at the power of ten just below the smallest
+   point and ends about 30% past the largest; the owner asked why it did not start at 10^17), y from just
    below the lowest final point (reference included) to about 15% above the highest; the early part of
    every trajectory is cut, which is the point ("we are serving the ends", the owner). Leave no tick
    value just under the top edge, where the panel name sits. Dots are solid fills with no white ring;
