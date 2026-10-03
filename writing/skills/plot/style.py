@@ -21,6 +21,9 @@ import math
 import warnings
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use('Agg')   # files only: the macOS backend shrinks a figure by a few pixels when it draws
 import matplotlib.colors as mc
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -55,6 +58,11 @@ TITLE_PT, SUB_PT, TEXT_PT, TICK_PT = 12.2, 9.3, 7.35, 7.0
 # other artistic image, never a data chart: a 16:9 panel is too short to read.
 WIDTH_1COL, WIDTH_TEXT, WIDTH_FULL, WIDTH_POST, WIDTH_WIDE = 5.5, 6.32, 7.6, 4.4, 5.6
 ASPECT_WIDE = 16 / 9
+# A card: Epoch's 1200 x 1500 social image, one chart on a grey ground with a footer. Measured off it,
+# every size is the web canvas's (title 9.2, text 7.35, ticks 7) once the canvas is 3.8 in wide, and the
+# margin is 0.30 in on all four sides.
+WIDTH_CARD, ASPECT_CARD, M_CARD = 3.8, 4 / 5, 0.30
+CARD_BG = '#F8F9FA'   # GM2 grey 50; the grid (grey 200) keeps Epoch's contrast on it
 POST_PX = 1600
 MIN_PANEL = 0.8     # inches: an `aspect` that leaves less for each panel raises
 
@@ -72,6 +80,10 @@ GM2 = {
               '#0D652D'],
     'purple': ['#F3E8FD', '#E9D2FD', '#D7AEFB', '#C58AF9', '#AF5CF7', '#A142F4', '#9334E6', '#8430CE', '#7627BB',
                '#681DA8'],
+    'cyan': ['#E4F7FB', '#CBF0F8', '#A1E4F2', '#78D9EC', '#4ECDE6', '#24C1E0', '#12B5CB', '#129EAF', '#098591',
+             '#007B83'],
+    'pink': ['#FDE7F3', '#FCD0E8', '#FBA9D6', '#FF8BCB', '#FF63B8', '#F538A0', '#E52592', '#C92786', '#B80672',
+             '#9C166B'],
     'grey': ['#F8F9FA', '#F1F3F4', '#E8EAED', '#DADCE0', '#BDC1C6', '#9AA0A6', '#80868B', '#5F6368', '#3C4043',
              '#202124'],
 }
@@ -96,6 +108,8 @@ TITLE_LINESPACING = 1.37     # a wrapped title's baselines 0.21 in apart
 GAP_SUBTITLE = 0.13          # title's last line to the subtitle
 GAP_TITLE_LEGEND = 0.235     # title (or subtitle) to the top of the legend row or the quantity
 LEGEND_H = 0.10              # the legend row
+LEGEND_PITCH = 0.19          # a wrapped legend's rows
+GAP_FOOTER = 0.11            # a footnote's last line to the footer
 GAP_LEGEND_QUANTITY = 0.16   # legend row's bottom to the top of the quantity
 QUANTITY_H = 0.10            # the quantity above each column
 GAP_QUANTITY_PANEL = 0.24    # quantity's bottom to the panel's top grid line; the top value sits between
@@ -254,6 +268,20 @@ def _legend_items(legend):
         yield name, color, kind
 
 
+def _legend_rows(fig, legend, width_in):
+    """The legend's items split into rows no wider than `width_in`, kept in order."""
+    sw = {'line': SWATCH, 'dash': SWATCH, 'ci': 0.16}
+    rows, used = [[]], 0.0
+    for item in _legend_items(legend):
+        w = sw.get(item[2], BOX) + SWATCH_GAP + _width(fig, item[0], TEXT_PT)
+        if rows[-1] and used + ITEM_GAP + w > width_in:
+            rows.append([])
+            used = 0.0
+        used += (ITEM_GAP if rows[-1] else 0) + w
+        rows[-1].append(item)
+    return rows
+
+
 def _legend_row(fig, legend, x, y, align='left'):
     """One legend row centred on height y (inches), starting at x ('left') or ending at x ('right')."""
     W, H = fig.get_size_inches()
@@ -273,7 +301,8 @@ def _legend_row(fig, legend, x, y, align='left'):
 def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subtitle=None,
            legend=None, legend_loc='row', legend_title=None, quantity=None, xlabel=None, note=None,
            note_style='normal', ticks='above', extra=(0, 0, 0, 0), gap_rows=GAP_ROWS, title_pt=TITLE_PT,
-           subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE, aspect=None):
+           subtitle_pt=SUB_PT, tick_pt=TICK_PT, note_pt=TEXT_PT, side=M_SIDE, aspect=None, card=False,
+           footer=None):
     """The figure and its panels, laid out top down in inches.
 
     title       names what is plotted, never a conclusion (SKILL.md rule 3); the owner's wording (a
@@ -307,11 +336,23 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
     aspect      width / height of the whole canvas, e.g. ASPECT_WIDE for a 16:9 post. The panels take
                 whatever height the header and footer leave, and `panel_height` is ignored; raises
                 when that is under MIN_PANEL (fewer rows, an 'inline' legend, or a wider canvas).
+    card        Epoch's 4:5 social image: WIDTH_CARD at ASPECT_CARD on CARD_BG, M_CARD clear on all
+                four sides, the web canvas's sizes (title 9.2, subtitle and ticks at text size, note
+                6.5). It overrides width, aspect, side and those sizes.
+    footer      (left, right): a line at the very bottom, muted, the left part semibold (who made
+                it, a licence), the right part regular (a site). Either may be ''.
     Returns (fig, axes) with axes a rows x cols array.
     """
+    top, edge, gap_subtitle, gap_title_legend = M_TOP, M_EDGE, GAP_SUBTITLE, GAP_TITLE_LEGEND
+    if card:
+        width, aspect, side, top, edge = WIDTH_CARD, ASPECT_CARD, M_CARD, M_CARD, M_CARD
+        gap_subtitle, gap_title_legend = 0.07, 0.17
+        title_pt, subtitle_pt, tick_pt, note_pt = 9.2, TEXT_PT, TICK_PT, 6.5
     fig = plt.figure(figsize=(width, 4))
+    if card:
+        fig.set_facecolor(CARD_BG)
     full = width - 2 * side
-    header, texts = M_TOP, []
+    header, texts = top, []
 
     def block(text, size, weight, color, style='normal', gap=0.0, warn=True, linespacing=1.2):
         nonlocal header
@@ -324,15 +365,16 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
     if title:
         block(title, title_pt, 'semibold', INK, linespacing=TITLE_LINESPACING)
     if subtitle:
-        block(subtitle, subtitle_pt, 'normal', MUTED, gap=GAP_SUBTITLE if title else 0, warn=False)
+        block(subtitle, subtitle_pt, 'normal', MUTED, gap=gap_subtitle if title else 0, warn=False)
     if title or subtitle:
-        header += GAP_TITLE_LEGEND
+        header += gap_title_legend
     if legend_loc == 'inline' and not quantity:
         legend_loc = 'right'
-    legend_from_top = None
+    legend_from_top, legend_rows = None, []
     if legend and legend_loc in ('row', 'right'):
+        legend_rows = _legend_rows(fig, legend, full)
         legend_from_top = header + LEGEND_H / 2
-        header += LEGEND_H + GAP_LEGEND_QUANTITY
+        header += LEGEND_H + (len(legend_rows) - 1) * LEGEND_PITCH + GAP_LEGEND_QUANTITY
     quantity_from_top = header if quantity else None
     if quantity:
         header += QUANTITY_H + (GAP_QUANTITY_PANEL if ticks == 'above' else GAP_QUANTITY_LEFT)
@@ -341,13 +383,21 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
     header += extra[0]
 
     bottom = M_BOTTOM + (GAP_XLABEL if xlabel else 0) + extra[2]
+    footer_texts = []
+    if footer:
+        for part, weight in zip(footer, ('semibold', 'normal')):
+            footer_texts.append(fig.text(0, 0, part, fontsize=TEXT_PT, weight=weight, color=GREY_600,
+                                         ha='left', va='baseline'))
+        footer_y = edge + 0.03                                        # the baseline, descenders below
+        edge = footer_y + _height(fig, footer_texts[0]) + GAP_FOOTER
     note_text = None
     if note:
         note_text = fig.text(0, 0, _wrap(fig, note, full, note_pt, 'normal', note_style, warn=False),
                              fontsize=note_pt, color=MUTED, style=note_style, ha='left', va='bottom',
                              linespacing=1.35)
+    if note or footer:
         bottom = (TICKS_BELOW + (XLABEL_BELOW if xlabel else 0) + extra[2] + GAP_NOTE
-                  + _height(fig, note_text) + M_EDGE)
+                  + (_height(fig, note_text) if note else 0) + edge)
 
     right_edge = width - side - extra[1]
     column_w = 0.0
@@ -372,6 +422,7 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
             x0 = left_edge + c * (pw + GAP_COLUMNS)
             y0 = bottom + (rows - 1 - r) * (panel_height + gap_rows)
             ax = fig.add_axes([x0 / W, y0 / H, pw / W, panel_height / H])
+            ax.set_facecolor(fig.get_facecolor())
             ax._style_ticks, ax._style_tick_pt = ticks, tick_pt
             ax.tick_params(labelsize=tick_pt)
             if ticks == 'left':
@@ -380,12 +431,17 @@ def canvas(rows=1, cols=1, width=WIDTH_TEXT, panel_height=1.5, title=None, subti
     for t, top in texts:
         t.set_position((side / W, 1 - top / H))
     if note_text is not None:
-        note_text.set_position((side / W, M_EDGE / H))
+        note_text.set_position((side / W, edge / H))
+    if footer_texts:
+        footer_texts[0].set_position((side / W, footer_y / H))
+        footer_texts[1].set_position(((W - side) / W, footer_y / H))
+        footer_texts[1].set_ha('right')
 
     panel_top = H - header + extra[0]
     if legend and legend_loc in ('row', 'right'):
-        y = H - legend_from_top
-        _legend_row(fig, legend, side if legend_loc == 'row' else W - side, y, legend_loc)
+        for k, row in enumerate(legend_rows):
+            y = H - legend_from_top - k * LEGEND_PITCH
+            _legend_row(fig, row, side if legend_loc == 'row' else W - side, y, legend_loc)
     elif legend and legend_loc == 'inline':
         _legend_row(fig, legend, W - side, H - quantity_from_top - QUANTITY_H / 2, 'right')
     elif legend and legend_loc == 'column':
@@ -474,17 +530,19 @@ def y_values(ax, ticks, fmt='{:,.0f}'):
 
 
 def room(ax, right_in=0.12, gap_in=0.08):
-    """Widen a linear x range so the data start `gap_in` past the widest y value (call after nice_y)
-    and run `right_in` past the last grid line. Other scales set their x range by hand."""
+    """Widen the x range so the data start `gap_in` past the widest y value (call after nice_y or
+    y_values) and run `right_in` past the last grid line. A log x axis is widened in log space."""
     fig = ax.figure
     width_in = ax.get_position().width * fig.get_size_inches()[0]
     r = _renderer(fig)
     values_in = max((t.get_window_extent(r).width / fig.dpi for t in getattr(ax, '_style_values', [])),
                     default=0.0)
     f_left, f_right = (values_in + gap_in) / width_in, right_in / width_in
-    a, b = ax.get_xlim()
+    log = ax.get_xscale() == 'log'
+    a, b = np.log10(ax.get_xlim()) if log else ax.get_xlim()
     total = (b - a) / (1 - f_left - f_right)
-    ax.set_xlim(a - f_left * total, b + f_right * total)
+    lo, hi = a - f_left * total, b + f_right * total
+    ax.set_xlim(*((10 ** lo, 10 ** hi) if log else (lo, hi)))
 
 
 def panel_label(ax, text, x=None):
@@ -497,7 +555,8 @@ def panel_label(ax, text, x=None):
     xa = ax.transAxes.inverted().transform(ax.transData.transform((x, 0)))[0] + 0.025
     height_in = ax.get_position().height * ax.figure.get_size_inches()[1]
     ax.text(xa, 1 - 0.035 / height_in, text, transform=ax.transAxes, ha='left', va='top', fontsize=TEXT_PT,
-            weight='medium', color=INK, zorder=4, bbox=dict(facecolor='white', edgecolor='none', pad=1.6))
+            weight='medium', color=INK, zorder=4,
+            bbox=dict(facecolor=ax.get_facecolor(), edgecolor='none', pad=1.6))
 
 
 # --- Marks and words on the data -------------------------------------------------------------------
@@ -541,16 +600,18 @@ def stack(ax, xy, lines, styles=None, ha='left', va='center', size=TEXT_PT, colo
 
 
 def callout(ax, xy, target, lines, color=INK, ha='left', va='center', rad=0.3, relpos=(0.5, 0.5),
-            styles=None, size=TEXT_PT, arrow_color=None):
+            styles=None, size=TEXT_PT, arrow_color=None, arrow=True):
     """A note at `xy` with a curved arrow to `target` (both data coordinates): the first line medium,
-    the rest regular unless `styles` says otherwise. The arrow leaves the text's box at its edge."""
+    the rest regular unless `styles` says otherwise. The arrow leaves the text's box at its edge.
+    arrow=False draws Epoch's point label instead: a bare curved leader stopping short at both ends."""
     lines = [lines] if isinstance(lines, str) else list(lines)
     styles = styles or [{'weight': 'medium'}] + [{}] * (len(lines) - 1)
     ax.annotate('\n'.join(lines), xy=target, xytext=xy, ha=ha, va=va, multialignment=ha, fontsize=size,
                 linespacing=1.25, color='none', weight='medium', zorder=5,
-                arrowprops=dict(arrowstyle='-|>,head_length=0.32,head_width=0.16',
+                arrowprops=dict(arrowstyle='-|>,head_length=0.32,head_width=0.16' if arrow else '-',
                                 connectionstyle=f'arc3,rad={rad}', color=arrow_color or color,
-                                linewidth=0.8, shrinkA=2, shrinkB=2.5, relpos=relpos, mutation_scale=10))
+                                linewidth=0.8, shrinkA=2 if arrow else 1.5, shrinkB=2.5,
+                                relpos=relpos, mutation_scale=10))
     return stack(ax, xy, lines, styles, ha=ha, va=va, size=size, color=color, zorder=5)
 
 
@@ -648,7 +709,8 @@ def save(fig, stem, png_px=POST_PX):
     check(fig)
     stem = Path(stem)
     fig.savefig(stem.with_suffix('.pdf'))
-    fig.savefig(stem.with_suffix('.png'), dpi=png_px / fig.get_size_inches()[0])
+    # a hair over the exact dpi: Agg floors pixel sizes, and 4.75 in x 1600/3.8 comes out as 1999.99
+    fig.savefig(stem.with_suffix('.png'), dpi=png_px / fig.get_size_inches()[0] * (1 + 1e-9))
 
 
 __all__ = ['apply_style', 'canvas', 'nice_y', 'y_values', 'room', 'panel_label', 'dots', 'logo', 'stack',
@@ -656,4 +718,5 @@ __all__ = ['apply_style', 'canvas', 'nice_y', 'y_values', 'room', 'panel_label',
            'MEDIUM', 'SOFT', 'WORDS', 'BLUE', 'LIGHT', 'GREY', 'BLUE_RAMP', 'GREY_50', 'GREY_100', 'GREY_200',
            'GREY_300', 'GREY_400', 'GREY_500', 'GREY_600', 'GREY_700', 'GREY_800', 'GREY_900', 'INK', 'TICK',
            'MUTED', 'GRID', 'AXIS', 'MARK', 'TITLE_PT', 'SUB_PT', 'TEXT_PT', 'TICK_PT', 'WIDTH_1COL',
-           'WIDTH_TEXT', 'WIDTH_FULL', 'WIDTH_POST', 'WIDTH_WIDE', 'ASPECT_WIDE', 'POST_PX']
+           'WIDTH_TEXT', 'WIDTH_FULL', 'WIDTH_POST', 'WIDTH_WIDE', 'ASPECT_WIDE', 'POST_PX', 'WIDTH_CARD',
+           'ASPECT_CARD', 'CARD_BG']

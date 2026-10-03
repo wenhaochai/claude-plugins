@@ -1,12 +1,14 @@
 ---
 name: plot
-description: "One matplotlib style for charts in posts and papers, after Epoch AI's charts: Instrument Sans at Epoch's measured sizes, margins and gaps; a light grid both ways and only the baseline axis; the quantity above each column and panel names inside; Google's GM2 tones, toned by mark size; layout set in inches. style.py plus one worked example. Use when the user wants a chart for a post or a paper. Skip for exploratory notebook plots."
+description: "One matplotlib style for charts in posts and papers, after Epoch AI's charts: Instrument Sans at Epoch's measured sizes, margins and gaps; a light grid both ways and only the baseline axis; the quantity above each column and panel names inside; Google's GM2 tones, toned by mark size; layout set in inches; a 4:5 card for social posts. style.py plus two worked examples. Use when the user wants a chart for a post or a paper. Skip for exploratory notebook plots."
 ---
 
 # Plot
 
-Two files: `style.py` (with `fonts/`) and `example.py`, a 2x2 grid of best-so-far step charts. Copy
-both, plus `fonts/`, next to your script, and start from the example.
+`style.py` (with `fonts/`) and two examples: `example.py`, a 2x2 grid of best-so-far step charts, and
+`example_card.py`, Epoch's 4:5 social card (a log-log line with a scenario band, labelled points and
+ranges, a footnote and a footer). Copy `style.py`, `fonts/` and the closer example next to your script,
+and start from the example.
 
 ```python
 from style import *
@@ -34,6 +36,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
 | Web-canvas charts | `title_pt`, `tick_pt`, `note_pt`, `side=0.10` (see rule 5) |
 | 16:9 cover | `canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE, ...)`: panels fill what the header leaves, a 1600 x 900 PNG; covers and artistic images only (see rule 9) |
 | Logo markers | `logo(ax, x, y, path)`: an organisation's logo on a white disc at the point (see rule 10) |
+| 4:5 card | `canvas(card=True, footer=(maker, site), ...)`: 3.8 in at 4:5 on grey, a 1600 x 2000 PNG; one chart for a social post (see rule 9) |
+| Point labels | `callout(..., arrow=False, relpos=...)`: name and value with a bare curved leader, leaving the label's box where `relpos` says |
+| Log axes | `ax.set_xscale('log')`, ticks at 1, 3, 10, then `y_values(ax, ticks, fmt)` and `room(ax)`, which widens in log space |
 
 ## Rules
 
@@ -108,7 +113,10 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    its panels, unless the owner names a paper. Never force a data chart to 16:9: the owner tried it on
    a scatter and a 16:9 panel came out too short, the points crowded and the labels collided. 16:9
    (`canvas(width=WIDTH_WIDE, aspect=ASPECT_WIDE)`, 1600 x 900) is for a cover or a more artistic
-   image, where the picture matters more than reading values.
+   image, where the picture matters more than reading values. A chart posted as an image on its own
+   (X, LinkedIn) can take the card: `canvas(card=True)` is Epoch's 1200 x 1500 export measured off
+   the source, every size the web canvas's at 3.8 in, 0.30 in clear on all four sides, the legend
+   wrapping into rows, and a footer naming who made it.
    Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
    kind of text on its own, so every size keeps its ratio to the others. At `WIDTH_POST` two columns of
    panels leave under 2 in each: category labels over about ten characters collide there, so stack the
@@ -127,7 +135,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     | Distinct categories: stacked areas, treemap cells | `SOFT` (300) |
     | Text set in a series' colour | `WORDS` (700) |
 
-    Categories run blue, red, yellow, green, purple. The larger the inked area, the lighter the tone, as
+    Categories run blue, red, yellow, green, purple. GM2 cyan and pink are there for a pair that should
+    stay off that order, as on the card (cyan 700 for open models, pink 600 for closed). The larger the inked area, the lighter the tone, as
     FiveThirtyEight and Datawrapper do. Yellow lines and words take 900, the only Google yellow at 3:1
     on white. Context behind a highlight steps down a set or goes grey, and stacked neighbours are split
     by thin white edges. Hold each series' colour across a piece; the legend names every colour.
