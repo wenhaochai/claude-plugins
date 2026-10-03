@@ -1,6 +1,6 @@
 ---
 name: training-monitor
-description: "Monitoring doctrine for a pretraining run, distilled from Chunyuan Deng, \"Reading a Pretraining Run\" (2026): the nine first-screen signals, the full metric table with cadence and priority (P0 every step, P1 every 100 steps, P2 on demand), the formulas, the cross-rank reduction rules, a robust spike detector, the fixed triage order, and the common mistakes. Use when starting, watching, comparing, or debugging a pretraining or large fine-tuning run, when building a dashboard or an alert set, or when the user asks 训练监控, 这个 run 健康吗, loss spike, 梯度爆炸, MFU 掉了, 专家不均衡, 怎么看训练曲线. Text only: the agent maps each signal onto what its own stack already logs and decides for itself whether a script, a dashboard, or a manual read is warranted."
+description: "Monitoring doctrine for a pretraining run, distilled from Chunyuan Deng, \"Reading a Pretraining Run\" (2026): the nine first-screen signals, the full metric table with cadence and priority (P0 every step, P1 every 100 steps, P2 on demand), the formulas, the cross-rank reduction rules, a robust spike detector, the fixed triage order, and the common mistakes. Use when starting, watching, comparing, or debugging a pretraining or large fine-tuning run, when building a dashboard or an alert set, or when the user asks 训练监控, 这个 run 健康吗, loss spike, 梯度爆炸, MFU 掉了, 专家不均衡, 怎么看训练曲线."
 ---
 
 # Training monitor
