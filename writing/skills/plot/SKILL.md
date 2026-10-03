@@ -70,8 +70,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    dot, legend swatch `'dot'`; the owner asked for this on learning curves whose endpoints were the
    comparison. When those endpoints run along an ordered variable (depth, size), draw a fitted curve
    through them, not straight segments (the owner), over their own range only, the fitted form in the
-   docstring and caption (for loss against compute, L = E + A·C^-α); its own legend entry: that curve is
-   the result. The curve describes the points, it is not a scaling claim: fit E freely and check the
+   docstring only (for loss against compute, L = E + A·C^-α). The legend and caption name the series,
+   never the fit: no ", fit" in a label and no word about fitting in the caption (the owner: "拟合这事情这个
+   不用说，也不用注明"). The curve describes the points, it is not a scaling claim: fit E freely and check the
    residual signs before showing it. Forcing an outside asymptote onto a form the points do not follow
    (residuals + at both ends, − in the middle) gives a line that misses them; the owner tried an
    anchored E, rejected the result and went back to the free fit. The endpoint dots all take that curve's one colour: a colour per dot repeats what the
