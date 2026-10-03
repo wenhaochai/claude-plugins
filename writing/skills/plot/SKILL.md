@@ -53,7 +53,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
 3. **The words are the owner's or the data's.** The title names what is plotted and never states a
    conclusion: `Vals Index cost-accuracy frontier`, not `Six models set the Vals Index cost-accuracy
    frontier`; `Throughput by setting`, not `Model A is fastest`. No count of winners, no verb of
-   outcome, no comparative: what to take away goes in the caption. The wording is the owner's; until
+   outcome, no comparative: what to take away goes in the caption. It is a plain noun phrase, the
+   caption's bold lead: `The judge boundary`, never a roundabout sentence such as `What crosses the
+   boundary and what stops at it` (the owner: "not how a person writes"). The wording is the owner's; until
    there is one, no title, or a draft that is called a draft. Axes use the data's own numbering
    (iterations 2 to 10, schemes 1 to 76, gaps kept). Renumber or relabel only on the owner's decision,
    and say so in the caption.
@@ -93,6 +95,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    lowercase and on where titles break: title 12.2 pt semibold, subtitle 9.3, every other word 7.35,
    tick values 7. Weight tells the roles apart: the quantity and axis names medium, the rest regular.
    Charts that Epoch sets on its narrower web canvas take a title near 9.2 pt and ticks at text size.
+   On a paper page with 10 pt body text, set the title near 10.5 pt (`title_pt=10.5`): 12.2 reads
+   larger than a section heading there and 9.2 smaller than the body (the owner, 2026-10-03).
 6. **Light grid, one axis, nothing touching.** Grid both ways on numeric axes, only the baseline axis,
    no tick marks: values sit just above their grid lines at the left edge, the quantity sits above
    each column, and panel names sit inside, top left, on white. Values are lifted off their lines, the
