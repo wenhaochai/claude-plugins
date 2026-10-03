@@ -23,39 +23,11 @@ Build the ledger for: **$ARGUMENTS**
 > `/schedule` / `CronCreate`; there is no verdict to re-fire and no external event to
 > wait on.
 
-## Why this exists
+## Why this exists and role in the pipeline (summary)
 
-Five language-model auditors each independently parsing a PDF = five different
-hallucinated tables and five different number lists, none reproducible — and the
-obvious dismissal, *"an LLM grading another LLM's paper is just slop."* The
-structural answer is **one deterministic pass** that turns the paper into:
-
-- `artifact_manifest.json` — what was observable; this fixes the **observability
-  level L**, the ceiling on every downstream finding's severity, and
-- `claims.json` — a list of **span-anchored, hashed, checkable** claims
-  (`schemas/claims.schema.json`).
-
-Every downstream finding must cite a `claim_id` from this ledger and quote a verbatim
-span of it. **No ledger claim → no finding** (the single most important integrity
-rule of the repo, enforced again by `tools/adjudicate_findings.py`). That is what
-makes the difference between "a model said so" and "here is the exact sentence, its
-file, and its content hash" (`DESIGN.md` §2).
-
-## Role in the pipeline (what this skill does and does NOT do)
-
-| Stage | Skill / tool | Emits | Judges? |
-|-------|--------------|-------|:-------:|
-| **[1]–[2] ledger** | **evidence-ledger (this skill)** + `tools/build_manifest.py`, `tools/build_claim_ledger.py` | `artifact_manifest.json` + `claims.json` | **No.** States *what the paper says*. |
-| [3] auditors | `consistency-audit`, `citation-forensics`, `baseline-comparison-audit`, `experiment-forensics` | `<skill>.findings.json` (read the ledger; quote its spans) | Propose findings — not the verdict. |
-| [3] surface | `presentation-signals` | capped-at-`minor` surface findings (auxiliary) | Never a standalone verdict. |
-| [3] memo | `adversarial-case-builder` | an evidence-bound memo | No verdict weight. |
-| [4] **verdict** | `tools/adjudicate_findings.py` | `report.json` + `REPORT.md` | **Yes** — the ONLY verdict, by fixed rules, no model in the loop. |
-
-This skill is stage [1]–[2] only. It states **what the paper says**, never **whether
-it is right**. The `finding.schema.json` `skill` enum technically lists
-`evidence-ledger` for completeness, but this skill never writes a finding object. If
-you came here for a PASS/FAIL, you want `/anti-autoresearch` (the orchestrator), not
-this skill.
+One deterministic pass gives every auditor the same span-anchored, hashed claims; **no ledger claim → no finding**.
+This skill is stage [1]–[2] only: it states *what the paper says*, never *whether it is right*, and writes no finding.
+For a PASS/FAIL, run `/anti-autoresearch`. Read `reference/rationale.md` for the full why and the pipeline-stage table.
 
 ## Core principle
 
@@ -256,30 +228,9 @@ model. Omit `--generated-at` for **byte-reproducible** output (the eval harness 
 this); pass `--generated-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)"` for run provenance — the
 *claims* are identical either way.
 
-**Worked example** (clean fixture `eval/fixtures/clean/sample_paper.tex` as `main.tex`)
-— the stdout above, then two real claims (`location.file` mirrors the path you pass to
-`--latex`):
+Read `reference/worked-example.md` for two real claims from the clean fixture and why a corrupted fixture yields the
+same claim shape (the ledger states, it does not judge).
 
-```json
-{ "claim_id": "C001", "type": "table_cell",
-  "text_span": "Baseline \\cite{smith2024bar} & 73.1 \\\\",
-  "location": {"file": "main.tex", "line": 36, "section": "table:1"},
-  "value": {"raw":"73.1","normalized":73.1,"unit":null,"metric":null,"direction":"unknown","aggregation":"unspecified"},
-  "evidence_anchor": "e6186efa…0460", "extractor": "table_parser", "confidence": "medium" }
-
-{ "claim_id": "C003", "type": "number",
-  "text_span": "FooNet reaches 78.0\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 6.7\\% relative improvement.",
-  "location": {"file": "main.tex", "line": 9, "section": "abstract"},
-  "value": {"raw":"78.0","normalized":78.0,"unit":"%","metric":"accuracy","direction":"unknown","aggregation":"unspecified"},
-  "evidence_anchor": "e6186efa…0460", "extractor": "latex_regex", "confidence": "high" }
-```
-
-> **The ledger states, it does not judge.** Run the extractor on the *corrupted*
-> `eval/fixtures/synthetic_corruptions/delta_inflate.tex` (abstract says "16.7%
-> relative improvement") and you get an **identical 13-claim shape** — only C003's
-> verbatim text changes. Spotting that 16.7% contradicts 73.1→78.0 is
-> **consistency-audit**'s job (HP-DELTA-ERROR), not the ledger's; the ledger just
-> captures the span faithfully.
 
 **Validation gate.** Confirm the ledger is well-formed, the level matches, and report
 the claim mix:
@@ -329,32 +280,8 @@ derivation steps**, **formulas / equations**, **stated assumptions**, load-beari
 spans); the executor's deterministic substring gate (Step 4) decides what is admitted —
 nothing here is a finding or a verdict (`references/reviewer-independence.md`).
 
-**No new `type` vocabulary — broadened *content* on the existing schema types.** Every
-new span rides on a `claims.schema.json` `type` the deterministic layer and Step 4
-already allow, so the anti-hallucination gate is unchanged and `claims.json` stays
-schema-valid. The mapping — *what new content the enrichment surfaces → which existing
-`type` carries it → which family/pattern anchors to it*:
-
-| New span the enrichment surfaces | Carrying `type` | Anchors for (family · pattern) |
-|----------------------------------|:---------------:|--------------------------------|
-| theorem / lemma / proposition **statement** (incl. its stated assumptions) | `scope` | B · `HP-THEOREM-SCOPE-DRIFT` · G · `HP-PROOF-OBLIGATION-GAP` |
-| stated **assumption / hypothesis** (standalone) | `scope` | G · `HP-ASSUMPTION-SMUGGLE` |
-| **definition** of a symbol / operator / construct | `method` | G · `HP-SYMBOL-SEMANTIC-DRIFT` |
-| **proof step / derivation transition** (symbolic) | `method` | G · `HP-DERIVATION-INVALID`, `HP-PROOF-CIRCULARITY` |
-| **formula / equation** (symbolic, non-numeric) | `method` | G · `HP-DERIVATION-INVALID`, `HP-SYMBOL-SEMANTIC-DRIFT` |
-| load-bearing **conclusion** (causal / equivalence / relational) | `comparison` | B · `HP-CAUSAL-EVIDENCE-LEAP` |
-| the **motivation / problem-framing** span | `scope` | B · `HP-ARGUMENT-CHAIN-BREAK` |
-| **reproducibility-artifact reference** (code / prompt / config present or "will release") | `artifact_ref` | D · `HP-MISSING-REPRO-ARTIFACT` |
-
-> These are **anchors, not findings.** The ledger never says a proof is circular, an
-> assumption is smuggled, a chain is broken, or an artifact is missing — it only
-> captures the verbatim span so the family-B/D/G reviewer has a `claim_id` to quote.
-> The judgment stays in the auditor; the verdict stays in
-> `tools/adjudicate_findings.py`. Family-G recall is highest at **L1**: equation and
-> theorem-statement spans carry stable line numbers, which lets
-> `proof-derivation-forensics` scaffold per-theorem anchor candidates by line window —
-> so the prompt below asks the reviewer to include `line` whenever it extracts from
-> LaTeX.
+**No new `type` vocabulary.** Every enrichment span rides on an existing `claims.schema.json` `type`; read
+`reference/enrichment.md` (Content mapping) for which span maps to which `type` and which family/pattern anchors to it.
 
 Set up the trace run dir and list the exact source paths to hand the reviewer:
 
@@ -372,76 +299,9 @@ Call the reviewer with a **fresh `mcp__codex__codex` thread** (never `codex-repl
 `cwd` = `PAPER_DIR`. Paste the source paths and the existing ledger's
 `claim_id + text_span` list into the prompt:
 
-```text
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <PAPER_DIR>
-  prompt: |
-    You are an ADDITIVE claim extractor for an evidence ledger. You are NOT a
-    reviewer and NOT a judge: do not assess correctness, do not propose findings, do
-    not assign severity or any verdict. Your ONLY job is to surface SEMANTIC claims a
-    regex pass misses, each anchored to a VERBATIM span of a real source file.
+Send the call verbatim from `reference/enrichment.md` (Reviewer prompt), filling `cwd`, the source paths, and the
+existing `claim_id + text_span` list.
 
-    Source files (use these EXACT path strings in location.file):
-    [list the paths from claims.json -> source_files[].path]
-
-    The deterministic ledger already extracted these (do NOT duplicate them):
-    [paste the claim_id + text_span list from claims.json]
-
-    ADD claims ONLY of these SEVEN schema types (numbers and table cells are already
-    covered by the deterministic layer — do NOT emit `number` or `table_cell`, and do
-    NOT invent any new type string). Each type's CONTENT is broadened below to carry the
-    proof/derivation + structure spans the v0.4 family-B/D/G auditors anchor to:
-      - method      : the sentence(s) that DEFINE the proposed method / its key
-                      conditions (e.g. "no test-time labels", backbone, training data);
-                      ALSO a formal **definition** of a symbol/operator/construct, a
-                      **proof step / derivation transition**, or a **formula/equation**
-                      stated symbolically (for family G — copy the math VERBATIM,
-                      including every \command, subscript, superscript, and delimiter).
-      - scope       : an explicit scope/generality/limitation sentence the regex missed;
-                      ALSO a **theorem/lemma/proposition statement** (you MUST include
-                      its stated assumptions/hypotheses in the span, not just the
-                      conclusion), a standalone **stated assumption**, or the
-                      **motivation / problem-framing** sentence the intro rests on
-                      (for families B and G).
-      - baseline    : the sentence or list naming the baselines compared against.
-      - comparison  : a sentence ASSERTING a comparison ("our method outperforms X") —
-                      the framing, not the numbers; ALSO a load-bearing **conclusion**
-                      that asserts a causal / equivalence / "therefore" relation
-                      ("A correlates with B, therefore A causes B") for family B.
-      - citation    : a sentence whose citation is load-bearing for a specific claim.
-      - caption     : a table/figure caption the extractor missed.
-      - artifact_ref: a reference to a named result file / table / appendix item; ALSO a
-                      **reproducibility-artifact reference** — code/repo/prompt/config
-                      the paper ships or promises ("code at github.com/…", "we will
-                      release", "prompts in App. C", "hyperparameters in Table 5") —
-                      for family D. Capture the EXACT sentence; do NOT judge whether the
-                      artifact is sufficient, present, or fake.
-
-    HARD RULES (a violation gets your item silently dropped by the merger):
-      - Use ONLY the seven types above. A new/unknown type string is dropped.
-      - text_span MUST be copied CHARACTER-FOR-CHARACTER from the named file
-        (including LaTeX markup like \cite{...}, \%, \le, \alpha, $...$). If unsure it
-        is verbatim, OMIT it. Do NOT unescape, re-LaTeX, normalize, or "tidy" math.
-      - NEVER introduce, alter, or "tidy" a number. Do NOT emit a `value` field.
-      - For a theorem (`scope`), the span MUST include the stated assumptions, not just
-        the claim. For an assumption anchor, prefer the span stating the hypotheses.
-      - For a conclusion (`comparison`), include the inferential connective
-        ("therefore"/"thus"/"hence"/"so") so the causal/equivalence leap is in the span.
-      - For an artifact_ref, capture the presence/promise sentence verbatim; the ledger
-        records that the reference EXISTS, it NEVER rules the artifact missing or fake.
-      - Prefer to include `line` when the source is LaTeX, so the proof/structure
-        auditors can scaffold per-theorem anchor candidates by line window.
-      - location.file MUST be one of the source paths above.
-
-    Output ONLY a strict JSON array (no prose, no markdown fence) of objects:
-      {"type":"<one of the seven types>","text_span":"<verbatim>",
-       "location":{"file":"<one of the listed paths>","line":<int — include when LaTeX>,
-                   "section":"abstract|intro|method|experiments|theorem|proof|appendix|..."}}
-    Output [] if you find nothing new.
-```
 
 Then, using the **Write** tool, save two files into the `RUNDIR` printed above —
 **substitute that literal absolute path** (the Write tool does not expand shell
@@ -575,30 +435,8 @@ Explicitly **NOT** emitted: any `<skill>.findings.json`, any `overall_verdict`, 
 
 ## What consumes the ledger downstream (integration)
 
-You normally reach these via `/anti-autoresearch`; the exact contracts are:
-
-```bash
-# consistency-audit's deterministic arithmetic layer (HP-DELTA-ERROR, HP-NUM-INFLATE):
-python3 "$ROOT/tools/check_numeric_consistency.py" --ledger "$PAPER_DIR/claims.json" \
-    --out consistency-audit.deterministic.findings.json
-
-# presentation-signals' surface checks (HP-DUP-TABLE via table_cell claims, etc.) —
-# AUXILIARY, capped at minor by the adjudicator, default false_positive_risk:high,
-# NOT an AI-text classifier, never a standalone verdict:
-python3 "$ROOT/tools/check_presentation.py" --ledger "$PAPER_DIR/claims.json" \
-    --out presentation-signals.deterministic.findings.json
-
-# the deterministic adjudicator — --ledger is REQUIRED:
-python3 "$ROOT/tools/adjudicate_findings.py" --findings *.findings.json \
-    --ledger "$PAPER_DIR/claims.json" --paper-id "$PAPER_ID" \
-    --observability-level "$L" --taxonomy-version 0.5 --out report.json --md REPORT.md
-```
-
-`adjudicate_findings.py` **requires** `--ledger`: it re-verifies that each
-above-`info` finding quotes a verbatim ledger span; without it every such finding
-**fails closed to `info`** — a missing or wrong ledger silently neuters the whole
-audit. The ledger you build here is load-bearing for every verdict. **This skill does
-not run any of these** — stop at a validated ledger.
+`tools/adjudicate_findings.py` **requires** `--ledger`; without it every above-`info` finding fails closed to `info`.
+This skill runs none of the downstream tools. Read `reference/integration.md` for the exact consumer commands.
 
 ## Key rules
 

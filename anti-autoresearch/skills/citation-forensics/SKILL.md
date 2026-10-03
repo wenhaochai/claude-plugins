@@ -13,37 +13,7 @@ Audit citation integrity for: **$ARGUMENTS** (requires `claims.json` from
 
 > 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper, the ledger or the bibliography changes (bibliography finalized → ledger rebuilt → audit once).
 
-> Adapted from ARIS `citation-audit`, re-wired onto this repo's evidence ledger and
-> the reviewer≠adjudicator contract, and reframed from "audit + **rewrite** the bib"
-> to **"emit ledger-anchored findings, never touch the paper."** Three layers, ported
-> verbatim: **existence → metadata → context.** Following the repo's
-> `baseline-comparison-audit` pattern, the **executor** gathers the canonical facts
-> (DBLP / arXiv / DOI) as neutral evidence; a **fresh cross-model reviewer** judges
-> existence + metadata + context over those facts. The reviewer never grades — the
-> deterministic adjudicator does.
-
-## Why this exists
-
-An autoresearch pipeline (or a rushed human) generates a bibliography in a separate
-pass from the prose and never reconciles the two. The failure modes are **not**
-wildly fake entries — those are easy to spot. The dangerous ones are:
-
-- **Hallucinated reference** — no paper exists at the claimed arXiv id / DOI / venue;
-  authors, title, or year are fabricated. (`HP-CITE-HALLUC`, critical)
-- **Metadata drift** — a real paper cited with the wrong year, wrong venue (the arXiv
-  preprint number used after the work appeared at CVPR/ICML/NeurIPS, or vice versa),
-  or a v1 title silently merged with a v3 retitle. (`HP-CITE-HALLUC`, major)
-- **Wrong-context citation** — a real paper used to support a claim it does **not**
-  make, or argues *against* (e.g. citing a self-refinement paper to support
-  "self-feedback yields correlated errors" when the cited paper argues the
-  opposite). (`HP-CITE-CONTEXT`, major)
-
-None of this needs the code, the data, or a re-run — only the citing sentence (from
-the ledger) checked against the cited work's public record (DBLP / arXiv /
-publisher). That is why this layer is **L0-decidable** (observability-wise — no repo
-or result files needed) and independently defensible. (The citing-sentence *claims* it
-anchors to still enter the ledger only via the LaTeX path; a pure PDF-text ledger
-yields none — see Step 0.)
+Read `reference/rationale.md` for the ARIS `citation-audit` lineage and the failure modes this skill exists to catch.
 
 ## Core principle
 
@@ -82,23 +52,8 @@ reviewer≠adjudicator, detect-only.**
 
 ## How this differs from the other auditors (route correctly)
 
-| Auditor | Question it answers | Level |
-|---------|---------------------|------|
-| **`citation-forensics`** (this) | **Do the cited papers exist, with correct metadata, and support the claim they are used for?** | **L0** |
-| `consistency-audit` | Does the paper contradict ITSELF / described method = evaluated method? | L0 |
-| `baseline-comparison-audit` | Are the right baselines present, tuned, and is "SOTA" earned? | L0 stated / L2 verified |
-| `experiment-forensics` | Are the reported numbers what the code actually computes? (fake GT, self-norm, phantom) | L2 |
-| `presentation-signals` | Surface "AI-flavor" hints (auxiliary, capped at minor) | L0 |
-| `adversarial-case-builder` | Strongest evidence-bound rejection memo (no verdict weight) | any |
-
-**Do NOT raise here** (hand off instead): numeric self-contradiction / method drift →
-`consistency-audit`; "first / SOTA / beats prior work" as an *empirical* claim →
-`baseline-comparison-audit` (emit `needs_external_check`); code/result-level fraud →
-`experiment-forensics` (needs L2); surface / AI-flavor of the prose →
-`presentation-signals`; the rejection memo → `adversarial-case-builder`. **Stay in
-lane:** this skill judges only whether *the cited work* exists, is described
-correctly, and supports the citing sentence — not whether the citing paper's own
-claim is true.
+This skill judges only whether the cited work exists, is described correctly, and supports the citing sentence. Numeric self-contradiction / method drift → `consistency-audit`; empirical "SOTA/first" → `baseline-comparison-audit` (`needs_external_check`); code/result fraud → `experiment-forensics` (L2); prose surface → `presentation-signals`.
+Read `reference/routing.md` for the full auditor table and hand-off list.
 
 ## Constants & Reviewer Calling Convention
 
@@ -340,135 +295,7 @@ PAPER_DIR` so the reviewer can re-open `claims.json` / the `.bib` to confirm a s
 bracketed blocks. Send EXACTLY this — it is the reviewer's complete instruction set;
 add no commentary of your own about the paper:
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are an integrity-forensics reviewer auditing ONE bibliographic citation key
-    of a research paper. You judge three things and NOTHING ELSE: does the cited
-    paper EXIST, is its METADATA correct, and does it actually SUPPORT the claim each
-    citing sentence uses it for. You do NOT judge whether the citing paper's own
-    result is true, and you NEVER accuse anyone of misconduct. You audit integrity,
-    not authorship.
-
-    Judge existence + metadata from the RESOLUTION SNAPSHOT below — canonical FACTS
-    (DBLP / arXiv / DOI) gathered by the executor. It is evidence, NOT a verdict:
-    cross-check the .bib's self-report against it. If the snapshot is "unavailable",
-    or does not settle a key either way, say so and set verdict_local
-    "needs_external_check"; do NOT guess existence, and NEVER fabricate the cited
-    paper's contents. Judge CONTEXT only from the snapshot's abstract/title (the
-    fetched record — never from memory of the cited paper); if the snapshot lacks
-    enough of the cited paper's content to decide, set "needs_external_check" and tell
-    the human which section of the cited paper to read.
-
-    ## THE ENTRY UNDER AUDIT (from the evidence ledger; claims.json is in your cwd —
-    ## you MAY re-open it to confirm a span is real, but you may NOT introduce a
-    ## claim_id that is not listed here):
-    [DOSSIER RECORD FOR THIS KEY — dossier.json["entries"][i]:
-     {key, n_cites, bib_entry (claimed metadata; null if no .bib), citing:[{claim_id, span, location}]}]
-
-    ## CANONICAL RESOLUTION gathered by the executor (FACTS; may be empty/unavailable):
-    [RESOLUTION RECORD FOR THIS KEY — resolution.json["<key>"]]
-
-    ## WHAT TO CHECK (run all three layers for THIS key; one finding per concrete discrepancy)
-    (A) EXISTENCE — does a paper exist at the claimed arXiv id / DOI / venue with the
-       claimed title (or, if bib_entry is null, the work implied by the key + the
-       citing sentences)?                                            [HP-CITE-HALLUC]
-       * No record resolves anywhere; authors/title/year fabricated -> severity critical.
-       * The id is a TYPO but the paper plainly exists at the corrected id -> severity
-         minor (a FIX, not a fabrication), false_positive_risk medium.
-       * Very recent work (<~2 weeks) not yet indexed / snapshot unavailable -> set
-         needs_external_check, severity info; do NOT call it fabricated.
-       * IDENTIFIER-HIJACKING: the arXiv id / DOI RESOLVES, but the resolved record's
-         title and/or authors in the snapshot do NOT match the citation -> the existence
-         check alone is NOT enough; the load-bearing test is the title/author MATCH against
-         the resolved record. Mismatch -> severity critical (resolves to an unrelated work).
-         Keep wording neutral (state the metadata mismatch; do NOT use "deception"). FP: the
-         id resolves to a newer VERSION of the same work.
-       * PLACEHOLDER CITATION: the bib/citing span is a leftover stub ("[ref?]", "[CITATION]",
-         "\cite{XXX}", "TODO: cite", "?") never replaced -> severity major if load-bearing,
-         else minor; false_positive_risk medium (a clearly-marked draft).
-    (B) METADATA — real paper, but wrong year / wrong venue (arXiv number used though it
-       appeared at NeurIPS) / wrong-or-missing authors / v1<->v3 retitle. [HP-CITE-HALLUC]
-       * severity major. A preprint->published migration (arXiv 2023 -> CVPR 2024) is
-         a COMMON legitimate case: severity minor, false_positive_risk high.
-    (C) CONTEXT — for EACH citing sentence: does the cited paper actually establish what
-       the sentence uses it for? Flag a real paper cited to support a claim it does
-       NOT make, or argues AGAINST.                                  [HP-CITE-CONTEXT]
-       * severity major. In `description`, state what the cited paper actually
-         establishes vs how the sentence uses it. false_positive_risk high if a
-         "see also / contrast with / unlike" reading is plausible, or the load-bearing
-         claim is the citing paper's OWN contribution.
-       * Also flag SEMANTIC-HALLUCINATION: a real reference attached to a finding the
-         cited paper does not contain, or an attribution of a specific claim/number the
-         cited work never makes (paper real; attributed content not). Judge ONLY from the
-         snapshot's abstract/title; if insufficient, set needs_external_check.
-       * AUXILIARY INTENT LABEL: optionally add `intent` ∈ {support|contrast|mention} with
-         a confidence in `description`. It only SHARPENS candidates (a contrast/mention
-         reading is the common FP; only a `support` cite whose work doesn't support the
-         claim is dangerous) — NEVER a verdict on its own; do not raise severity on it.
-
-    (D) RETRACTION — does the RESOLUTION SNAPSHOT report the cited work as RETRACTED or
-       withdrawn (Crossref / Retraction-Watch open metadata)? If so, and a citing sentence
-       RELIES on it to support a claim with no note of the retraction, flag it. [HP-CITE-RETRACTED]
-       * severity major when the retracted reference is load-bearing.
-       * If the sentence cites it EXPRESSLY to discuss the retraction, or the retraction
-         POST-DATES submission -> severity info/minor, false_positive_risk high (honest use).
-       * An "expression of concern" / erratum / correction is NOT a full retraction -> do
-         not flag as retracted. If the snapshot has no retraction record -> do NOT infer one.
-       * Retraction is a FACT about the cited work (source + date in `description`), never an
-         accusation against the citing authors.
-
-    ## HARD RULES (a finding that breaks any of these is worthless)
-    1. ANCHOR. Every finding above severity "info" MUST carry >=1 evidence entry
-       {claim_id, span}, where claim_id is ONE OF the citing claim_ids above and span
-       is a VERBATIM substring of THAT citing sentence (no paraphrase — e.g. quote
-       "\cite{<key>}" or a phrase of the sentence). Put the .bib metadata, the
-       canonical record, and the URL in `description`, NOT in `span` — there is no
-       ledger claim for the .bib line or a DBLP URL to anchor to. If you cannot quote
-       a verbatim substring of a listed sentence, keep the finding at "info".
-    2. FACT OR HAND OFF — never guess from memory. Settle existence/metadata against
-       the snapshot (cite the record/URL in `description`). If the snapshot cannot
-       settle it, emit verdict_local "needs_external_check", requires_external_check
-       true, severity "info", and say what to look up. A false "this citation is
-       fabricated" is a serious error.
-    3. OBSERVABILITY. Set observability_level_required = 0 on every finding: citation
-       existence, metadata, and wrong-context are decidable from text + the public
-       record (you do not need the repo or result files).
-    4. DISCREPANCY, NOT ACCUSATION. `description` and `recommended_reviewer_action`
-       say what a human should CHECK or ASK. Never "reject", "fabricated by the
-       authors", "the authors faked X".
-    5. HONEST FP RISK — set it truthfully. COMMON false positives: typo'd-but-
-       resolvable id (a FIX); preprint->published migration; "see also / contrast"
-       framing; 6+-author "and others" truncation; the claim being the citing paper's
-       own contribution.
-    6. pattern_id is exactly one of: "HP-CITE-HALLUC", "HP-CITE-CONTEXT", "HP-CITE-RETRACTED".
-
-    ## OUTPUT — a single JSON array, and NOTHING ELSE (no prose, no code fence). Each
-    element conforms to schemas/finding.schema.json:
-      {
-        "finding_id": "F001",
-        "skill": "citation-forensics",
-        "pattern_id": "HP-CITE-HALLUC | HP-CITE-CONTEXT | HP-CITE-RETRACTED",
-        "title": "short, neutral",
-        "description": "the discrepancy: what the .bib claims, what the canonical "
-                       "source returns (+URL), and/or what the cited paper actually "
-                       "establishes vs how it is used",
-        "severity": "critical|major|minor|info",
-        "observability_level_required": 0,
-        "evidence": [{"claim_id": "C0xx", "span": "verbatim substring of the citing sentence",
-                      "location": {"file": "...", "section": "..."}}],
-        "verdict_local": "fail|warn|clean|needs_external_check",
-        "requires_external_check": false,
-        "false_positive_risk": "low|medium|high",
-        "recommended_reviewer_action": "what to CHECK or ASK — never 'reject'"
-      }
-    If this key is clean on all three layers, emit []. An empty array is a valid,
-    honest result.
-```
+The exact `mcp__codex__codex` call (envelope, layers A–D, hard rules, output schema) is in `reference/reviewer-prompt.md`. Read it and send it verbatim per key, with that key's dossier and resolution records injected.
 
 **Immediately after each call returns**, persist the trace (Step 5) **before** the
 next key's call: write the FULL raw reply with `Write` to
@@ -477,37 +304,7 @@ next key's call: write the FULL raw reply with `Write` to
 (`{model, reasoning, sandbox, thread_id}`). The `.response.md` files are the immutable
 input to Step 4.
 
-**Reference output — what good findings look like** (the shape the validator keeps):
-
-```json
-// HP-CITE-CONTEXT (major) — the dangerous case: real paper, wrong claim
-{
-  "finding_id": "F001", "skill": "citation-forensics", "pattern_id": "HP-CITE-CONTEXT",
-  "title": "Self-refinement work cited for the opposite of what it shows",
-  "description": "The sentence cites \\cite{madaan2023selfrefine} to support that self-feedback yields correlated errors. The cited paper (Self-Refine, NeurIPS 2023; DBLP https://dblp.org/... confirms title/venue/authors; abstract in resolution.json) demonstrates that iterative self-feedback IMPROVES outputs — it does not establish correlated self-feedback errors. The citation supports a claim the cited work does not make.",
-  "severity": "major", "observability_level_required": 0,
-  "evidence": [{"claim_id": "C042", "span": "\\cite{madaan2023selfrefine}",
-                "location": {"file": "sections/2.overview.tex", "section": "method"}}],
-  "verdict_local": "fail", "false_positive_risk": "medium",
-  "recommended_reviewer_action": "Re-read Self-Refine §1; ask which result supports 'correlated errors', or re-attribute the claim to a paper that establishes it."
-}
-// HP-CITE-HALLUC (critical) — no canonical record resolves
-{
-  "finding_id": "F002", "skill": "citation-forensics", "pattern_id": "HP-CITE-HALLUC",
-  "title": "No paper resolves at the claimed arXiv id / title",
-  "description": "\\cite{kim2024neuralcompress} claims arXiv:2407.99999 with authors {Kim, Park}. resolution.json: arXiv:2407.99999 does not resolve; DBLP fuzzy+boolean return no paper with this title and author set. The reference appears to have no canonical record.",
-  "severity": "critical", "observability_level_required": 0,
-  "evidence": [{"claim_id": "C051", "span": "\\cite{kim2024neuralcompress}",
-                "location": {"file": "sections/6.related.tex", "section": "related"}}],
-  "verdict_local": "fail", "false_positive_risk": "low",
-  "recommended_reviewer_action": "Ask the authors for a resolvable arXiv id / DOI; verify it exists before relying on the surrounding claim."
-}
-```
-> Contrast (NOT critical): a typo'd-but-resolvable id (`2407.9999` → real `2407.09999`)
-> is a **FIX** → `severity: minor`/`info`, `false_positive_risk: low`,
-> `recommended_reviewer_action: "correct the arXiv id"`. A preprint→venue migration
-> (arXiv 2023 → CVPR 2024) is metadata drift at most (`major` only if the wrong record
-> is load-bearing), never `critical`.
+Read `reference/worked-examples.md` for what good findings look like (a major `HP-CITE-CONTEXT`, a critical `HP-CITE-HALLUC`, and the typo / preprint-migration contrast).
 
 **Budget / fan-out.** Default: **one fresh thread per cited key** (the bias guard).
 For a long bibliography you MAY group a handful of keys into one fresh
@@ -544,83 +341,7 @@ renumbers. The span must be a verbatim, whitespace-normalized **substring of** t
 cited claim (`span in claim`, never `claim in span` — appending hallucinated text to a
 real sentence must fail):
 
-```bash
-LEDGER="<abs LEDGER>"; TRACE_DIR="<abs TRACE_DIR>"
-OUT="<abs PAPER_DIR>/citation-forensics.findings.json"
-python3 - "$LEDGER" "$TRACE_DIR" "$OUT" <<'PY'
-import json, re, sys, glob, os
-ledger_path, trace_dir, out_path = sys.argv[1], sys.argv[2], sys.argv[3]
-
-def nw(s):                                    # mirror adjudicator _norm_ws (whitespace only)
-    return " ".join((s or "").split())
-
-ALLOWED    = {"HP-CITE-HALLUC", "HP-CITE-CONTEXT", "HP-CITE-RETRACTED"}   # the ONLY patterns this skill emits
-OBS        = {"HP-CITE-HALLUC": 0, "HP-CITE-CONTEXT": 0, "HP-CITE-RETRACTED": 0}   # all decidable at L0 (taxonomy 0.5 §E)
-SEV        = {"critical", "major", "minor", "info"}
-VL         = {"fail", "warn", "clean", "needs_external_check"}
-FPR        = {"low", "medium", "high"}
-ABOVE_INFO = {"critical", "major", "minor"}
-
-L = json.load(open(ledger_path, encoding="utf-8"))
-claims = {c["claim_id"]: c for c in L.get("claims", []) if c.get("claim_id")}
-
-kept, dropped, demoted, n = [], 0, 0, 0
-files = sorted(glob.glob(os.path.join(trace_dir, "*.response.md")))
-for fp in files:
-    raw = open(fp, encoding="utf-8", errors="replace").read()
-    m = re.search(r"\[.*\]", raw, re.S)       # tolerate prose / code-fence wrapping
-    if not m:
-        print(f"  note: no JSON array in {os.path.basename(fp)} (treated as [])"); continue
-    try:
-        arr = json.loads(m.group(0))
-    except Exception as e:
-        print(f"  WARN: unparseable JSON in {os.path.basename(fp)}: {e} (treated as [])"); continue
-    if isinstance(arr, dict):                  # tolerate {"findings": [...]}
-        arr = arr.get("findings", [])
-    for f in arr:
-        if not isinstance(f, dict):
-            dropped += 1; continue
-        pid = f.get("pattern_id")
-        if pid not in ALLOWED:                 # stray HP-* / surface signal -> not this skill's to emit
-            dropped += 1; continue
-        n += 1
-        f["finding_id"] = f"F{n:03d}"          # FORCE renumber — per-key arrays each start at F001
-        f["skill"] = "citation-forensics"      # force-correct the skill tag
-        # enum hygiene: any illegal value -> safe default
-        if f.get("severity") not in SEV: f["severity"] = "info"
-        if f.get("verdict_local") not in VL: f["verdict_local"] = "warn"
-        if f.get("false_positive_risk") not in FPR: f["false_positive_risk"] = "high"
-        if f["verdict_local"] == "needs_external_check":
-            f["requires_external_check"] = True
-        # ANCHOR gate: span is a verbatim ws-normalized SUBSTRING of its cited claim,
-        # AND that claim must be a type:"citation" (citing-sentence) claim.
-        anchored, has_cite_anchor = [], False
-        for ev in (f.get("evidence") or []):
-            cid, span = ev.get("claim_id"), nw(ev.get("span", ""))
-            c = claims.get(cid)
-            if c and span and span in nw(c.get("text_span", "")):   # span IN claim, not claim IN span
-                ev.setdefault("location", c.get("location", {}))     # enrich for human navigation
-                ev.setdefault("artifact_hash", c.get("evidence_anchor", ""))
-                anchored.append(ev)
-                if c.get("type") == "citation":
-                    has_cite_anchor = True
-        f["evidence"] = anchored
-        if f["severity"] in ABOVE_INFO and not (anchored and has_cite_anchor):
-            f["severity"] = "info"; demoted += 1   # unanchored / non-citation anchor -> info
-        # observability fallback: a real int 0-3 (JSON bool is an int subclass -> reject)
-        olr = f.get("observability_level_required")
-        if isinstance(olr, bool) or not isinstance(olr, int) or not (0 <= olr <= 3):
-            f["observability_level_required"] = OBS.get(pid, 0)
-        # cross-model provenance (reviewer-independence: a proposal, not a verdict)
-        f["reviewer"] = {"model": "gpt-5.5", "reasoning": "xhigh", "deterministic": False}
-        kept.append(f)
-
-json.dump(kept, open(out_path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-print(f"validated {len(kept)} citation findings from {len(files)} entry response(s) "
-      f"({demoted} demoted to info for unanchored/non-citation span, "
-      f"{dropped} dropped: non-citation-pattern/malformed) -> {out_path}")
-PY
-```
+Run the validator script in `reference/validate-anchor.md` (set `LEDGER`, `TRACE_DIR`, `OUT` as shown there); it merges every `*.response.md` into `citation-forensics.findings.json`.
 
 Scope of this gate: **anchoring + schema hygiene** — verbatim-span anchoring (the span
 must be a substring of a `type:"citation"` claim), enum coercion, non-citation-pattern
@@ -758,26 +479,8 @@ only from `tools/adjudicate_findings.py` (Step 6 / the orchestrator).
 
 ## When NOT to use this skill
 
-- **No `claims.json` yet** → run `/evidence-ledger` first; this skill never invents
-  structure from the raw PDF.
-- **No citation claims in the ledger** (e.g. an L0 PDF-text-only run, where the
-  extractor does not pull citations) → there is nothing to anchor to. Re-run
-  `/evidence-ledger` with the LaTeX source so `citation` claims enter the ledger;
-  otherwise emit `[]` and say why.
-- **You need numeric self-contradiction or method drift** → `/consistency-audit`.
-- **You need to verify an empirical "SOTA / first / beats prior work" claim** →
-  `/baseline-comparison-audit` (+ hand off via `needs_external_check`); this skill
-  judges only whether *the cited work* supports the sentence, not whether the citing
-  paper's own result is true.
-- **You need code/result-level fraud** (fake GT, self-normalization, phantom numbers)
-  → `/experiment-forensics` at **L2**.
-- **You want an AI-text / "looks machine-written" verdict** → out of scope. Surface
-  hints live in `/presentation-signals` (auxiliary, capped at minor); this repo is
-  **not** an AI-text classifier.
-- **You want the `.bib`/`.tex` auto-fixed** → that is ARIS `citation-audit`
-  (co-author mode). This skill is detect-only.
-- **On a timer** → never `/loop` / `/schedule` / `CronCreate` this skill; re-fire only
-  when the paper / ledger / bibliography changes (see the fence at the top).
+No `claims.json` → `/evidence-ledger` first; no citation claims → re-run the ledger on LaTeX or emit `[]`; other dimensions → their own auditors; never on a timer.
+Read `reference/routing.md` (section "When NOT to use this skill") for the full hand-off list.
 
 ## Review tracing
 

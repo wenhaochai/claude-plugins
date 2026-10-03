@@ -17,47 +17,9 @@ contribution, and emit `novelty-duplication-advisory.memo.md`. Run AFTER `/evide
 
 > 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the ledger, the paper or the literature changes.
 
-> Adapted from ARIS `novelty-check`, with **one deliberate reframing and one deliberate
-> downgrade.** The reframing: ARIS `novelty-check` asks *"is MY idea novel — should I PROCEED
-> / ABANDON?"* and hands the author a `Score: X/10` + a recommendation; this skill asks *"here
-> is the overlap a third-party reviewer should weigh"* and hands the human candidates, not a
-> verdict. The downgrade: it is **memo-only.** Novelty is the textbook example of a judgment
-> that is **not decidable from the paper alone, and not decidable at any observability level**
-> — it depends on a corpus you can never prove you searched exhaustively. So this skill
-> **retrieves and lays out** overlap; it refuses to grade it. `tools/adjudicate_findings.py`
-> lists `novelty-duplication-advisory` in `MEMO_ONLY_SKILLS` and caps anything it emits at
-> `info`. The memo *informs*; the human *judges*; the deterministic adjudicator owns the
-> report verdict — and this skill never moves it.
+> Lineage (adapted from ARIS `novelty-check`: reframed to a reviewer-facing brief, downgraded to memo-only),
+> why this skill exists, and the full parent comparison: read `reference/rationale.md` when you need the why.
 
-## Why this exists
-
-Two complaints recur in real reviews of autoresearch (and rushed human) output, and neither
-is an *internal*-consistency failure the other auditors catch — they are *relational* to the
-wider literature:
-
-- **"标准的 A + B + C，全是已知模块" / "缝合" (stapling)** — the paper bolts together three
-  well-known techniques and presents the bundle as the contribution. Whether that bundle is a
-  genuine advance or a trivial staple is a **reviewer judgment** — a surprising combination is
-  publishable, an obvious one is not, and no tool can draw that line.
-- **"这不就是 X 换了个壳" (repackaged / duplicate submission)** — the submission looks like a
-  prior paper (often the authors' own) with a new title. An *exact* title/abstract/DOI match
-  is reportable; the **absence** of a match proves nothing, because your search corpus is
-  never complete.
-
-Both are listed in `references/hack-pattern-taxonomy.md` (v0.4) under **Advisory signals (NOT
-in the 39 · zero verdict weight · reviewer-judgment only)** — `ADV-TRIVIAL-COMBINATION` and
-`ADV-DUPLICATE-PUBLICATION`. The taxonomy is explicit: *"Novelty is a reviewer judgment; the
-tool can lay out the prior-work overlap, it cannot rule 'trivial'"* and *"the absence of a
-match is **not** evidence of originality."*
-
-So this skill does the one honest, high-leverage thing the other auditors do not: it **reaches
-outside the paper** to *retrieve* candidate prior work, and **lays it out side-by-side**
-against the paper's own contribution so a human can weigh novelty with the overlap in front of
-them. It is the only auditor that consults an external corpus — which is exactly why it can
-carry **no verdict weight**: the moment a tool grades novelty from an incomplete search, it
-manufactures the "AI slop grading AI slop" failure this repo exists to refuse. It is the
-literature-facing complement to `citation-forensics`: that skill audits the papers the
-submission **does** cite; this one surfaces prior work it may **not** have cited at all.
 
 ## Core principle
 
@@ -81,59 +43,15 @@ rules novelty · absence ≠ originality.** Three honesty spines hold this skill
    nothing is a valid output that says **nothing** about novelty — "no candidate overlap
    found" is not "the paper is original."
 
-> **Deliberate exception to "the reviewer reads only the ledger."** The other auditors reason
-> strictly inside the paper. This one must consult an external corpus, so the executor
-> performs the retrieval and hands each reviewer a *structured candidates file* (real records,
-> with identifiers) alongside the ledger. That file is retrieval output, **not** a Claude
-> opinion or digest of the paper — so the spirit of reviewer-independence (no executor
-> judgment leaks into the reviewer prompt) still holds.
+> Two design notes (the deliberate external-corpus exception to "the reviewer reads only the ledger"; why the anchor is
+> the contribution sentence, never the prior work) are in `reference/rationale.md`; read them before changing the anchor rules.
 
-> **The anchor is the contribution sentence, not the prior work.** Every surfaced item anchors
-> to one of the submission's own **contribution claims** — a `scope` / `method` / `comparison`
-> claim, OR (because the deterministic extractor types most abstract/intro contribution
-> sentences as `number` / `citation` / `scope`, so the three contribution *types* alone are
-> too thin to anchor to on a real ledger) any claim located in the `abstract` / `intro`
-> section. The candidate prior work — its title, arXiv id / DOI / DBLP url, overlap kind —
-> lives in the memo table and the finding's `description`, **never** as the anchor span: there
-> is no ledger claim for an external paper (same shape as `citation-forensics`, where the DBLP
-> facts go in `description` and the anchor is the citing sentence).
+## Routing (summary)
 
-## How this differs from the other auditors (route correctly)
-
-| Auditor | Question it answers | External lookup? | Verdict weight |
-|---------|---------------------|:---:|:---:|
-| `consistency-audit` | Does the paper contradict ITSELF / described method = evaluated method? | no | yes (via adjudicator) |
-| `experiment-forensics` | Are reported numbers what the code computes? (fake GT, self-norm, phantom) | no | yes (L2) |
-| `baseline-comparison-audit` | Right baselines present, tuned, "SOTA" earned? | profile only | yes |
-| `citation-forensics` | Do the *cited* papers EXIST and support the claim they are used for? | yes (existence/context of *cited* works) | yes |
-| `proof-derivation-forensics` | Does the written proof / derivation hold? | no | yes |
-| `presentation-signals` | Surface "AI-flavor" hints (auxiliary) | no | capped at minor |
-| `adversarial-case-builder` | Strongest *anchored* rejection memo + defense | no | none (memo-only) |
-| **`novelty-duplication-advisory`** (this) | **What prior-work OVERLAP should a reviewer weigh for trivial-combination / duplicate?** | **YES — retrieves *uncited* prior work** | **none (memo-only, capped at info)** |
-
-**Route, do not overreach.** `citation-forensics` checks the works the paper *already cites*;
-this skill goes looking for prior work the paper *omits or overlaps*. A **wrong-context or
-fabricated citation** belongs to `citation-forensics`. A **"SOTA / first / beats prior work"**
-claim that needs a baseline comparison belongs to `baseline-comparison-audit` (this skill can
-emit `needs_external_check` and hand it off). An **internal** scope-overclaim ("comprehensive"
-on thin scope) belongs to `consistency-audit` (`HP-SCOPE-INFLATE`). This skill owns *only* the
-two advisory overlap signals — and even those it only *surfaces*.
-
-## How this differs from ARIS `novelty-check` (the parent)
-
-| | ARIS `novelty-check` | `novelty-duplication-advisory` (forensics) |
-|---|---|---|
-| Frame | "is MY idea novel — PROCEED / ABANDON?" | "here is the overlap a REVIEWER should weigh" |
-| Subject | the author's own prospective idea | a third party's submitted paper |
-| Paper side | a free-text method description | **ledger claims** (`claim_id` + verbatim span) |
-| Output | a `Score: X/10` + recommendation + "suggested positioning" | a side-by-side overlap memo — **no score, no recommendation** |
-| Verdict | "Novelty: HIGH/MEDIUM/LOW" | **none** — never rules trivial/duplicate; capped at `info` |
-| Empty retrieval | "looks novel, proceed" | "no candidate overlap found — this says **nothing** about novelty" |
-| Prior-work anchoring | `verify_papers.py` (anti-hallucination) | every candidate a resolved record in `candidates.json`; unresolved → dropped |
-
-The multi-source retrieval and the cross-model verification are kept *exactly* (they are the
-load-bearing parts). What changes is the refusal to grade: a forensics tool that scored
-novelty from an incomplete corpus would be precisely the over-claim this repo refuses.
+This skill owns only the two advisory overlap signals (`ADV-TRIVIAL-COMBINATION`, `ADV-DUPLICATE-PUBLICATION`), and only surfaces them.
+Cited-reference existence/context → `citation-forensics`; "SOTA / first / beats prior work" → `baseline-comparison-audit`;
+internal scope-overclaim → `consistency-audit` (`HP-SCOPE-INFLATE`). Read `reference/routing.md` when unsure which auditor owns a
+finding (full comparison table, ARIS `novelty-check` table, and the when-not-to-use list).
 
 ## Constants & Reviewer Calling Convention
 
@@ -258,87 +176,9 @@ sections — and read the **title** from the source as a *search seed*. These sp
 **paper-side anchors**; the executor never paraphrases them and never invents a contribution
 the ledger does not contain.
 
-```bash
-LEDGER="<abs claims.json from Step 0>"
-PAPER_DIR="$(dirname "$LEDGER")"
-python3 - "$LEDGER" "$PAPER_DIR" <<'PY'
-import json, sys, os, re
-ledger_path, paper_dir = sys.argv[1], sys.argv[2]
-d = json.load(open(ledger_path, encoding="utf-8"))
-claims = d.get("claims", []); PID = d.get("paper_id", "?")
-src = d.get("source_files", []) or []
-def sect(c): return ((c.get("location") or {}).get("section") or "").lower()
+Run the profile builder verbatim from `reference/profile-script.md` (self-contained bash + python; fill in `LEDGER`).
+It writes `novelty-duplication-advisory.profile.json` and prints `PROFILE` / `TITLE` / `CONTRIB` (or `NO_CONTRIB`).
 
-CONTRIB_TYPES = {"scope", "method", "comparison"}
-CONTRIB_SECT  = {"abstract", "intro", "introduction"}
-PRI = {"abstract", "intro", "introduction"}
-CUE = re.compile(r"\b(we\s+(propose|present|introduce|develop|design|show|demonstrate)|"
-                 r"our\s+(approach|method|framework|model|contribution|key\s+idea)|"
-                 r"in\s+this\s+(paper|work)|the\s+first\s+to|novel|contributions?\s+(are|of))\b", re.I)
-
-ranked = []
-for c in claims:
-    if not c.get("claim_id") or not c.get("text_span"):
-        continue
-    s = sect(c)
-    if not (c.get("type") in CONTRIB_TYPES or s in CONTRIB_SECT):
-        continue
-    span = c["text_span"]
-    score = (2 if s in PRI else 0) + (2 if CUE.search(span) else 0) + (1 if c.get("type") in CONTRIB_TYPES else 0)
-    ranked.append((score, {"claim_id": c["claim_id"], "type": c.get("type", "?"),
-                           "section": s or "?", "text_span": span}))
-ranked.sort(key=lambda x: -x[0])
-contrib = [c for _, c in ranked][:10]
-
-# title SEARCH SEED (never an anchor): prefer a title-section ledger claim, else \title{...}
-# from a latex source (brace-matched), else the first substantive line of the pdf text.
-def strip_tex(s):
-    s = re.sub(r"\\thanks\{[^}]*\}", " ", s)
-    s = re.sub(r"\\[a-zA-Z]+\*?", " ", s)
-    return " ".join(s.replace("{", " ").replace("}", " ").replace("\\", " ").split())
-def title_from_latex(txt):
-    m = re.search(r"\\title\s*(\[[^\]]*\])?\s*\{", txt)
-    if not m: return None
-    i, depth = m.end(), 1
-    while i < len(txt) and depth:
-        depth += (txt[i] == "{") - (txt[i] == "}"); i += 1
-    t = strip_tex(txt[m.end():i-1]); return t if len(t) >= 6 else None
-
-title, title_src = None, None
-for c in claims:
-    if sect(c) == "title" and c.get("text_span"):
-        title, title_src = c["text_span"], "ledger:title-claim"; break
-if not title:
-    for s in src:
-        if s.get("kind") == "latex" and os.path.isfile(s.get("path", "")):
-            t = title_from_latex(open(s["path"], encoding="utf-8", errors="replace").read())
-            if t: title, title_src = t[:240], "source:" + os.path.basename(s["path"]); break
-if not title:
-    for s in src:
-        if s.get("kind") in ("text", "pdf") and os.path.isfile(s.get("path", "")):
-            for ln in open(s["path"], encoding="utf-8", errors="replace"):
-                ln = ln.strip()
-                if len(ln) >= 12 and not ln.lower().startswith(("arxiv", "http", "doi")):
-                    title, title_src = ln[:240], "source:" + os.path.basename(s["path"]); break
-        if title: break
-if not title and contrib:
-    title, title_src = contrib[0]["text_span"][:240], "fallback:abstract-claim"
-
-prof = {"paper_id": PID, "title_seed": title, "title_seed_source": title_src,
-        "title_seed_is_anchor": False, "contribution_claims": contrib,
-        "n_contribution_claims": len(contrib)}
-out = os.path.join(paper_dir, "novelty-duplication-advisory.profile.json")
-json.dump(prof, open(out, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-print("PROFILE  =", out)
-print("TITLE    =", (title or "(none — combination axis only)")[:120], "| source:", title_src)
-print("CONTRIB  =", len(contrib))
-for c in contrib[:10]:
-    print(f"  [{c['claim_id']}] ({c['section']}/{c['type']}) {c['text_span'][:100]}")
-if not contrib:
-    print("NO_CONTRIB: ledger has no scope/method/comparison/abstract/intro claim — "
-          "cannot build a retrieval query. Treat like CONTRIB_CLAIMS==0 (Step 4 honest-null).")
-PY
-```
 
 **Sanity gate (before searching).** `title_seed` should look like a paper title and `CONTRIB`
 should be > 0 for any normal paper. If a span looks truncated or mis-sectioned, **Read**
@@ -447,60 +287,9 @@ conclude the staple is trivial.
 Then run the validation + self-record gate (de-dups by identifier, flags the paper's own record
 so it is never mis-reported as a duplicate, and refuses memory-sourced entries):
 
-```bash
-PAPER_DIR="<abs PAPER_DIR from Step 0>"
-CAND="$PAPER_DIR/novelty-duplication-advisory.candidates.json"
-PROF="$PAPER_DIR/novelty-duplication-advisory.profile.json"
-python3 - "$CAND" "$PROF" <<'PY'
-import json, sys, re
-cand_path, prof_path = sys.argv[1], sys.argv[2]
-prof = json.load(open(prof_path, encoding="utf-8"))
-def norm(s): return re.sub(r"[^a-z0-9]+", " ", (s or "").lower()).strip()
-ptitle = norm(prof.get("title_seed"))
-pauthors = {norm(a) for a in (prof.get("authors") or []) if a}   # audited paper's authors (for self-record check)
-try:
-    arr = json.load(open(cand_path, encoding="utf-8"))
-except Exception as e:
-    sys.exit(f"CANDIDATES_PARSE_FAILED: {e} — fix candidates.json (assemble from REAL calls only).")
-SRC = {"dblp_fuzzy_title", "dblp_boolean", "websearch", "webfetch"}
-seen, clean, dropped = set(), [], 0
-for c in arr:
-    if not isinstance(c, dict): dropped += 1; continue
-    ident = c.get("identifier") or {}
-    idval = next((v for v in (ident.get("arxiv"), ident.get("doi"),
-                              ident.get("dblp_url"), ident.get("url")) if v), None)
-    if c.get("source") not in SRC or not c.get("title") or not idval:
-        dropped += 1; continue                      # no real source / no identifier -> not a real record
-    key = idval.strip().lower()
-    if key in seen: continue                        # de-dup by identifier
-    seen.add(key)
-    c["candidate_id"] = "K%02d" % (len(clean) + 1)  # re-id deterministically
-    # self-record guard: a near-identical title MAY be the AUDITED paper's own record (its
-    # preprint/venue copy). But title-similarity ALONE is not enough — a real duplicate-
-    # publication by DIFFERENT authors can share a near-identical title. Treat as the paper's
-    # OWN record (and exclude) ONLY when title is near-identical AND authorship overlaps; if the
-    # title matches but authorship can't be confirmed, SURFACE it flagged for human author-check
-    # rather than silently dropping a possible real duplicate.
-    sim = c.get("title_similarity")
-    title_match = bool(ptitle) and (norm(c.get("title")) == ptitle
-                                    or (isinstance(sim, (int, float)) and sim >= 0.95))
-    cand_auth = {norm(a) for a in (c.get("authors") or []) if a}
-    authors_overlap = bool(pauthors and cand_auth and (pauthors & cand_auth))
-    c["self_record_suspected"]   = bool(title_match and authors_overlap)        # confirmed own record -> exclude
-    c["self_record_unconfirmed"] = bool(title_match and not authors_overlap)    # near title, authorship unverified -> surface + flag
-    clean.append(c)
-json.dump(clean, open(cand_path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-dup = sum(1 for c in clean if c["retrieved_for"] == "duplicate" and not c["self_record_suspected"])
-comb = sum(1 for c in clean if str(c["retrieved_for"]).startswith("combination"))
-self_n = sum(1 for c in clean if c["self_record_suspected"])
-print(f"candidates kept={len(clean)} (duplicate-axis usable={dup}, combination-axis={comb}, "
-      f"self-record-suspected={self_n}) dropped(no-source/no-id/malformed)={dropped} -> {cand_path}")
-if not clean:
-    print("NO_CANDIDATES: retrieval surfaced nothing usable. This is a VALID result and says "
-          "NOTHING about novelty (absence of a match is not evidence of originality). "
-          "Step 4 -> disposition=no_candidate_overlap_found.")
-PY
-```
+Run the gate verbatim from `reference/candidates-gate-script.md` (fill in `PAPER_DIR`). It prints the kept/dropped
+counts, or `CANDIDATES_PARSE_FAILED` / `NO_CANDIDATES`.
+
 
 `candidates.json` lives in `PAPER_DIR` so each reviewer reads it from its `cwd`. When done,
 update `"$TRACE/run.meta.json"` `retrieval` to record per-axis status (`"done"` /
@@ -521,143 +310,13 @@ repeatedly — that it must **not** conclude "trivial" or "duplicate."
 
 ### Thread 1 — duplicate axis (tag `001`)
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are an integrity-forensics reviewer preparing a NEUTRAL, ADVISORY prior-work
-    overlap brief for a human area chair on ONE question: where does this submission's
-    contribution OVERLAP with a candidate that may be a repackaged / duplicate publication?
-    You lay the overlap out side-by-side. You are FORBIDDEN to render a judgment: never
-    output "duplicate", "plagiarized", "not novel", "derivative", or "reject". Duplication
-    is the human's call; you only surface the overlap so they can weigh it.
+Send the Thread 1 call verbatim from `reference/reviewer-prompts.md` (section Thread 1), filling `cwd` and `L`.
 
-    INPUTS — read these directly from your working directory:
-      - claims.json — the evidence ledger. The contribution lives in its scope / method /
-        comparison claims AND in any abstract/intro claim {claim_id, type, text_span
-        (VERBATIM), location}. These contribution claims are the ONLY anchor universe; do
-        NOT invent a claim that is not in it.
-      - novelty-duplication-advisory.candidates.json — REAL retrieved prior work, one record
-        per candidate {candidate_id (e.g. K01), title, authors, venue, year, identifier,
-        title_similarity?, abstract_snippet?, retrieved_for, self_record_suspected}. These
-        are FACTS, not a verdict. Consider candidates with retrieved_for=="duplicate". You
-        may cite ONLY candidate_ids present here — never recall a paper from memory, never
-        invent ids/titles. A candidate not in this file is DELETED downstream as a hallucination.
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-
-    WHAT TO DO — for each non-self candidate that genuinely overlaps the submission's
-    title / contribution, emit ONE overlap item that:
-      * anchors to the most specific contribution claim it overlaps with (a VERBATIM
-        substring of that claim's text_span);
-      * names the candidate by its EXACT candidate_id and states the overlap_kind
-        (near_exact_title | abstract_overlap | same_core_contribution) using the file's
-        title/abstract — never memory;
-      * if self_record_suspected==true, the candidate is very likely THIS paper's own
-        preprint/venue copy — EXCLUDE it from the duplicate axis (you may note it was excluded);
-      * describes the RESIDUAL DELTA: what the submission still claims BEYOND the candidate
-        (descriptive only — NOT a "the delta is too small" ruling).
-
-    HARD RULES (an item that breaks any of these is worthless):
-    1. ANCHOR. Every item carries >=1 anchor {claim_id, span} where claim_id is a
-       contribution claim in claims.json and span is a VERBATIM, whitespace-normalized
-       SUBSTRING of THAT claim's text_span (copy LaTeX escapes like \% exactly; do NOT
-       unescape/paraphrase). The candidate goes in candidate_ids/the description, NEVER in
-       span. No anchor -> drop the item.
-    2. CANDIDATES FROM THE FILE ONLY. Every candidate_id must appear in candidates.json.
-       Never fabricate a paper. A false "duplicate" is a serious error.
-    3. NEVER RULE. Do NOT classify the paper duplicate/novel. reviewer_action is what a human
-       should WEIGH or CHECK ("compare the method against K01 and judge whether the
-       contribution is subsumed"), never "reject"/"duplicate".
-    4. ABSENCE IS NOT ORIGINALITY. If no non-self candidate genuinely overlaps, emit an EMPTY
-       array []. Do NOT conclude the paper is original — the memo states absence of a match
-       is not evidence of originality.
-    5. OBSERVABILITY = 0 for every item.
-    6. pattern_id is exactly "ADV-DUPLICATE-PUBLICATION".
-
-    OUTPUT: a single JSON array, and NOTHING ELSE (no prose, no code fence). Each element:
-      {
-        "id": "O1",
-        "axis": "duplicate",
-        "pattern_id": "ADV-DUPLICATE-PUBLICATION",
-        "label": "short neutral label",
-        "overlap_statement": "~30 words: what part of the contribution overlaps which candidate",
-        "anchors": [{"claim_id": "C0xx", "span": "verbatim substring of that contribution claim"}],
-        "candidate_ids": ["K01"],
-        "overlap_kind": "near_exact_title | abstract_overlap | same_core_contribution",
-        "residual_delta_note": "~40 words: what the submission still claims beyond the candidate (descriptive, NOT a ruling)",
-        "reviewer_action": "what the human should WEIGH/CHECK — never 'duplicate'/'reject'"
-      }
-    An empty array [] is a valid, honest result.
-```
 
 ### Thread 2 — combination axis (tag `002`, a SECOND fresh thread)
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are an integrity-forensics reviewer preparing a NEUTRAL, ADVISORY prior-work brief
-    for a human area chair on ONE question: the submission combines known techniques — which
-    components are individually ESTABLISHED in prior work, and does the COMBINATION itself
-    already appear somewhere? You lay this out side-by-side. You are FORBIDDEN to render a
-    judgment: never output "trivial", "incremental", "mere stapling", "缝合", "not novel",
-    or "reject". Whether a combination is a real contribution is the human's call.
+Send the Thread 2 call verbatim from `reference/reviewer-prompts.md` (section Thread 2), filling `cwd` and `L`.
 
-    INPUTS — read directly from your working directory:
-      - claims.json — the contribution lives in scope/method/comparison claims AND in any
-        abstract/intro claim {claim_id, type, text_span (VERBATIM), location}. ONLY anchor
-        universe; do not invent claims.
-      - novelty-duplication-advisory.candidates.json — REAL retrieved prior work. Consider
-        candidates with retrieved_for starting "combination". Cite ONLY candidate_ids
-        present here; never recall a paper from memory.
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-
-    WHAT TO DO:
-      1. From the contribution claims, identify the component techniques the paper combines
-         (A, B, C ...). If it does not decompose into >=2 known components, emit [] (the
-         combination axis is N/A — say nothing, do not force a decomposition).
-      2. For EACH component the candidates show is established in prior work, emit one item
-         anchored to the contribution claim that introduces it, citing the component's
-         established prior work by candidate_id.
-      3. Optionally emit one item for THE COMBINATION if the candidates show the same
-         combination already exists. If no such candidate was retrieved, do NOT infer
-         "novel" — simply omit it.
-      4. In residual_delta_note, describe what the paper claims is NEW about the combination
-         (mechanism / setting / result) — descriptive only.
-
-    HARD RULES (same discipline as the duplicate axis):
-    1. ANCHOR every item to a VERBATIM substring of a contribution claim. Prior work goes in
-       candidate_ids/description, NEVER in span. No anchor -> drop the item.
-    2. CANDIDATES FROM THE FILE ONLY — never fabricate prior work.
-    3. NEVER RULE — no "trivial"/"incremental"/"novel"; reviewer_action is what the human
-       should WEIGH ("assess whether combining K05 and K06 for this task is a contribution
-       beyond the components"), never a verdict.
-    4. ABSENCE IS NOT ORIGINALITY — if no component overlap is in the file, emit []. Do not
-       conclude the paper is novel.
-    5. OBSERVABILITY = 0 for every item.
-    6. pattern_id is exactly "ADV-TRIVIAL-COMBINATION".
-
-    OUTPUT: a single JSON array, NOTHING ELSE. Each element:
-      {
-        "id": "O1",
-        "axis": "combination",
-        "pattern_id": "ADV-TRIVIAL-COMBINATION",
-        "label": "component or combination label",
-        "overlap_statement": "~30 words: which component/combination overlaps which prior work",
-        "anchors": [{"claim_id": "C0xx", "span": "verbatim substring of the contribution claim"}],
-        "candidate_ids": ["K05"],
-        "overlap_kind": "component_established | combination_appears",
-        "residual_delta_note": "~40 words: what the paper claims is new about the combination (descriptive, NOT a ruling)",
-        "reviewer_action": "what the human should WEIGH — never 'trivial'/'reject'"
-      }
-    An empty array [] is a valid, honest result.
-```
 
 **Persist immediately, then run the next thread.** After EACH call returns, save the FULL raw
 reply with **Write** to `"$TRACE/<NNN>-<axis>.response.md"` (`001-duplicate.response.md`,
@@ -675,12 +334,7 @@ reply with **Write** to `"$TRACE/<NNN>-<axis>.response.md"` (`001-duplicate.resp
 - *Reviewer slips in a verdict* ("this is trivial / a duplicate"): that text is advisory memo
   content only; Step 4 strips leaked ruling words and the adjudicator caps the skill at `info`.
   Do not propagate it as a conclusion.
-- *(Optional fan-out, `— effort: max`)*: run each combination component as a separate fresh
-  `mcp__codex__codex` probe for breadth, then concatenate the arrays. Separate fresh threads
-  are fine; carrying context via `codex-reply` is not. These are **NOT Claude subagents** and
-  there is deliberately **no `Agent` grant** — the reviewer must be cross-model (non-Claude),
-  and Codex MCP is **serial** (concurrent calls hang), so probes run **sequentially** (Tier-3
-  in the fan-out ladder).
+- *(Optional fan-out, `— effort: max`)*: read `reference/reviewer-prompts.md` (Optional fan-out) before running per-component probes.
 
 ## Step 4 — Validate + anchor, render the memo + the info-only findings mirror
 
@@ -693,223 +347,11 @@ neutralized. The adjudicator independently re-applies the span-anchor gate and t
 the authoritative verdict, so this memo can never out-rank it. This single command writes both
 deliverables:
 
-```bash
-PAPER_DIR="<abs PAPER_DIR from Step 0>"
-LEDGER="$PAPER_DIR/claims.json"
-CAND="$PAPER_DIR/novelty-duplication-advisory.candidates.json"
-TRACE="<abs TRACE dir from Step 0>"
-RUNMETA="$TRACE/run.meta.json"
-python3 - "$LEDGER" "$CAND" "$TRACE" "$PAPER_DIR" "$RUNMETA" <<'PY'
-import json, re, sys, os, glob
-ledger_path, cand_path, trace_dir, paper_dir, runmeta = sys.argv[1:6]
-def nw(s): return " ".join((s or "").split())
+Run the validator/renderer verbatim from `reference/validate-render-script.md` (fill in `PAPER_DIR` and `TRACE`). It
+prints the disposition and writes `novelty-duplication-advisory.memo.md` + `novelty-duplication-advisory.findings.json`.
 
-led = json.load(open(ledger_path, encoding="utf-8"))
-L = int(led.get("observability_level", 0)); PID = led.get("paper_id", "?")
-CONTRIB_TYPES = {"scope", "method", "comparison"}
-CONTRIB_SECT  = {"abstract", "intro", "introduction"}
-# a contribution CUE — so an abstract/intro claim only anchors if it actually states a
-# contribution, not background/citation/problem-statement text (avoids over-anchoring).
-CONTRIB_CUE = re.compile(r"\b(we\s+(propose|present|introduce|develop|design|show|"
-                         r"contribute)|our\s+(method|approach|model|framework|contribution)|"
-                         r"novel|first\s+to|state[- ]of[- ]the[- ]art|key\s+(idea|contribution))\b", re.I)
-def sect(c): return ((c.get("location") or {}).get("section") or "").lower()
-def is_contrib(c):
-    if c.get("type") in CONTRIB_TYPES: return True            # deterministic contribution types
-    return sect(c) in CONTRIB_SECT and bool(CONTRIB_CUE.search(c.get("text_span", "")))
-claims = {c["claim_id"]: c for c in led.get("claims", [])
-          if c.get("claim_id") and is_contrib(c)}
 
-cands = {}
-if os.path.isfile(cand_path):
-    for c in json.load(open(cand_path, encoding="utf-8")):
-        if isinstance(c, dict) and c.get("candidate_id"):
-            cands[c["candidate_id"]] = c
-
-# retrieval_incomplete is honestly recorded by Step 2 in run.meta.json
-retrieval_incomplete = False
-try:
-    rm = json.load(open(runmeta, encoding="utf-8"))
-    rv = rm.get("retrieval", {})
-    retrieval_incomplete = isinstance(rv, dict) and any(v == "unavailable" for v in rv.values())
-except Exception:
-    pass
-
-AXES = {"duplicate": "ADV-DUPLICATE-PUBLICATION", "combination": "ADV-TRIVIAL-COMBINATION"}
-# neutralize leaked VERDICT phrasings. The bare descriptive word "duplicate" stays intact
-# (it is this skill's axis term — e.g. "duplicate axis", "duplicate candidate"), but RULING
-# phrasings that assert a verdict ("is a duplicate", "duplicate of", "duplicated publication")
-# ARE scrubbed — surfacing candidate overlap must never read as a ruling that it IS a duplicate.
-RULE_WORDS = re.compile(
-    r"\b(not\s+novel|lacks?\s+novelty|trivial\w*|incremental|mere\s+stapl\w*|"
-    r"reject\w*|plagiar\w*|derivative|duplicate[sd]?\s+publication|repackag\w*)\b"
-    r"|\b(?:is|are|appears?|seems?|clearly|essentially|simply)\s+(?:a\s+|an\s+)?duplicate\b"
-    r"|\bduplicate\s+of\b|缝合", re.I)
-n_scrubbed = 0
-def scrub(s):
-    global n_scrubbed
-    out, n = RULE_WORDS.subn("[reviewer-judgment]", s or "")
-    n_scrubbed += n; return out
-
-def claim_anchor(a):
-    if not isinstance(a, dict): return None
-    cid, span = a.get("claim_id"), nw(a.get("span", ""))
-    c = claims.get(cid)
-    if c and span and span in nw(c.get("text_span", "")):   # span IN claim, never claim IN span
-        return {"claim_id": cid, "span": span,
-                "location": c.get("location", {}), "artifact_hash": c.get("evidence_anchor", "")}
-    return None
-
-items, dropped, n_halluc = [], [], 0
-for fp in sorted(glob.glob(os.path.join(trace_dir, "*.response.md"))):
-    raw = open(fp, encoding="utf-8", errors="replace").read()
-    m = re.search(r"\[.*\]", raw, re.S)            # tolerate prose / code-fence wrapping
-    if not m:
-        print(f"  note: no JSON array in {os.path.basename(fp)} (treated as [])"); continue
-    try:
-        arr = json.loads(m.group(0))
-    except Exception as e:
-        print(f"  WARN: unparseable JSON in {os.path.basename(fp)}: {e} (treated as [])"); continue
-    if isinstance(arr, dict): arr = arr.get("findings", arr.get("items", []))
-    for it in (arr or []):
-        if not isinstance(it, dict): dropped.append({"why": "malformed"}); continue
-        axis = it.get("axis")
-        if axis not in AXES:                       # infer from pattern_id if missing
-            axis = next((a for a, p in AXES.items() if p == it.get("pattern_id")), None)
-        if axis not in AXES:
-            dropped.append({"label": it.get("label", ""), "why": "unknown-axis"}); continue
-        anch = [v for v in (claim_anchor(a) for a in (it.get("anchors") or [])) if v]
-        good_ids, bad_ids, self_ids = [], [], []
-        for cid in (it.get("candidate_ids") or []):
-            c = cands.get(cid)
-            if not c:
-                bad_ids.append(cid)                                  # not in candidates.json -> hallucinated ref
-            elif axis == "duplicate" and c.get("self_record_suspected"):
-                self_ids.append(cid)                                 # confirmed own record -> excluded (NOT hallucinated)
-            else:
-                good_ids.append(cid)                                 # real candidate (incl. self_record_unconfirmed -> surfaced w/ flag)
-        n_halluc += len(bad_ids)
-        rec = {"axis": axis, "pattern_id": AXES[axis], "label": scrub(nw(it.get("label", ""))),
-               "overlap_statement": scrub(nw(it.get("overlap_statement", ""))), "anchors": anch,
-               "candidate_ids": good_ids, "overlap_kind": nw(it.get("overlap_kind", "")),
-               "residual_delta_note": scrub(nw(it.get("residual_delta_note", ""))),
-               "reviewer_action": scrub(nw(it.get("reviewer_action", "")))}
-        # LOAD-BEARING only if it anchors to a real contribution span AND cites a real candidate
-        if anch and good_ids:
-            items.append(rec)
-        else:
-            dropped.append({**rec, "why": ("no-anchor" if not anch else "no-resolved-candidate")})
-for i, p in enumerate(items, 1): p["id"] = "O%d" % i
-
-n_dup  = sum(1 for p in items if p["axis"] == "duplicate")
-n_comb = sum(1 for p in items if p["axis"] == "combination")
-if retrieval_incomplete: disp = "retrieval_incomplete"
-elif items:              disp = "candidate_overlap_surfaced"
-else:                    disp = "no_candidate_overlap_found"
-
-# ---------- render memo ----------
-def cstr(cid):
-    c = cands.get(cid, {}); idv = c.get("identifier", {}) or {}
-    ref = idv.get("arxiv") or idv.get("doi") or idv.get("dblp_url") or idv.get("url") or ""
-    flag = (" ⚠️ near-identical title, authorship unverified — confirm self-record vs real duplicate"
-            if c.get("self_record_unconfirmed") else "")
-    return f"**{c.get('title','?')}** ({c.get('venue','?')} {c.get('year','?')}) — `{ref}` [{cid}]{flag}"
-def astr(a):
-    sec = (a.get("location") or {}).get("section", "")
-    return f"claim `{a['claim_id']}`{f' ({sec})' if sec else ''}: “{a['span']}”"
-
-out = []
-out.append(f"**Novelty / Duplication Advisory — {PID}** (retrieval-grounded, MEMO-ONLY — no verdict weight).")
-out.append(f"Reviewer: gpt-5.5 xhigh, two fresh per-axis threads (no codex-reply)  ·  Run level: L{L}  "
-           f"·  Disposition (informational, NOT a verdict): **{disp}**")
-out.append(f"Overlap items surfaced: {n_dup} duplicate · {n_comb} combination  ·  Candidates retrieved: {len(cands)}  "
-           f"·  Hallucinated candidate refs dropped: {n_halluc}  ·  Ruling words neutralized: {n_scrubbed}")
-out += ["", "> ⚠️ **This is not a novelty verdict.** It lays out prior work the contribution OVERLAPS with so a "
-        "human reviewer can weigh `ADV-TRIVIAL-COMBINATION` and `ADV-DUPLICATE-PUBLICATION` themselves. **It never "
-        "rules \"trivial\" or \"duplicate\", and the absence of a candidate match below is NOT evidence of "
-        "originality** — the search corpus is incomplete by construction (recent / non-indexed / paywalled / "
-        "differently-titled work is missed). A same-authors match is legitimate self-overlap (arXiv→venue, "
-        "workshop→conference, extended journal), not misconduct. `tools/adjudicate_findings.py` lists this skill in "
-        "`MEMO_ONLY_SKILLS` and caps it at `info`; it carries no verdict weight.", ""]
-
-for axis, head in [("duplicate", "ADV-DUPLICATE-PUBLICATION — candidate near-duplicates (verify; never a verdict)"),
-                   ("combination", "ADV-TRIVIAL-COMBINATION — is the contribution a standard A+B+C? (reviewer judgment)")]:
-    rows = [p for p in items if p["axis"] == axis]
-    out += [f"### {head}", ""]
-    if not rows:
-        out += ["_No resolved candidate overlap surfaced on this axis. **Not** an originality finding — see the caveat above._", ""]
-        continue
-    for p in rows:
-        out.append(f"#### {p['id']} — {p['label'] or '(unlabeled)'}  ·  _{p['overlap_kind'] or 'overlap'}_")
-        if p["overlap_statement"]:   out.append(f"- **Overlap:** {p['overlap_statement']}")
-        if p["anchors"]:             out.append("- **Submission contribution (anchor):** " + " ; ".join(astr(a) for a in p["anchors"]))
-        if p["candidate_ids"]:       out.append("- **Candidate prior work:** " + " ; ".join(cstr(c) for c in p["candidate_ids"]))
-        if p["residual_delta_note"]: out.append(f"- **Residual delta the paper still claims (descriptive):** {p['residual_delta_note']}")
-        if p["reviewer_action"]:     out.append(f"- **For the human reviewer to weigh:** {p['reviewer_action']}")
-        out.append("")
-
-if disp == "no_candidate_overlap_found":
-    out += ["### No candidate overlap found (NOT an originality verdict)", "",
-            "The retrieval ran but surfaced no resolved prior-work overlap with the submission's title / "
-            "contribution at this search depth. This is **not** evidence the work is original: the corpus search is "
-            "necessarily incomplete, and the queries are bounded by the ledger's contribution spans. A human reviewer "
-            "should still judge novelty against their own knowledge of the field. No verdict is rendered.", ""]
-elif disp == "retrieval_incomplete":
-    out += ["### Retrieval incomplete (inconclusive)", "",
-            "One or more lookups were unavailable, so the prior-work search could not be completed. This memo "
-            "concludes **nothing** about novelty or duplication; re-run with corpus access for a fuller picture.", ""]
-if dropped:
-    out += ["### Dropped (no anchor / no resolved candidate — excluded from the brief)", ""]
-    out += [f"- {p.get('label') or '(no label)'}: {p.get('why','')}" for p in dropped]
-    out.append("")
-out += ["### Retrieval & anchoring audit", "",
-        f"- overlap items surfaced: {len(items)}  ·  dropped: {len(dropped)}  ·  hallucinated/self candidate refs dropped: {n_halluc}  ·  ruling words neutralized: {n_scrubbed}",
-        "- every surfaced candidate is a resolved record in candidates.json (real call + verifiable id); every anchor "
-        "is a verbatim span of a contribution ledger claim.", ""]
-out += ["---",
-        "_Informational only. `tools/adjudicate_findings.py` lists `novelty-duplication-advisory` in "
-        "`MEMO_ONLY_SKILLS` and caps every finding it emits at `info`, so this memo contributes **no verdict "
-        "weight**. Novelty is a reviewer judgment; the deterministic adjudicator owns the report verdict, and neither "
-        "it nor this skill rules \"trivial\" or \"duplicate\"._"]
-memo_path = os.path.join(paper_dir, "novelty-duplication-advisory.memo.md")
-open(memo_path, "w", encoding="utf-8").write("\n".join(out) + "\n")
-
-# ---------- info-only findings mirror: one per surfaced item; MEMO gate caps at info ----------
-mir = []
-for k, p in enumerate(items, 1):
-    cdesc = "; ".join(cstr(c) for c in p["candidate_ids"])
-    ev = [{"claim_id": a["claim_id"], "span": a["span"], "location": a.get("location", {}),
-           "artifact_hash": a.get("artifact_hash", "")} for a in p["anchors"]]
-    mir.append({
-        "finding_id": "NDA%03d" % k, "skill": "novelty-duplication-advisory",
-        "pattern_id": p["pattern_id"],
-        "title": (p["label"] or "prior-work overlap")[:120],
-        "description": (p["overlap_statement"] + (" — candidates: " + cdesc if cdesc else "")
-                        + ((" Residual: " + p["residual_delta_note"]) if p["residual_delta_note"] else "")
-                        + "  [ADVISORY: prior-work overlap for the reviewer to weigh — NOT a trivial/duplicate ruling.]").strip(),
-        "severity": "info",                        # memo-only: never verdict-bearing
-        "observability_level_required": 0,
-        "evidence": ev,                            # may be [] (schema permits empty evidence for info)
-        "verdict_local": "needs_external_check", "requires_external_check": True,
-        "false_positive_risk": "high",
-        "recommended_reviewer_action": p["reviewer_action"] or ("Weigh the contribution against: " + cdesc),
-        "reviewer": {"model": "gpt-5.5", "reasoning": "xhigh", "deterministic": False},
-    })
-find_path = os.path.join(paper_dir, "novelty-duplication-advisory.findings.json")
-json.dump(mir, open(find_path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-print(f"disposition={disp} (informational, NOT a verdict) | surfaced={len(items)} (dup={n_dup}, comb={n_comb}) "
-      f"| dropped={len(dropped)} | hallucinated/self_dropped={n_halluc} | ruling_scrubbed={n_scrubbed}")
-print("memo     ->", memo_path)
-print("findings ->", find_path, f"({len(mir)} info-only)")
-PY
-```
-
-**Scope of this gate:** anchor validation (verbatim span of a contribution claim), candidate
-validation (the **anti-hallucination** check — every `candidate_id` must exist in
-`candidates.json`; self-records excluded from the duplicate axis), ruling-word neutralization,
-the informational disposition, and rendering. It computes **no verdict** and prints **no
-novelty grade** — the memo is advisory and the adjudicator decides (and caps this skill at
-`info`).
+Read `reference/validate-render-script.md` (Scope of this gate) for exactly what the gate checks; it computes no verdict.
 
 **CONTRIB_CLAIMS == 0 / NO_CONTRIB / NO_CANDIDATES — honest-null path.** When Step 0/1/2 sent
 you here, write the two files directly (no reviewer call) so the orchestrator's globs still find
@@ -982,13 +424,7 @@ python3 "$ROOT/tools/adjudicate_findings.py" \
     --out "$D/report.json" --md "$D/REPORT.md"
 ```
 
-The adjudicator applies its gates in order (ANCHOR → OBSERVABILITY → FP-RISK → **MEMO** →
-SURFACE) and computes `overall_verdict` ∈ {CLEAN_GIVEN_EVIDENCE, SOFT_FLAGS, HARD_FLAGS} from
-the **other** auditors' findings. The MEMO gate caps every `novelty-duplication-advisory`
-finding at `info`, and this skill is absent from `SKILL_TO_DIMENSION`, so it contributes **no
-dimension verdict and cannot move the overall verdict** — by design. A standalone run with no
-other findings therefore yields `CLEAN_GIVEN_EVIDENCE`; that is **correct**, not a miss — the
-value of this skill is the **memo**; read it. Treat a single-skill report as a PREVIEW.
+A standalone run with no other findings yields `CLEAN_GIVEN_EVIDENCE` by design; read `reference/rationale.md` for the gate order and why. Read the memo.
 
 ## Output contract
 
@@ -1056,40 +492,7 @@ It writes **no verdict and no report** of its own — `report.json` / `REPORT.md
 - **Reproducible.** Same ledger + same candidates snapshot + same reviewer outputs → same
   validated memo + same disposition.
 
-## When NOT to use this skill
-
-- **No `claims.json` yet** → run `/evidence-ledger` first; this skill never invents structure
-  from the raw PDF, and it needs the contribution spans to build its query (the title is read
-  from the source only as a search seed).
-- **You want a novelty SCORE / a PROCEED-vs-ABANDON recommendation** → that is the
-  *author-facing* ARIS `/novelty-check`, not this forensics advisory. This skill never scores or
-  recommends; it only surfaces overlap for a human to weigh.
-- **You want a "this paper is trivial / a duplicate" verdict** → impossible by design; novelty
-  is a reviewer judgment and this skill is capped at `info`. Read the memo and decide yourself.
-- **You need to verify a *cited* reference exists / is used in the right context** →
-  `/citation-forensics` (this skill is about overlap with work the paper need not cite).
-- **You need to verify an empirical "first / SOTA / beats prior work" claim** →
-  `/baseline-comparison-audit` (a baseline-integrity verdict, not an overlap memo).
-- **You need intra-paper contradiction or method drift** → `/consistency-audit`
-  (`HP-SCOPE-INFLATE` for an internal scope-overclaim).
-- **You need code/result-level fraud** (fake GT, self-normalization, phantom numbers) →
-  `/experiment-forensics` at **L2**.
-- **You want an AI-text / "looks machine-written" verdict** → out of scope. Surface hints live
-  in `/presentation-signals` (auxiliary, capped at minor); this repo is **not** an AI-text
-  classifier and **not** a plagiarism detector — it surfaces candidates to weigh.
-- **No corpus access** → the retrieval cannot run; the honest output is `retrieval_incomplete`
-  (concludes nothing), not a guessed "no duplication".
-- **On a timer** → never `/loop` / `/schedule` / `CronCreate` this skill; re-fire only when the
-  paper / ledger / literature change (see the fence at the top). Re-running burns external-search
-  budget for an identical memo.
 
 ## Review tracing
 
-Trace policy is **forensic** (never silently skipped) — see **Step 5** for the exact layout:
-`run.meta.json` + per-axis `001-duplicate.{request.json,response.md,meta.json}` and
-`002-combination.{...}` (and, under `— effort: max`, each combination-component probe). Write
-each `.response.md` during Step 3, immediately after its reviewer call. Every `request.json`
-must contain only the paths + the ledger + the candidates file + the per-axis checklist that
-were sent — the reviewer-independence audit trail. The retrieved `candidates.json` and
-`profile.json` are persisted in `PAPER_DIR` and referenced from `run.meta.json` so the
-prior-work universe the memo rests on is reproducible.
+Forensic, never skipped; the layout is in Step 5. Read `reference/rationale.md` (Review tracing) for the request.json audit-trail requirements.

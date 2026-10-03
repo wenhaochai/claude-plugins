@@ -26,33 +26,7 @@ Audit evaluation-design and reporting validity for: **$ARGUMENTS** (requires
 > it stays honest — leakage and under-reporting are usually **honest methodological
 > errors**, so every finding is a discrepancy to *clarify*, never an accusation.
 
-## Why this exists
-
-An optimizing pipeline (or rushed human) treats the evaluation as a number to make
-go up, not a measurement to keep valid. The repeatable failure modes — distinct
-from "is the number real?" (family D) — are:
-
-- **Leakage** — the train/test boundary is broken (preprocessing fit before the
-  split, no held-out set, duplicates across splits, a random split over time-ordered
-  data, the same subject in both splits, an evaluated LLM that saw the benchmark in
-  pretraining), so the reported score may not measure **generalization** at all.
-  `HP-EVAL-LEAKAGE`
-- **Judge validity** — the headline rests on an automatic **LLM judge** that is
-  *conflicted* (the same model/family as a compared system, so its preference for
-  that system is the "evidence") or *unvalidated* (no human-agreement correlation,
-  no position/length bias control). `HP-JUDGE-VALIDITY`
-- **Selective reporting** — a dataset / baseline / metric / seed-count the setup
-  **explicitly declares** is dropped from the results, the metric is **switched**
-  across tables to keep the method ahead, or "we report the best run/prompt/
-  checkpoint" with **no held-out selection set** (selecting on the test set).
-  `HP-SELECTIVE-REPORTING`
-
-None of these is inherently misconduct — they are what an agent does when nothing
-forces a *valid* evaluation. The **stated** version is decidable at **L0/L1** from
-the described protocol; the **verified** version (real split/preprocessing/result
-files) deepens at **L2**. What this skill will **not** do is *guess*: three leakage
-subtypes are undecidable even with the repo and are handed off as
-`needs_external_check`, not invented (see below).
+Read `reference/rationale.md` for why this skill exists (the leakage / judge-validity / selective-reporting failure modes it targets).
 
 ## Core principle
 
@@ -93,63 +67,13 @@ settle.** Four properties:
 
 ## How this differs from the other auditors (route correctly)
 
-This skill is the **L0/L1-stated / L2-verified** sibling of
-`baseline-comparison-audit` and `proof-derivation-forensics` (both verdict-bearing
-**without a repo**) — *not* the L2-only `experiment-forensics`.
+L0/L1-stated, L2-verified; owns only `HP-EVAL-LEAKAGE`, `HP-JUDGE-VALIDITY`, `HP-SELECTIVE-REPORTING`.
+Hand off: an LLM generating ground truth → `experiment-forensics` `HP-FAKE-GT` (L2); best-as-mean /
+thin scope / appendix-vs-main → `consistency-audit`; never-mentioned SOTA baseline or single-dataset
+"consistently" → `baseline-comparison-audit`; number-vs-code → `experiment-forensics`; citations →
+`citation-forensics`; surface → `presentation-signals`. Read `reference/routing.md` for the full table and de-dup rules.
 
-| Auditor | Question it answers | Level |
-|---------|---------------------|------|
-| **`eval-design-forensics`** (this) | **Is the evaluation a VALID measurement of the claim, and is the reporting complete?** (train/test leakage, conflicted/unvalidated LLM judge, declared-but-unreported / metric-switch / best-without-held-out) | **L0/L1 stated · L2 verified** |
-| `experiment-forensics` | Are the reported numbers what the **code** computes? (fake/derived GT, self-norm, phantom, dead metric) | L2 |
-| `consistency-audit` | Does the paper contradict ITSELF / described method = evaluated method? (owns `HP-AGG-DRIFT`, `HP-APPENDIX-CONTRA`, text-only `HP-SCOPE-INFLATE`) | L0 |
-| `baseline-comparison-audit` | Are the right baselines present, fairly tuned, and is "SOTA" earned? (owns `HP-MISSING-BASELINE`, `HP-SIG-OVERLAP`) | L0 stated / L2 verified |
-| `citation-forensics` | Do the cited papers exist and support the claim? | L0 |
-| `presentation-signals` | Surface "AI-flavor" hints (auxiliary, capped at minor) | L0 |
-| `adversarial-case-builder` | Strongest evidence-bound rejection memo (no verdict weight) | any |
-
-**Do NOT raise here** (hand off instead):
-
-- **An LLM generating the GROUND-TRUTH labels/targets** (not judging outputs) →
-  `experiment-forensics` `HP-FAKE-GT` (L2). The clean split: a judge whose
-  **preference IS the reported metric** is `HP-JUDGE-VALIDITY` (here, L0/L1 stated);
-  a model that **fabricates the reference** the metric is computed against is
-  `HP-FAKE-GT` (there, needs the code, L2). When unsure which, prefer the L2 route
-  and set `needs_external_check`.
-- **best-reported-as-mean** (the aggregation lies) → `consistency-audit`
-  `HP-AGG-DRIFT`; **thin overall scope** with no comparison → `consistency-audit`
-  `HP-SCOPE-INFLATE`; **appendix-vs-main disagreement on the same quantity** →
-  `consistency-audit` `HP-APPENDIX-CONTRA`.
-- **A never-mentioned expected SOTA baseline** (completeness) →
-  `baseline-comparison-audit` `HP-MISSING-BASELINE`; a "consistently/across-the-board"
-  comparison resting on **one dataset** → `baseline-comparison-audit`'s single-dataset
-  `HP-SIG-OVERLAP`.
-- **Whether a reported number matches the code** (fake GT, self-norm, phantom) →
-  `experiment-forensics` (L2); **whether a cited paper exists / is used in context**
-  → `citation-forensics`; **surface / AI-flavor** → `presentation-signals`.
-
-`HP-SELECTIVE-REPORTING` is **scoped to declared-but-unreported / cherry-picked-
-among-shown** — the gap between what the setup *promised* and what the tables
-*deliver*. It never re-emits the four patterns above.
-
-## The Kapoor & Narayanan leakage taxonomy (adopted — paraphrased)
-
-`HP-EVAL-LEAKAGE` adopts the **eight leakage types in three categories** of Kapoor &
-Narayanan (2023), paraphrased. The reviewer maps each finding to one type and records
-it in the `description`.
-
-| K&N category (the leakage **TYPE**) | The tell (subtypes) | This repo's **observability** | Common false positive |
-|---|---|---|---|
-| **L1 — no clean train/test separation** | (a) no held-out test set at all; (b) preprocessing (scaling / imputation / resampling) **fit on all data before the split**; (c) feature selection fit before the split; (d) duplicate / near-duplicate records across splits | **L0** stated / **L2** verified | a transductive / semi-supervised design where overlap is **intended and declared**; preprocessing fit on **train only**, then applied to test (the *correct* pattern) |
-| **L2 — illegitimate (proxy) feature** | a feature that stands in for the target, or would be unavailable at prediction time | **needs_external_check** (domain judgment) | a "proxy-looking" feature that is **genuinely available** at prediction time |
-| **L3 — test set not from the distribution of interest** | (a) **temporal** leakage (random split over time-ordered data / training on the future); (b) **non-independence** (same subject / patient / group in both splits); (c) **sampling bias** in the test set | (a),(b) **L0** stated / **L2** verified; (c) **needs_external_check** | a correctly time-respecting split; a standard fixed benchmark split the field uses |
-| **(LLM-specific) pretraining / benchmark contamination** | the evaluated model may have seen the public benchmark during pretraining | **needs_external_check** (black-box) — name Oren 2023 (exchangeability), Shi 2023 (Min-K%), Golchin 2023 (Time-Travel), BIG-bench canary; **never run them** | a benchmark released **after** the model's training cutoff, or a corpus **documented to exclude** it |
-
-> ⚠️ **Two scales — do not conflate them.** K&N's **L1 / L2 / L3** are leakage-*type*
-> labels (severity-ordered *categories of leak*). This repo's **L0 / L1 / L2** are
-> *observability* levels (what you can *see*: PDF / +source / +repo). They are
-> orthogonal. A K&N-**L1** preprocessing leak that is *stated* in the protocol is
-> decidable at observability-**L0**. Every finding carries **both**: the K&N type in
-> `description`, the observability in `observability_level_required`.
+Read `reference/leakage-taxonomy.md` when mapping a leak to one of the Kapoor & Narayanan (2023) types (8 types / 3 categories, with observability and common false positives). K&N's L1/L2/L3 are leakage types, not this repo's observability levels L0/L1/L2.
 
 ## Constants & Reviewer Calling Convention
 
@@ -353,98 +277,7 @@ reads `claims.json` from its `cwd` for the described protocol and, at L2, the sp
 preprocessing files; every finding anchors to a ledger `claim_id`. Send EXACTLY (fill
 every `[ ... ]`):
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are a train/test-LEAKAGE forensics reviewer. You judge ONE thing: given the
-    EVALUATION PROTOCOL this paper describes (and, at L2, the split/preprocessing code
-    it ships), is there a leak that means the reported score may NOT measure
-    generalization? You do NOT judge whether numbers are real (that needs the code and
-    is another auditor) and you do NOT grade the paper. Describe a discrepancy to
-    CHECK/CLARIFY, never an accusation — leakage is most often an HONEST methodological
-    error. Hand off what you cannot ground.
-
-    INPUTS (in your working directory — read them directly):
-      - claims.json — the evidence ledger. The PROTOCOL/SPLIT/PREPROCESSING language
-        lives in type:"method" and type:"scope" claims; the ONLY structure you reason
-        over. Each claim = {claim_id, type, text_span (VERBATIM), location, value?}. You
-        MAY re-open a source file (and, at L2, the split/preprocessing code) to confirm a
-        span is real, but you may NOT introduce a claim not in the ledger.
-    LEAKAGE ANCHOR TARGETS (protocol/scope claims — claim_id + verbatim text_span):
-      [paste the LEAKAGE anchors from Step 1]
-    L2 SPLIT/PREPROCESSING FACTS (raw grep/hash — uninterpreted; empty if L<2):
-      [inline RUNDIR/leakage_grep.txt + RUNDIR/hashes.txt, or "L<2: no repo/code available"]
-    CONTAMINATION DATE FACT (public record, if gathered — GIVEN data, not a verdict):
-      [inline RUNDIR/contamination_dates.json, or "none gathered"]
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-
-    THE LEAKAGE TAXONOMY you map onto (Kapoor & Narayanan 2023 — 8 types / 3 categories;
-    paraphrase the type in your description). ⚠️ K&N's L1/L2/L3 below are leakage-TYPE
-    labels — they are NOT this repo's observability L0/L1/L2 (what you can SEE). Set
-    observability_level_required from what you can SEE, and name the K&N type in text:
-      - K&N L1 (no clean separation): (a) no held-out test; (b) preprocessing fit on ALL
-        data BEFORE the split; (c) feature selection before the split; (d) duplicate /
-        near-duplicate rows across splits.  -> observability 0 (stated) / 2 (verified).
-      - K&N L2 (illegitimate/proxy feature): a feature that proxies the target or is
-        unavailable at prediction time.  -> needs_external_check (domain judgment).
-      - K&N L3 (test not from the distribution of interest): (a) temporal leakage (random
-        split over time-ordered data / training on the future); (b) non-independence
-        (same subject/patient/group in both splits) -> observability 0 / 2; (c) sampling
-        bias in the test set -> needs_external_check.
-      - Pretraining/benchmark CONTAMINATION of an evaluated LLM (the model may have seen
-        the public benchmark in pretraining) -> needs_external_check. You may NAME the
-        external methods a human would use (exchangeability, Oren 2023; Min-K% Prob, Shi
-        2023; Time-Travel, Golchin 2023; BIG-bench canary) but you do NOT run them.
-
-    HARD RULES (a finding that breaks any of these is worthless):
-    1. ANCHOR. Every finding above "info" MUST carry >=1 evidence {claim_id, span} where
-       claim_id EXISTS in claims.json and span is a VERBATIM whitespace-normalized
-       SUBSTRING of THAT claim's text_span (no paraphrase). The anchor is the protocol/
-       split/preprocessing claim the leak undermines; a code file:line goes in
-       `description`, never as the anchor. ALWAYS anchor — even a needs_external_check
-       finding — so it stays navigable.
-    2. DISCREPANCY, NOT ACCUSATION. Never "reject", "fabricated", "the authors cheated".
-    3. OBSERVABILITY. A leak visible in the DESCRIBED protocol => observability_level_
-       required = 0 (this is verdict-bearing from a PDF). A leak only CONFIRMABLE from the
-       split/preprocessing files => a SEPARATE finding with observability_level_required = 2
-       (it auto-demotes on an L0/L1 run — that is correct). NEVER put the stated tell at 2.
-    4. HAND OFF THE 3 UNDECIDABLE SUBTYPES. illegitimate-proxy feature, sampling bias, and
-       pretraining/benchmark contamination are NOT decidable from the PDF or the repo:
-       set verdict_local "needs_external_check", requires_external_check true, severity
-       "info", false_positive_risk "high", and name what a human should check.
-    5. HONEST FP. A declared transductive/semi-supervised overlap, a standard fixed
-       benchmark split, preprocessing fit on TRAIN ONLY then applied to test, a correctly
-       time-respecting split, a benchmark released AFTER the model's cutoff — these LOOK
-       like leaks but are legitimate. Say so; if the protocol is under-described, prefer
-       needs_external_check over a flag.
-    6. pattern_id MUST be HP-EVAL-LEAKAGE.
-
-    SEVERITY DECISION (HP-EVAL-LEAKAGE):
-      - unambiguous stated leak (e.g. "standardize all features, then split") that
-        plausibly invalidates the HEADLINE generalization claim -> "critical", FP "low",
-        observability 0, requires_external_check false.
-      - a leak affecting a NON-headline result, or a stated tell that needs the code to
-        confirm -> "major" (FP "medium"); the L2 confirmation is a separate observability-2
-        finding.
-      - proxy / sampling-bias / contamination -> "info", needs_external_check, FP "high".
-
-    OUTPUT: a single JSON array and NOTHING ELSE (no prose, no code fence). Each element
-    conforms to schemas/finding.schema.json:
-      {"finding_id":"ED001","skill":"eval-design-forensics","pattern_id":"HP-EVAL-LEAKAGE",
-       "title":"short, neutral","description":"which K&N type + the protocol span it
-       undermines + (L2) the split/preprocessing file:line","severity":"critical|major|
-       minor|info","observability_level_required":0,
-       "evidence":[{"claim_id":"C0xx","span":"verbatim substring",
-                    "location":{"file":"...","section":"..."}}],
-       "verdict_local":"fail|warn|clean|needs_external_check",
-       "requires_external_check":true|false,"false_positive_risk":"low|medium|high",
-       "recommended_reviewer_action":"what to CHECK or ASK — never 'reject'"}
-    An empty array [] is a valid, honest result (the protocol shows no leak).
-```
+The prompt is the **Step 3 — Leakage prompt** block in `reference/reviewer-prompts.md`; read it and send it verbatim (gpt-5.5, xhigh, read-only, `cwd` = PAPER_DIR; it holds the K&N mapping, hard rules, severity decision and JSON output schema).
 
 Persist the raw response to the trace dir (Step 7) **before** parsing. **Failure
 handling:** MCP stall → re-invoke the **identical** prompt as a fresh
@@ -457,95 +290,7 @@ never invent a split file.
 
 A **separate, new** `mcp__codex__codex` thread. Send EXACTLY (fill every `[ ... ]`):
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are an EVALUATION-VALIDITY and REPORTING-COMPLETENESS forensics reviewer. You
-    judge two things: (1) does a headline metric rest on an LLM JUDGE that is conflicted
-    or unvalidated? (2) does the reporting DROP a condition the setup declared, SWITCH a
-    metric to favor the method, or select "best" with no held-out set? PROPOSE findings
-    only — do NOT grade the paper; describe a discrepancy to CHECK/CLARIFY, never an
-    accusation. You do NOT judge whether the numbers are real (another auditor).
-
-    INPUTS (read directly in your working directory):
-      - claims.json — the JUDGE protocol lives in type:"method"/"comparison"/"scope"/
-        "number"; the DECLARED conditions in type:"scope"/"method"; the reported tables in
-        type:"table_cell"/"caption"/"number"/"baseline". The ONLY structure you navigate
-        by; each claim = {claim_id, type, text_span (VERBATIM), location, value?}. You MAY
-        re-open a source file (and, at L2, the judge/result files) to confirm a span.
-    JUDGE ANCHOR TARGETS (claim_id + verbatim text_span):
-      [paste the JUDGE anchors from Step 1]
-    REPORTING ANCHOR TARGETS (declared-condition / table claims — claim_id + verbatim):
-      [paste the REPORTING anchors from Step 1]
-    L2 JUDGE + RESULT-FILE FACTS (raw grep — uninterpreted; empty if L<2):
-      [inline RUNDIR/judge_grep.txt + RUNDIR/reporting_grep.txt, or "L<2: no repo available"]
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-
-    HARD RULES:
-    1. ANCHOR every finding above "info" to a real claim_id + a VERBATIM substring of that
-       claim. For JUDGE-VALIDITY anchor to the judge-protocol claim naming the judge model
-       (and the compared-systems claim showing the family overlap, as extra evidence). For
-       SELECTIVE-REPORTING anchor to the setup-DECLARATION claim (what was promised). A
-       config/result file:line is forensic detail for the description — NOT a valid anchor.
-    2. DISCREPANCY, NOT ACCUSATION. Say what to CHECK/ASK. Never "reject"/"faked".
-    3. OBSERVABILITY. Judge identity + the absence of reported validation are read off the
-       described protocol => observability_level_required 0 (1 if only the source shows it).
-       A declared-but-unreported condition is stated => 0; CONFIRMING the condition actually
-       ran but went unreported needs the result files => a SEPARATE observability-2 finding.
-    4. HONEST FP. (judge) a judge validated against human agreement with bias controls
-       reported; a judge from a clearly DIFFERENT family than every compared system AND not
-       load-bearing (corroborated by human eval / standard metrics); a calibrated standard
-       protocol. UNVALIDATED-ONLY is HIGH-FP — missing validation *reporting* is not proof
-       none was done (may be in an appendix / a cited standard). (reporting) a declared
-       condition omitted but explicitly justified ("full grid in the repo"); different
-       tasks legitimately using different standard metrics; best-selection on a DECLARED
-       held-out validation set; an honestly-labeled pilot.
-    5. pattern_id MUST be one of: HP-JUDGE-VALIDITY, HP-SELECTIVE-REPORTING.
-
-    CHECKLIST (one finding per concrete discrepancy):
-     1. JUDGE VALIDITY [HP-JUDGE-VALIDITY] — a headline comparison rests on an automatic
-        LLM judge, and either:
-        (a) CONFLICTED — the judge is the same MODEL or model FAMILY as a compared system
-            (especially the proposed one), so its preference for that system IS the
-            evidence (self-enhancement / self-preference). This is the lower-FP STRUCTURAL
-            case (family overlap is checkable) -> severity major, false_positive_risk
-            "medium". observability 0.
-        (b) UNVALIDATED — the LLM judge is load-bearing yet the paper reports NO
-            human-agreement validation (no correlation / kappa vs humans) AND NO bias
-            control (no position-swap, no length/verbosity control) -> severity major if
-            the headline rests on it, minor otherwise; false_positive_risk "high" (caps at
-            minor). observability 0.
-        ROUTING: an LLM that generates the GROUND-TRUTH labels/targets (not judging
-        outputs) is HP-FAKE-GT (experiment-forensics, L2) — do NOT raise it here; if
-        unsure which, set verdict_local "needs_external_check".
-     2. SELECTIVE REPORTING [HP-SELECTIVE-REPORTING] — one of:
-        (a) a dataset / baseline / metric / seed-count the SETUP EXPLICITLY DECLARES is
-            then omitted from the results and is not in the appendix;
-        (b) METRIC-SWITCHING across tables (Table 2 reports M where the method leads;
-            Table 3 quietly switches to M' where it also leads) in a way that consistently
-            favors the proposed method;
-        (c) "we report the best checkpoint / prompt / run" with NO held-out selection set
-            (selecting on the test set).
-        severity major; critical if the omission/switch/selection is what PRODUCES the
-        headline (false_positive_risk "low" when the declared-vs-reported gap is
-        unambiguous); minor if peripheral. observability 0 (stated) / 2 (the result file
-        shows the condition ran but went unreported — a SEPARATE finding).
-        DE-DUP (do NOT emit these — route them): best-reported-as-mean -> HP-AGG-DRIFT
-        (consistency-audit); thin overall scope with no comparison -> HP-SCOPE-INFLATE
-        (consistency-audit); a never-mentioned expected baseline -> HP-MISSING-BASELINE
-        (baseline-comparison-audit); appendix-vs-main on the SAME quantity ->
-        HP-APPENDIX-CONTRA (consistency-audit). This pattern is ONLY declared-but-unreported
-        / cherry-picked-among-shown.
-
-    OUTPUT: a single JSON array and NOTHING ELSE (schemas/finding.schema.json), same shape
-    as the leakage prompt; set finding_id "ED0xx", skill "eval-design-forensics". An empty
-    array [] is valid and honest. Set requires_external_check only when you genuinely
-    cannot settle a point at this level.
-```
+The prompt is the **Step 4 — Judge-validity + Selective-reporting prompt** block in `reference/reviewer-prompts.md`; read it and send it verbatim (hard rules, the two-item checklist with severities and de-dup routing, JSON output).
 
 **Deepen at L2.** When `L == 2`, the judge/result facts let the reviewer promote a
 text-only suspicion to a confirmed finding (keep `observability_level_required: 0` if
@@ -566,94 +311,7 @@ hallucinated text to a real claim must fail). Pass **every** saved raw reviewer 
 (leakage + judge/reporting + any per-track fan-out files); they merge into one findings
 file with one `ED###` namespace:
 
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"
-LEDGER="<abs path to claims.json>"
-OUT="$(dirname "$LEDGER")/eval-design-forensics.findings.json"
-# args: LEDGER OUT then each saved raw reviewer response file from Steps 3–4:
-python3 - "$LEDGER" "$OUT" "<resp_leakage.md>" "<resp_judge_reporting.md>" <<'PY'
-import json, re, sys, os
-ledger_path, out_path = sys.argv[1], sys.argv[2]
-resp_paths = [p for p in sys.argv[3:] if p and os.path.isfile(p)]
-
-def nw(s):                                   # mirror adjudicator _norm_ws (whitespace only)
-    return " ".join((s or "").split())
-
-OWNED = {"HP-EVAL-LEAKAGE", "HP-JUDGE-VALIDITY", "HP-SELECTIVE-REPORTING"}   # ALLOWED set
-ABOVE = {"critical", "major", "minor"}
-# OBS map — the canonical observability each owned pattern is decidable at (documentation;
-# the REVIEWER sets observability_level_required per finding, and the adjudicator does the
-# real req>run_level downgrade). stated-tell = 0; repo confirm = 2; the 3 leakage external
-# subtypes carry no level (needs_external_check -> info).
-OBS = {"HP-EVAL-LEAKAGE": "0 stated / 2 verified (proxy|sampling|contamination -> needs_external_check)",
-       "HP-JUDGE-VALIDITY": "0/1 stated (2 may corroborate)",
-       "HP-SELECTIVE-REPORTING": "0 stated / 2 verified"}
-
-ledger = json.load(open(ledger_path, encoding="utf-8"))
-base = {c["claim_id"]: nw(c.get("text_span", "")) for c in ledger.get("claims", [])
-        if c.get("claim_id")}
-
-proposed = []
-for p in resp_paths:
-    raw = open(p, encoding="utf-8").read()
-    m = re.search(r"\[.*\]", raw, re.S)      # tolerate prose / code-fence wrapping
-    try:
-        chunk = json.loads(m.group(0) if m else raw)
-        proposed += chunk.get("findings", []) if isinstance(chunk, dict) else chunk
-    except Exception as e:
-        print(f"WARN: could not parse {p}: {e}", file=sys.stderr)
-
-kept, demoted, not_owned, ext = [], 0, 0, 0
-for f in proposed:
-    if not isinstance(f, dict):
-        continue
-    # OWNED gate: this skill emits ONLY family-H patterns — a missing/non-owned pattern_id is
-    # DROPPED (not demoted), so nothing foreign can ride the `evaluation` dimension or survive
-    # above-info on a malformed/absent id.
-    if f.get("pattern_id") not in OWNED:
-        not_owned += 1
-        continue
-    f["skill"] = "eval-design-forensics"
-    # ANCHOR: keep only evidence whose span is a verbatim ws-normalized substring of its claim.
-    # Guard malformed evidence (non-list / non-dict items can't anchor).
-    anchored = [ev for ev in (f.get("evidence") if isinstance(f.get("evidence"), list) else [])
-                if isinstance(ev, dict) and ev.get("claim_id") in base and nw(ev.get("span", "")) and
-                nw(ev["span"]) in base[ev["claim_id"]]]               # span IN claim, never claim IN span
-    f["evidence"] = anchored
-    # ANCHOR gate: above-info needs >=1 anchored span
-    if f.get("severity") in ABOVE and not anchored:
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("unanchored"); demoted += 1
-    # OBS hygiene — MIRROR the adjudicator, fail-closed: an above-info finding whose
-    # observability_level_required is missing/invalid demotes to info. NEVER default to 0
-    # (that would let a forgotten level-2 code-confirm survive an L0 run). type() not
-    # isinstance() so JSON booleans (True==1) are rejected, exactly as adjudicate_findings.py.
-    olr = f.get("observability_level_required")
-    if f.get("severity") in ABOVE and (type(olr) is not int or not (0 <= olr <= 3)):
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("undeclared-observability"); demoted += 1
-    # FP-RISK hygiene — false_positive_risk is the REVIEWER's self-assessment (it drives the
-    # adjudicator's cap); the executor never guesses it. Missing/invalid demotes to info.
-    if f.get("severity") in ABOVE and f.get("false_positive_risk") not in ("low", "medium", "high"):
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("undeclared-fp-risk"); demoted += 1
-    f.setdefault("reviewer", {"model": "gpt-5.5", "reasoning": "xhigh", "deterministic": False})
-    # honest hand-off: needs_external_check carries no severity weight (the 3 leakage external
-    # subtypes land here) — pin it to info, never drop it. Mirrors the adjudicator's gate 6.
-    if f.get("verdict_local") == "needs_external_check" or f.get("requires_external_check") is True:
-        f["requires_external_check"] = True
-        if f.get("severity") in ABOVE:
-            f["severity"] = "info"; f.setdefault("_demotions", []).append("needs-external-check-no-weight"); ext += 1
-    kept.append(f)
-
-for k, f in enumerate(kept, 1):                                       # one namespace, sequential
-    f["finding_id"] = f"ED{k:03d}"
-
-json.dump(kept, open(out_path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-above = sum(1 for x in kept if x.get("severity") in ABOVE)
-seen = sorted({f.get("pattern_id") for f in kept if f.get("pattern_id") in OWNED})
-print(f"validated {len(kept)} eval-design findings (above_info={above}; {demoted} demoted->info "
-      f"(unanchored/undeclared); {not_owned} not-owned dropped; {ext} needs-external-check->info) -> {out_path}")
-print("OBS map for patterns seen:", {p: OBS[p] for p in seen})
-PY
-```
+The validator is the bash block in `reference/validator.md`; read it and run it verbatim with `LEDGER`, `OUT` (`$(dirname "$LEDGER")/eval-design-forensics.findings.json`), then every saved raw reviewer response file from Steps 3–4. Export `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}"` first: variables are substituted in SKILL.md only, not in reference files.
 
 Scope of this gate: **anchoring + owned-pattern + schema hygiene + external-check
 pinning only** (schema hygiene = the *presence/validity* of the reviewer's required
@@ -669,93 +327,7 @@ unsure judge/GT call) are pinned to `info`, never dropped. The remaining judgmen
 violates one, re-run that pass with the correction noted (never hand-fabricate). A finding
 that loses all evidence is **kept as info** (the forensic record stays).
 
-**Worked HP-EVAL-LEAKAGE (stated preprocessing-before-split, headline, critical, L0):**
-
-```json
-{
-  "finding_id": "ED001",
-  "skill": "eval-design-forensics",
-  "pattern_id": "HP-EVAL-LEAKAGE",
-  "title": "Preprocessing fit before the split may leak the test set into the reported accuracy",
-  "description": "Claim C006 describes the protocol as 'we standardize all features, then split 80/20'. Standardizing before the split fits the scaler on the test rows (Kapoor & Narayanan leakage type L1 — no clean train/test separation), so the headline accuracy may not measure generalization. Discrepancy to verify: confirm whether the scaler was in fact fit on the training partition only and applied to test.",
-  "severity": "critical",
-  "observability_level_required": 0,
-  "evidence": [
-    {"claim_id": "C006", "span": "we standardize all features, then split 80/20",
-     "location": {"file": "main.tex", "section": "method"}}
-  ],
-  "verdict_local": "fail",
-  "requires_external_check": false,
-  "false_positive_risk": "low",
-  "recommended_reviewer_action": "Ask the authors whether the scaler/imputer was fit on TRAIN ONLY and then applied to test; if it was fit on all data before the split, the reported accuracy should be re-measured with a leak-free pipeline."
-}
-```
-
-**Worked needs_external_check (pretraining contamination — hand off, do NOT guess):**
-
-```json
-{
-  "finding_id": "ED002",
-  "skill": "eval-design-forensics",
-  "pattern_id": "HP-EVAL-LEAKAGE",
-  "title": "Benchmark may be contaminated in the evaluated model's pretraining (not decidable here)",
-  "description": "Claim C012 reports a headline score on a widely-published benchmark using a frontier LLM. Whether the model saw this benchmark during pretraining is a black-box question undecidable from the PDF or the repo — NOT an allegation. A domain check would use an exchangeability test (Oren 2023), Min-K% Prob (Shi 2023), Time-Travel (Golchin 2023), or BIG-bench canary strings; this tool does not run them.",
-  "severity": "info",
-  "observability_level_required": 0,
-  "evidence": [
-    {"claim_id": "C012", "span": "achieves 91.2 on the public benchmark",
-     "location": {"file": "main.tex", "section": "experiments"}}
-  ],
-  "verdict_local": "needs_external_check",
-  "requires_external_check": true,
-  "false_positive_risk": "high",
-  "recommended_reviewer_action": "Have a domain expert run a contamination probe (Min-K% / exchangeability / Time-Travel) or confirm the benchmark post-dates the model's training cutoff."
-}
-```
-
-**Worked HP-JUDGE-VALIDITY (conflicted judge, major, L0):**
-
-```json
-{
-  "finding_id": "ED003",
-  "skill": "eval-design-forensics",
-  "pattern_id": "HP-JUDGE-VALIDITY",
-  "title": "Headline win-rate rests on a judge that shares a family with the proposed system",
-  "description": "Claim C021 reports 'our GPT-4-based agent wins 78% of pairwise comparisons, judged by GPT-4'. The judge shares a model family with the proposed system (self-enhancement / self-preference: an evaluator favors its own family's generations), and no human-agreement number is reported. Discrepancy to verify: the 78% is the load-bearing evidence yet the judge is conflicted and unvalidated.",
-  "severity": "major",
-  "observability_level_required": 0,
-  "evidence": [
-    {"claim_id": "C021", "span": "wins 78% of pairwise comparisons, judged by GPT-4",
-     "location": {"file": "main.tex", "section": "experiments"}}
-  ],
-  "verdict_local": "warn",
-  "requires_external_check": false,
-  "false_positive_risk": "medium",
-  "recommended_reviewer_action": "Ask for a human-agreement validation of the judge (correlation/kappa) and a family-disjoint or position-swapped judge; report the win-rate under a judge that does not share a family with the proposed system."
-}
-```
-
-**Worked HP-SELECTIVE-REPORTING (declared-but-unreported datasets, L0):**
-
-```json
-{
-  "finding_id": "ED004",
-  "skill": "eval-design-forensics",
-  "pattern_id": "HP-SELECTIVE-REPORTING",
-  "title": "Two declared evaluation datasets are not reported and not in the appendix",
-  "description": "Claim C008 declares 'we evaluate on five datasets {A,B,C,D,E}', but every results table reports only {A,B,C} and no appendix reports D or E. Discrepancy to verify: ask for the D/E results, or an explicit reason for the omission. (De-dup: this is declared-but-unreported, not best-as-mean (HP-AGG-DRIFT) or a missing expected baseline (HP-MISSING-BASELINE).)",
-  "severity": "major",
-  "observability_level_required": 0,
-  "evidence": [
-    {"claim_id": "C008", "span": "we evaluate on five datasets",
-     "location": {"file": "main.tex", "section": "experiments"}}
-  ],
-  "verdict_local": "warn",
-  "requires_external_check": false,
-  "false_positive_risk": "low",
-  "recommended_reviewer_action": "Ask the authors for the results on datasets D and E (or an explicit justification for omitting them); confirm the headline survives once the declared conditions are all reported."
-}
-```
+Worked findings (stated preprocessing leak, contamination hand-off, conflicted judge, declared-but-unreported datasets) are in `reference/worked-examples.md`; read them when unsure of a finding's expected shape or severity.
 
 ## Step 6 — Emit (one file)
 
@@ -917,21 +489,4 @@ judge/reporting, and any per-track fan-out).
 
 ## Acknowledgements
 
-The taxonomy this skill operationalizes is reframed from the ML-evaluation-methodology
-literature for **third-party** forensics — ledger-anchored findings, observability
-tiers, and reviewer ≠ adjudicator:
-
-- **Kapoor, S. & Narayanan, A. (2023),** "Leakage and the reproducibility crisis in
-  machine-learning-based science," *Patterns* — the eight leakage types / three
-  categories that `HP-EVAL-LEAKAGE` adopts and paraphrases (**priority ack**).
-  Contamination methods are **named only**, never run: Oren et al. (2023) exchangeability
-  test; Shi et al. (2023) Min-K% Prob; Golchin & Surdeanu (2023) Time-Travel; the
-  BIG-bench (Srivastava et al. 2022) canary-string convention.
-- **Zheng et al. (2023),** "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena" —
-  self-enhancement bias and the human-agreement bar behind `HP-JUDGE-VALIDITY`;
-  **Panickssery et al. (2024),** self-preference (evaluators favor their own
-  generations); **Wang et al. (2024),** position bias in LLM evaluators.
-- **Dodge et al. (2019),** "Show Your Work: Improved Reporting of Experimental Results,"
-  and **Pineau et al. (2021),** the ML Reproducibility Checklist (NeurIPS 2019
-  Reproducibility Program report) — the under-reporting norms behind
-  `HP-SELECTIVE-REPORTING`.
+The sources this skill adapts (Kapoor & Narayanan 2023; MT-Bench judge-bias work; Show Your Work / reproducibility checklist) are acknowledged in `reference/rationale.md`.

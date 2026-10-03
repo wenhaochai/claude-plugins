@@ -23,37 +23,8 @@ skill computes **no verdict**.
 
 > 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper or the ledger changes.
 
-## Why this exists
-
-Real reviewers notice surface tells before they read a single number — and they say
-so out loud: *"两张表一模一样"* (two tables are identical), *"图还是大模型生成的"*
-(the figure is LLM-generated), *"就这还没写满9页"* (couldn't even fill 9 pages),
-*"堆砌名词吗"* (just stuffing jargon?), *"本文不是什么什么，而是什么什么…论文应该直接表达
-做了什么"* (stop hedging "this paper is not X but rather Y" — just say what you did),
-*"摘要写的像实验分析,读不到引言"* (the abstract reads like an experiment log; the
-introduction is unreadable). An autoresearch pipeline (or a rushed human) produces
-exactly these artifacts: a table copy-pasted and never updated, an oversized float to
-pad the page limit, a decorative generated illustration in place of a real results
-plot, paragraphs of generic LLM boilerplate, draft text so densely over-hedged that
-every sentence defends against an objection, and an abstract that dumps experiment
-notes instead of telling a background → contribution → evidence story.
-
-These signals are **real** in the sense that reviewers react to them — but they are
-**weak evidence of misconduct**. A concise honest paper has few floats; a careful
-honest author uses LLM assistance for prose; a legitimate teaser figure can look
-"generated". So this skill's contract is narrow and permanent:
-
-- it emits only the five §F surface patterns, all **capped at `minor`**;
-- it defaults every *semantic* finding to `false_positive_risk: high` (the deterministic
-  `HP-DUP-TABLE` / `HP-PIPELINE-ARTIFACT` checks set their own — the latter is low-FP);
-- it **never** says a paper is "AI-generated" or implies fabrication;
-- **silence is the common, correct output** — most papers should produce few or zero
-  surface findings.
-
-It exists to add *context* to the substantive auditors (`consistency-audit`,
-`experiment-forensics`, `baseline-comparison-audit`, `citation-forensics`), not to
-stand alone. If a surface tell sits next to a real numeric contradiction, the
-substantive finding carries the weight; the surface note just says "look closer."
+Why this exists (reviewer-noticed surface tells; real but weak evidence; context for the substantive auditors, never
+standalone): read `reference/rationale.md` when you need the rationale.
 
 ## Core principle
 
@@ -79,20 +50,8 @@ structurally almost never becomes even a `minor` flag. The model **proposes**;
 
 ## How this differs from the other auditors (route correctly)
 
-| Auditor | Question it answers | Level |
-|---------|---------------------|------|
-| **`presentation-signals`** (this) | **Surface tells a reviewer notices first (dup tables, pipeline artifacts, thin/LLM figures, padding) — AUXILIARY, capped at `minor`** | **L0** |
-| `ai-style-impressions` | Pure AI writing-style impressions (AI-flavor, defensive hedging, broken narrative arc, jargon-stuffing, invented codenames) — zero verdict weight (AIS track) | L0 |
-| `consistency-audit` | Does the paper contradict ITSELF / described method = evaluated method? | L0 |
-| `experiment-forensics` | Are the reported numbers what the code actually computes? (fake GT, self-norm, phantom) | L2 |
-| `baseline-comparison-audit` | Are the right baselines present, tuned, and is "SOTA" earned? | L0 stated / L2 verified |
-| `citation-forensics` | Do the cited papers exist and support the claim they are used for? | L0 |
-| `adversarial-case-builder` | Strongest evidence-bound rejection memo (no verdict weight) | any |
-
-The pure AI writing-style impressions — AI-flavor, defensive hedging, broken narrative
-arc, jargon-stuffing, and invented codenames — **moved out of this skill** in v0.5 to
-the zero-verdict-weight **AIS track** owned by `skills/ai-style-impressions`; route any
-AI-writing-style question there, not here.
+Pure AI writing-style impressions (AI-flavor, hedging, narrative arc, jargon, codenames) belong to `ai-style-impressions`
+(zero-weight AIS track), not here. Read `reference/routing.md` for the full auditor table and the when-not-to-use list.
 
 **Stay in lane.** This skill emits **only** the five §F surface (`HP-DUP-TABLE`,
 `HP-PIPELINE-ARTIFACT`, `HP-THIN-FLOAT`, `HP-LLM-FIGURE`, `HP-PAGE-PADDING`)
@@ -136,8 +95,7 @@ TRACE_DIR               = .aris/traces/presentation-signals/<YYYY-MM-DD>_run<NN>
   (visually only if it can render it; otherwise caption text only — see HP-LLM-FIGURE),
   proposes **gross-only** surface signals, and self-reports `false_positive_risk`. It
   is the evidence-extractor, not the judge.
-- **Fresh thread per run.** `codex-reply` is intentionally absent from `allowed-tools`;
-  never carry one run's conclusions into another (the bias guard).
+- Executor/reviewer split and fresh-thread rule: `${CLAUDE_PLUGIN_ROOT}/support/references/reviewer-independence.md` Layer 1.
 - **Detect-only.** No `Edit` in `allowed-tools`; the reviewer sandbox is `read-only`.
   `Write` is used **only** for this skill's own findings / trace artifacts, never the
   audited paper. This is a third-party forensics tool, never a co-author.
@@ -276,88 +234,8 @@ Replace the bracketed placeholders below with the real values from Step 0, send 
 this, and save the **verbatim** reviewer reply to the `PROPOSED` path above (the Step 3
 input) **before** parsing:
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are checking PRESENTATION signals only — the kind of surface tell a reviewer
-    notices at a glance. You are explicitly NOT deciding whether the paper is
-    AI-written, and NOT whether it is fraudulent. You are NOT an AI-text classifier.
-    Your output is auxiliary "look closer" context that a deterministic adjudicator
-    will CAP at severity "minor"; it can never raise a verdict on its own. Default to
-    SILENCE: an empty array [] is the expected, correct output for most papers.
+Send the call verbatim from `reference/reviewer-prompt.md`, filling `cwd`, `PDF_TEXT_FILE`, `PDF_FILE` and `L`.
 
-    INPUTS (in your working directory, read them directly):
-      - claims.json        — the evidence ledger: the authoritative, span-anchored list
-        of every checkable claim {claim_id, type, text_span (VERBATIM source text),
-        location, value?}. This is the ONLY thing you may anchor a finding to.
-      - <PDF_TEXT_FILE from Step 0>   — extracted PDF text (for prose / padding / jargon).
-      - <PDF_FILE from Step 0, if any> — the rendered PDF (for figure inspection).
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-
-    HARD RULES (a finding that breaks any of these is worthless):
-    1. GROSS ONLY. Flag only BLATANT cases. If you are unsure, do NOT flag. This is
-       especially binding for HP-LLM-FIGURE and HP-PAGE-PADDING (the most FP-prone).
-    2. ANCHOR. Every finding above severity "info" MUST carry >=1 evidence entry
-       {claim_id, span}, where claim_id EXISTS in claims.json and span is a VERBATIM
-       substring of THAT claim's text_span (no paraphrase, no added words). If you
-       cannot quote a verbatim ledger span for a signal, emit it at severity "info"
-       (a note) or drop it — it can NEVER be a flag. The ledger holds numbers, scope,
-       captions, citations, and table cells; generic prose is usually NOT in it, so
-       any surface impression that cannot quote such a claim will correctly remain "info".
-    3. SEVERITY + FP. Surface flags are capped at "minor". For any ANCHORED finding
-       (rule 2 satisfied) set severity = "minor"; an UNANCHORED signal stays "info"
-       (rule 2) — never promote it to "minor". NEVER use "major"/"critical" (the
-       adjudicator caps surface signals at minor regardless; do not argue past it). Set
-       false_positive_risk = "high" and observability_level_required = 0 for EVERY
-       finding (all L0-decidable).
-    4. NO ACCUSATION, NO AUTHORSHIP VERDICT. description and recommended_reviewer_action
-       say what a human should glance at / ask. NEVER write "AI-generated", "fabricated",
-       "reject", or imply misconduct. A surface tell is a prompt to look, nothing more.
-    5. STAY IN LANE. pattern_id MUST be exactly one of the three below. If you notice a
-       SUBSTANTIVE problem (numbers contradict, a citation looks fake, a baseline is
-       missing), do NOT encode it here — that belongs to consistency-audit /
-       citation-forensics / baseline-comparison-audit. Ignore it.
-
-    CHECKLIST (the THREE semantic surface patterns; one finding per concrete, blatant case):
-      HP-THIN-FLOAT   — a full-length paper claiming broad/comprehensive empirical
-                        results while containing almost no figures/tables. Anchor to the
-                        SCOPE claim (e.g. "comprehensive evaluation across diverse
-                        benchmarks"); put the actual float count in the description.
-                        FP (high): legitimately theoretical or short-format work.
-      HP-LLM-FIGURE   — a "figure" that is a generated/decorative illustration rather
-                        than a real plot/diagram of results. Anchor to the figure's
-                        CAPTION claim. If you cannot VISUALLY inspect the PDF, judge only
-                        from the caption text (e.g. it literally describes a generated
-                        illustration) and otherwise leave it at "info" /
-                        needs_external_check — do NOT guess from a filename.
-                        FP (high): legitimate conceptual/teaser figures; good diagrams.
-      HP-PAGE-PADDING — oversized floats, repeated content, or vacuous filler used to
-                        reach (or conspicuously miss) the page limit. Anchor to a ledger
-                        claim that the padding rests on (a caption / scope / table cell).
-                        FP (high): legitimately concise work; venue length norms.
-
-    OUTPUT: a single JSON array, and NOTHING ELSE (no prose, no code fence). Each
-    element conforms to schemas/finding.schema.json:
-      {
-        "finding_id": "F001",
-        "skill": "presentation-signals",
-        "pattern_id": "HP-THIN-FLOAT | HP-LLM-FIGURE | HP-PAGE-PADDING",
-        "title": "short, neutral",
-        "description": "the surface observation, plus the explicit note that it is a weak signal to look closer (not evidence of AI-authorship or fraud)",
-        "severity": "minor",
-        "observability_level_required": 0,
-        "evidence": [{"claim_id": "C0xx", "span": "verbatim substring of that claim",
-                      "location": {"file": "...", "section": "..."}}],
-        "verdict_local": "warn",
-        "false_positive_risk": "high",
-        "recommended_reviewer_action": "what to GLANCE AT or ASK — never 'reject', never 'AI-generated'"
-      }
-    If nothing is blatant, return []. That is the expected output for most papers.
-```
 
 **Failure handling.**
 - *MCP stall / hang* (common in long sessions): re-invoke the **identical** prompt as a
@@ -461,46 +339,9 @@ allow-list (drop everything else), enum coercion, and cross-model provenance. It
 the same `SURFACE_ONLY_SKILLS` + `SURFACE_PATTERNS` cap (double-belt: by skill AND by
 pattern_id, so a surface signal cannot bypass the cap even if mis-tagged).
 
-**Worked finding — `HP-THIN-FLOAT` (anchored → survives as `minor`):**
+Read `reference/worked-examples.md` for worked `HP-THIN-FLOAT` / `HP-PAGE-PADDING` findings and an `HP-LLM-FIGURE`
+non-finding held at `info`.
 
-```json
-{
-  "finding_id": "F001",
-  "skill": "presentation-signals",
-  "pattern_id": "HP-THIN-FLOAT",
-  "title": "Broad empirical scope claimed with very few floats",
-  "description": "The abstract claims a 'comprehensive empirical evaluation across diverse benchmarks', but the paper contains only 2 tables and 1 figure (ledger: 2 table sections, 1 caption claim). This is a surface signal only — a concise paper can be honest; it is NOT evidence the results are weak or fabricated. Route the substantive scope question to baseline-comparison-audit / consistency-audit.",
-  "severity": "minor",
-  "observability_level_required": 0,
-  "evidence": [{"claim_id": "C003",
-                "span": "comprehensive empirical evaluation across diverse benchmarks",
-                "location": {"file": "paper.txt", "section": "abstract"}}],
-  "verdict_local": "warn",
-  "false_positive_risk": "high",
-  "recommended_reviewer_action": "Glance at whether the float count matches the breadth of the empirical claim; if it feels thin, route the substantive scope check to baseline-comparison-audit / consistency-audit."
-}
-```
-
-**Worked non-finding — `HP-LLM-FIGURE` (unanchored → held at `info`, the design working):**
-the reviewer's impression is that a teaser figure "looks generated", but no caption
-claim in the ledger covers that figure (the extractor keeps numbers / scope / captions /
-citations, and here the figure carries no extracted caption claim — the PDF could not be
-visually inspected). With no verbatim ledger span to anchor to, the validator (and the
-adjudicator) hold it at `info` — a note, never a flag. A surface impression that lands
-on no extracted claim structurally almost never becomes even a `minor`
-flag. **We are not an AI-text classifier.**
-
-**Worked finding — `HP-PAGE-PADDING` (anchored → survives as `minor`):** the reviewer
-notes an oversized float plus a repeated block that conspicuously pad toward the page
-limit. To rise above `info` the finding must anchor to a ledger claim the padding rests
-on (a caption / scope / table-cell span) — an unanchored "this section feels padded"
-impression stays `info`. Even with a verbatim anchored span it survives only as
-`minor`, `false_positive_risk: high` — context to look closer, never a claim about how
-(or by what) the text was produced. The same anchor-or-`info` gate applies to
-**`HP-THIN-FLOAT`** and **`HP-LLM-FIGURE`**: anchor to the real scope / caption span and
-name the concrete surface fact, or stay `info`. Neither is an authorship verdict — for
-AI writing-style impressions use the AIS track (`skills/ai-style-impressions`), and for
-authorship detection a dedicated tool.
 
 **Failure handling.** A `KeyError` / `JSONDecodeError` means the reviewer output was
 malformed → re-run Step 2 once with the strict-JSON reminder. If it is **still**
@@ -614,20 +455,8 @@ only from `tools/adjudicate_findings.py` (Step 6 / the orchestrator).
 
 ## When NOT to use this skill
 
-- **No `claims.json` yet** → run `/evidence-ledger` first; this skill never invents
-  structure from the raw PDF.
-- **You want an AI-text / "looks machine-written" verdict** → out of scope by design.
-  This skill is auxiliary and capped at `minor`; for authorship detection use a
-  dedicated tool (Pangram / GPTZero / Binoculars).
-- **You need numeric self-contradiction / method drift** → `/consistency-audit`.
-- **You need citation existence / wrong-context** → `/citation-forensics`.
-- **You need "SOTA / first" or baseline integrity** → `/baseline-comparison-audit`.
-- **You need code/result-level fraud** (fake GT, self-normalization, phantom numbers)
-  → `/experiment-forensics` at **L2**.
-- **As the basis for a reject / accusation** → never. The strongest thing a surface
-  signal can do is say "combine with the substantive findings and look closer."
-- **On a timer** → never `/loop` / `/schedule` / `CronCreate` this skill; re-fire only
-  when the paper or ledger changes (see the fence at the top).
+Read `reference/routing.md` (When NOT to use this skill) before using this as the basis for any verdict or accusation.
+
 
 ## Review tracing
 

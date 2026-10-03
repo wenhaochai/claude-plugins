@@ -19,60 +19,11 @@ reviewer / area chair an evidence-first Integrity Forensics Report.
 > paper is fine now." Re-run the sweep when the inputs change; that is the only honest
 > trigger.
 
-> 🛡️ **The dual of ARIS.** ARIS ships an internal audit stack so its *own* autoresearch
-> output stays honest; Anti-Autoresearch is that same audit DNA **pointed outward** at a
-> third party's submission. This is decision **support** for a human — it surfaces
-> span-anchored discrepancies to investigate. It is **not** an AI-text detector and it
-> does **not** judge misconduct (`DESIGN.md` §1; `references/`).
-
-## Why this exists
-
-A machine-driven research pipeline (or rushed human) writes the abstract, the tables,
-the method section, the bibliography, and the appendix in separate passes and never
-reconciles them. The result is a paper that disagrees with itself, cites papers that do
-not exist or argue the opposite, claims SOTA while omitting the obvious baseline, or
-reports numbers the code never computed. Six LLMs each re-reading the PDF would
-hallucinate six different structures and invite the obvious dismissal — *"an LLM
-grading another LLM's paper is just slop."*
-
-This orchestrator answers that structurally. **One deterministic pass** turns the paper
-into a hashed, span-anchored evidence ledger; **six auditors** read only that ledger
-and *propose* findings; a **deterministic adjudicator** *decides* the verdict by fixed
-rules with no model in the loop; and **observability levels** make it impossible to
-shout "fraud" from a PDF. Same artifacts → same ledger → same verdict.
+Read `reference/rationale.md` for background: why this orchestrator exists and how it is the outward-facing dual of ARIS.
 
 ## Pipeline role (what this run does, and never does)
 
-```
-[0] ingest          arxiv-id | pdf | dir  →  working dir (+ pdftotext text for L0)
-        │
-        ▼
-[1] /evidence-ledger   tools/build_manifest.py + tools/build_claim_ledger.py
-        │              → artifact_manifest.json (derives observability level L)
-        │              → claims.json   (span-anchored, hashed; the ONLY structure auditors read)
-        ▼
-[2] fan out auditors (each reads the ledger, emits <skill>.findings.json):
-        consistency-audit          (always · flagship · deterministic arithmetic + semantic)
-        citation-forensics         (if ≥1 citation claim)
-        baseline-comparison-audit  (if ≥1 comparison / SOTA scope claim)
-        experiment-forensics       (always · L0/L1 = info "could-not-verify" · L2 = full code audit)
-        presentation-signals       (always · AUXILIARY · capped at minor)
-        ai-style-impressions       (always · AIS track · NOT integrity · zero verdict weight)
-        proof-derivation-forensics (if ≥1 theorem/proof/derivation claim · verdict-bearing · dim=proof · L1 source, CAN reach HARD_FLAGS; L0 PDF-only → info)
-        eval-design-forensics      (if ≥1 comparison/eval claim · family H · dim=evaluation · L0/L1 stated-tells: leakage / judge-validity / selective-reporting)
-        │
-        ▼
-[3] advisory memos (each reads the ledger + merged findings · NO verdict weight):
-        /adversarial-case-builder      → adversarial-case-builder.memo.md       (strongest evidence-bound objection)
-        /novelty-duplication-advisory  → novelty-duplication-advisory.memo.md   (if ≥1 contribution claim · MEMO-ONLY · prior-work overlap · capped at info)
-        │
-        ▼
-[4] tools/adjudicate_findings.py  --ledger REQUIRED  → report.json + REPORT.md
-        │   gates (in order): ANCHOR → OBSERVABILITY → FP-RISK → MEMO → SURFACE
-        │   overall_verdict ∈ {CLEAN_GIVEN_EVIDENCE, SOFT_FLAGS, HARD_FLAGS}  (rules, no model)
-        ▼
-[5] present REPORT.md to the human (verdict + level first; state what could NOT be checked)
-```
+The one-page stage diagram (ingest → ledger → auditors → memos → adjudicate → present) is in `reference/pipeline-diagram.md`.
 
 - **Auditors propose; the adjudicator decides.** No auditor (and not this orchestrator)
   ever computes `overall_verdict`; only `tools/adjudicate_findings.py` does, by fixed
@@ -132,8 +83,9 @@ verdict) is byte-deterministic given those files + the ledger.**
 - **Inline (fallback — only shell + Read/Write + codex MCP):** run the deterministic
   tools yourself with the exact commands below; for each cross-model dimension open a
   **fresh** `mcp__codex__codex` thread, send the **verbatim** reviewer-prompt block —
-  the fenced `prompt:` / checklist inside that sub-skill's `## Step … — Cross-model …`
-  section in `skills/<dim>/SKILL.md` (Read it — the single source of truth; fill its
+  the fenced `prompt:` / checklist in `skills/<dim>/reference/reviewer-prompt*.md`
+  where that file exists, else in the sub-skill's `## Step … — Cross-model …` section of
+  `skills/<dim>/SKILL.md` (Read it — the single source of truth; fill its
   `[...]` inputs from `claims.json`), save the raw reply, then run the **shared anchor gate**
   (Step 2) to produce the validated `<dim>.findings.json`.
 
@@ -185,38 +137,7 @@ There is no run-state file and no "accepted vs done" gate, because **Step 4 reco
 the verdict deterministically** from whatever findings are present every time. Probe
 completeness *and staleness* before redoing work:
 
-```bash
-PAPER_DIR="<from Step 0>"
-python3 - "$PAPER_DIR" <<'PY'
-import json, os, glob, sys
-D = sys.argv[1]
-def is_array(p):
-    try: return isinstance(json.load(open(p, encoding="utf-8")), list)
-    except Exception: return False
-def is_ledger(p):
-    try:
-        d = json.load(open(p, encoding="utf-8")); return isinstance(d, dict) and "claims" in d
-    except Exception: return False
-def newest_source(d):
-    s = []
-    for ext in ("*.tex", "*.txt", "*.bib"):
-        s += glob.glob(os.path.join(d, ext)) + glob.glob(os.path.join(d, "**", ext), recursive=True)
-    return max((os.path.getmtime(p) for p in s), default=0.0)
-led = os.path.join(D, "claims.json"); have = is_ledger(led)
-stale = have and os.path.getmtime(led) < newest_source(D)
-print(f"STEP1 ledger      : {'present' if have else 'MISSING'}{'  ⚠ STALE → rebuild (sources changed)' if stale else ''}")
-for f in ("consistency-audit.deterministic", "consistency-audit", "citation-forensics",
-          "baseline-comparison-audit", "experiment-forensics",
-          "presentation-signals.deterministic", "presentation-signals",
-          "proof-derivation-forensics", "eval-design-forensics",
-          "ai-style-impressions.deterministic", "ai-style-impressions"):
-    p = os.path.join(D, f + ".findings.json")
-    print(f"STEP2 {f:<32}: {'ok' if (os.path.isfile(p) and is_array(p)) else 'todo'}")
-print(f"STEP3 adversarial memo            : {'present' if os.path.isfile(os.path.join(D,'adversarial-case-builder.memo.md')) else 'todo'}")
-print(f"STEP3 novelty advisory memo       : {'present' if os.path.isfile(os.path.join(D,'novelty-duplication-advisory.memo.md')) else 'todo'}")
-print(f"STEP4 report.json : {'present' if os.path.isfile(os.path.join(D,'report.json')) else 'todo'}")
-PY
-```
+Run the probe script in `reference/step-scripts.md` (section "Re-entrancy probe"); per step it prints present/ok, `todo`, or a ⚠ STALE ledger.
 
 Rule: a **stale ledger forces a full rebuild** (Step 1 → re-fan Step 2 → re-adjudicate)
 — stale findings anchored to an old ledger are worse than none. If the ledger is fresh,
@@ -233,43 +154,7 @@ directory** (`PAPER_DIR`) that contains the best source the level allows. Prefer
 (stable `file:line` spans → L1) over PDF text (best-effort → L0); leave any `code/` +
 `results/` in place so the manifest can derive L2.
 
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"
-test -f "$ROOT/tools/adjudicate_findings.py" || { echo "FATAL: not inside the Anti-Autoresearch checkout (point ROOT at it)."; exit 1; }
-ARG="$ARGUMENTS"
-
-if [ -d "$ARG" ]; then                       # ---- DIRECTORY ----
-  PAPER_DIR="$(cd "$ARG" && pwd)"
-  # if only a PDF is present, extract text so the ledger has an L0 source
-  if ! ls "$PAPER_DIR"/*.tex >/dev/null 2>&1 && ! ls "$PAPER_DIR"/*.txt >/dev/null 2>&1; then
-    P=$(ls "$PAPER_DIR"/*.pdf 2>/dev/null | head -1)
-    [ -n "$P" ] && pdftotext -layout "$P" "$PAPER_DIR/paper.txt"
-  fi
-
-elif [ -f "$ARG" ] && case "$ARG" in *.pdf) true;; *) false;; esac; then   # ---- PDF FILE ----
-  PAPER_DIR="$(cd "$(dirname "$ARG")" && pwd)"
-  pdftotext -layout "$ARG" "$PAPER_DIR/paper.txt" \
-    || echo "WARN: pdftotext failed/missing — try: mutool draw -F txt, or pip install pdfminer.six (pdf2txt.py)."
-
-else                                          # ---- ARXIV ID (e.g. 2401.01234) ----
-  ID=$(printf '%s' "$ARG" | grep -oE '[0-9]{4}\.[0-9]{4,5}(v[0-9]+)?' | head -1)
-  [ -n "$ID" ] || { echo "FATAL: '$ARG' is not a dir, a .pdf, or an arXiv id."; exit 1; }
-  PAPER_DIR="$(pwd)/aar-$ID"; mkdir -p "$PAPER_DIR"
-  # LaTeX source first (best spans → L1). e-print may be a tarball OR a single gzipped .tex.
-  if curl -fsSL "https://arxiv.org/e-print/$ID" -o "$PAPER_DIR/src.tgz"; then
-    tar -xzf "$PAPER_DIR/src.tgz" -C "$PAPER_DIR" 2>/dev/null \
-      || gunzip -c "$PAPER_DIR/src.tgz" > "$PAPER_DIR/main.tex" 2>/dev/null
-  fi
-  if ! ls "$PAPER_DIR"/*.tex >/dev/null 2>&1; then     # fallback: PDF → text (L0)
-    curl -fsSL "https://arxiv.org/pdf/$ID.pdf" -o "$PAPER_DIR/paper.pdf" \
-      && pdftotext -layout "$PAPER_DIR/paper.pdf" "$PAPER_DIR/paper.txt"
-  fi
-fi
-
-echo "PAPER_DIR = $PAPER_DIR"
-ls -1 "$PAPER_DIR"/*.tex "$PAPER_DIR"/*.bib "$PAPER_DIR"/*.txt "$PAPER_DIR"/*.pdf 2>/dev/null
-ls -d  "$PAPER_DIR"/code "$PAPER_DIR"/src "$PAPER_DIR"/results "$PAPER_DIR"/outputs 2>/dev/null   # L2 candidates
-```
+Run the ingest script in `reference/step-scripts.md` (section "Step 0 — ingest") with `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" ARGUMENTS="$ARGUMENTS"` exported first (the reference file is not substituted); it sets and prints `PAPER_DIR` and lists the sources and L2 candidates it found.
 
 **Validation gate.** `PAPER_DIR` must now contain **anchorable text** — at least one
 `*.tex` or `*.txt`. A bare `*.pdf` is **not** enough: the ledger builders accept only
@@ -304,19 +189,7 @@ span-anchored semantic-enrichment pass. Everything downstream reads these two fi
 Then read **L** and **PAPER_ID** back from the ledger — it is the source of truth for
 every later block (re-derive, never persist):
 
-```bash
-PAPER_DIR="<from Step 0>"
-test -f "$PAPER_DIR/claims.json" || { echo "FATAL: /evidence-ledger did not produce claims.json — re-run Step 1."; exit 1; }
-L=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["observability_level"])' "$PAPER_DIR/claims.json")
-PAPER_ID=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["paper_id"])' "$PAPER_DIR/claims.json")
-python3 - "$PAPER_DIR/claims.json" "$PAPER_DIR/artifact_manifest.json" <<'PY'
-import json, sys, collections
-L = json.load(open(sys.argv[1], encoding="utf-8")); M = json.load(open(sys.argv[2], encoding="utf-8"))
-assert L["observability_level"] == M["observability_level"], "ledger level != manifest level"
-t = collections.Counter(c["type"] for c in L["claims"])
-print(f"PAPER_ID={L['paper_id']}  L={L['observability_level']}  claims={len(L['claims'])}  types={dict(t)}")
-PY
-```
+Run the read-back script in `reference/step-scripts.md` (section "Step 1 — read-back"); it prints `PAPER_ID`, `L`, the claim count and claim-type histogram, and asserts ledger level = manifest level.
 
 **Validation gate.**
 - `claims.json` exists and `claims` is non-empty. **Zero claims on a paper that visibly
@@ -329,20 +202,7 @@ PY
 - `— human checkpoint: true` → present `L`, the claim-type histogram, and the source
   list, and pause for confirmation before fanning out.
 
-**Failure handling.** If `/evidence-ledger` is unavailable, build the ledger directly
-with the real tools (exact flags — confirm via `--help`):
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"; PAPER_DIR="<from Step 0>"
-SLUG=$(basename "$PAPER_DIR" | tr -cs 'A-Za-z0-9.' '-')
-TXT=(); [ -f "$PAPER_DIR/paper.txt" ] && TXT=(--pdf-text "$PAPER_DIR/paper.txt")
-python3 "$ROOT/tools/build_manifest.py" --paper-id "$SLUG" --dir "$PAPER_DIR" "${TXT[@]}" --out "$PAPER_DIR/artifact_manifest.json"
-L=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["observability_level"])' "$PAPER_DIR/artifact_manifest.json")
-if ls "$PAPER_DIR"/*.tex >/dev/null 2>&1; then
-  python3 "$ROOT/tools/build_claim_ledger.py" --paper-id "$SLUG" --latex "$PAPER_DIR"/*.tex --observability-level "$L" --out "$PAPER_DIR/claims.json"
-else
-  python3 "$ROOT/tools/build_claim_ledger.py" --paper-id "$SLUG" --pdf-text "$PAPER_DIR/paper.txt" --observability-level "$L" --out "$PAPER_DIR/claims.json"
-fi
-```
+**Failure handling.** If `/evidence-ledger` is unavailable, build the ledger directly with the commands in `reference/fallbacks.md` (section "Step 1 without /evidence-ledger"), with `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}"` exported first.
 
 ## Step 2 — Fan out the six auditors (breadth; the verdict is NOT decided here)
 
@@ -353,47 +213,7 @@ own spans, and writes `<skill>.findings.json` (the deterministic auditors also w
 `<skill>.deterministic.findings.json`). The orchestrator only *sequences* these calls and
 enforces the Reviewer Calling Convention above — it authors no finding.
 
-```bash
-PAPER_DIR="<from Step 0>"
-python3 - "$PAPER_DIR/claims.json" <<'PY'
-import json, re, sys, os
-d = json.load(open(sys.argv[1], encoding="utf-8")); cl = d.get("claims", [])
-paper_dir = os.path.dirname(os.path.abspath(sys.argv[1])) or "."
-CMP = re.compile(r"state[- ]of[- ]the[- ]art|\bSOTA\b|outperform\w*|\bbest\b|surpass\w*|"
-                 r"beats?|superior|first to|compared? (?:to|with)|baseline|prior (?:work|art)", re.I)
-has_cite = any(c.get("type") == "citation" for c in cl)
-has_cmp  = any(c.get("type") in ("scope", "comparison", "baseline", "caption") and CMP.search(c.get("text_span","")) for c in cl)
-# proofs: scan the SOURCE for theorem/proof/derivation markers (mirrors /proof-derivation-forensics's
-# own HAS_PROOFS gate). The skill self-guards (writes [] if it finds none), so this gate is a
-# budget hint, not a correctness gate — running proof-derivation-forensics unconditionally is safe.
-TH  = re.compile(r"\\begin\{(theorem|lemma|proposition|corollary|claim|conjecture|"
-                 r"proof|definition|assumption)\*?\}", re.I)
-EQ  = re.compile(r"\\begin\{(equation|align|gather|multline|eqnarray)\*?\}|\\\[", re.I)
-TXT = re.compile(r"\b(Theorem|Lemma|Proposition|Corollary|Proof|Q\.?E\.?D\.?)\b")
-ph = 0
-for s in d.get("source_files", []):
-    sp = s.get("path", ""); kind = s.get("kind", "")
-    cand = sp if os.path.isabs(sp) else os.path.join(paper_dir, sp)
-    if not os.path.isfile(cand): cand = sp
-    try: t = open(cand, encoding="utf-8", errors="replace").read()
-    except OSError: continue
-    ph += (len(TH.findall(t)) + len(EQ.findall(t))) if kind == "latex" else len(TXT.findall(t))
-if ph == 0:                                            # L0 fallback: theorem/proof words inside ledger spans
-    ph = sum(1 for c in cl if TXT.search(c.get("text_span", "") or ""))
-has_proof = ph > 0
-# contribution claims (Step 3 novelty advisory anchor universe): scope/method/comparison OR abstract/intro
-CONTRIB_SECT = {"abstract", "intro", "introduction"}
-has_contrib = any((c.get("type") in ("scope", "method", "comparison")
-                   or ((c.get("location") or {}).get("section", "") or "").lower() in CONTRIB_SECT)
-                  and c.get("claim_id") and c.get("text_span") for c in cl)
-print("RUN (always): /consistency-audit  /experiment-forensics  /presentation-signals  /ai-style-impressions")
-print(f"RUN /citation-forensics            : {has_cite}   (≥1 citation claim)")
-print(f"RUN /baseline-comparison-audit     : {has_cmp}    (≥1 comparison/SOTA scope claim)")
-print(f"RUN /proof-derivation-forensics    : {has_proof}   (≥1 theorem/proof/derivation marker; self-guards → [] if none)")
-print(f"RUN /eval-design-forensics         : {has_cmp}    (≥1 comparison/eval claim · leakage / judge-validity / selective-reporting; self-guards → [] if no eval protocol)")
-print(f"RUN /novelty-duplication-advisory  : {has_contrib}   (Step 3 memo · ≥1 contribution claim · MEMO-ONLY)")
-PY
-```
+Run the decision script in `reference/step-scripts.md` (section "Step 2 — auditor decision"); it prints which optional auditors and the novelty memo apply (`has_cite`, `has_cmp`, `has_proof`, `has_contrib`).
 
 Run the applicable skills (pass `PAPER_DIR` so each locates the ledger). **Keep the
 reviewer calls serial.** Each row's `Writes` column is the exact filename the Step-4 glob
@@ -441,106 +261,13 @@ Notes the orchestrator must honor:
   presentation, `EF###` experiment, `F###` other semantic. Ids may repeat across
   semantic files; that is cosmetic — the report keys on skill + file, not id.)
 
-**Inline mode only — the shared anchor gate.** When delegation is unavailable, run each
-applicable dimension's codex call yourself (envelope + verbatim sub-skill prompt above;
-save the raw reply to `$PAPER_DIR/.aris/<dim>.response.md`), then convert that raw reply
-into a validated `<dim>.findings.json` with this gate. It enforces invariant #3 exactly
-as `tools/adjudicate_findings.py` re-binds it (`span in claim`, never `claim in span`).
-`SURFACE=1` only for presentation-signals:
-
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"; PAPER_DIR="<from Step 0>"
-LEDGER="$PAPER_DIR/claims.json"; SKILL="<dimension>"; SURFACE="<0 or 1>"
-mkdir -p "$PAPER_DIR/.aris"   # the fresh-thread raw reply is saved here before this gate runs
-RAW="$PAPER_DIR/.aris/$SKILL.response.md"; OUT="$PAPER_DIR/$SKILL.findings.json"
-python3 - "$LEDGER" "$RAW" "$OUT" "$SKILL" "$SURFACE" <<'PY'
-import json, re, sys
-ledger_p, raw_p, out_p, skill, surface = sys.argv[1:6]
-surface = surface == "1"
-nw = lambda s: " ".join((s or "").split())
-SEV={"critical","major","minor","info"}; VL={"fail","warn","clean","needs_external_check"}
-FPR={"low","medium","high"}; ABOVE={"critical","major","minor"}
-claims = {c["claim_id"]: c for c in json.load(open(ledger_p, encoding="utf-8")).get("claims", []) if c.get("claim_id")}
-raw = open(raw_p, encoding="utf-8").read(); m = re.search(r"\[.*\]", raw, re.S)
-prop = json.loads(m.group(0) if m else raw)
-if isinstance(prop, dict): prop = prop.get("findings", [])
-kept = []; n = 0; demoted = 0; capped = 0
-for f in prop:
-    if not isinstance(f, dict): continue
-    n += 1; f["finding_id"] = f"F{n:03d}"; f["skill"] = skill
-    if f.get("severity") not in SEV: f["severity"] = "info"
-    if f.get("verdict_local") not in VL: f["verdict_local"] = "warn"
-    if f.get("false_positive_risk") not in FPR: f["false_positive_risk"] = "high" if surface else "medium"
-    if f["verdict_local"] == "needs_external_check": f["requires_external_check"] = True
-    if surface:                                   # surface signals: forced high-FP, capped at minor, L0-decidable
-        f["false_positive_risk"] = "high"; f["observability_level_required"] = 0
-        if f["severity"] in ("critical", "major"): f["severity"] = "minor"; capped += 1
-    anchored = []
-    for ev in (f.get("evidence") or []):
-        cid = ev.get("claim_id"); span = nw(ev.get("span", "")); c = claims.get(cid)
-        if c and span and span in nw(c.get("text_span", "")):   # span IN claim, NOT claim IN span
-            ev.setdefault("location", c.get("location", {}))
-            ev.setdefault("artifact_hash", c.get("evidence_anchor", ""))
-            anchored.append(ev)
-    f["evidence"] = anchored
-    if f["severity"] in ABOVE and not anchored: f["severity"] = "info"; demoted += 1
-    # observability_level_required is passed through verbatim — a missing/invalid one is
-    # left as-is so the adjudicator's OBSERVABILITY gate fail-closes it to info.
-    f["reviewer"] = {"model": "gpt-5.5", "reasoning": "xhigh", "deterministic": False}
-    kept.append(f)
-json.dump(kept, open(out_p, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-print(f"{skill}: validated {len(kept)} ({demoted} ->info unanchored, {capped} surface-capped) -> {out_p}")
-PY
-```
-
-For dimension-specific extras (citation must anchor to a `type:"citation"` claim;
-baseline pattern-ownership + cross-row delta dedup; presentation surface allow-list),
-prefer the sub-skill's own `Validate + anchor` step — it is a strict superset of this
-gate. The deterministic passes have **no** LLM step — run their tools directly:
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"; PAPER_DIR="<from Step 0>"
-python3 "$ROOT/tools/check_numeric_consistency.py" --ledger "$PAPER_DIR/claims.json" \
-    --out "$PAPER_DIR/consistency-audit.deterministic.findings.json"
-python3 "$ROOT/tools/check_presentation.py" --ledger "$PAPER_DIR/claims.json" \
-    --out "$PAPER_DIR/presentation-signals.deterministic.findings.json"
-```
+**Inline mode only.** When delegation is unavailable, turn each raw reviewer reply into a validated `<dim>.findings.json` with the shared anchor gate, and run the deterministic passes directly; both are in `reference/inline-mode.md`. Export `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}"` first.
 
 **Validation gate — files exist + parse, and every above-info finding is anchored.** This
 independently re-checks invariant #3 (it mirrors the adjudicator; it is report-only here —
 the adjudicator is the *binding* gate and fail-closes anything unanchored to `info`):
 
-```bash
-PAPER_DIR="<from Step 0>"
-python3 - "$PAPER_DIR" <<'PY'
-import json, glob, os, sys
-D = sys.argv[1]
-claims = {c["claim_id"]: " ".join((c.get("text_span") or "").split())
-          for c in json.load(open(f"{D}/claims.json", encoding="utf-8"))["claims"] if c.get("claim_id")}
-nw = lambda s: " ".join((s or "").split()); ABOVE = {"critical", "major", "minor"}
-mandatory = ["consistency-audit.deterministic", "consistency-audit", "experiment-forensics",
-             "presentation-signals.deterministic", "presentation-signals",
-             "ai-style-impressions.deterministic", "ai-style-impressions"]
-missing = []
-for f in mandatory:
-    p = f"{D}/{f}.findings.json"; ok = os.path.isfile(p)
-    if ok:
-        try: ok = isinstance(json.load(open(p, encoding="utf-8")), list)
-        except Exception: ok = False
-    if not ok: missing.append(f)
-total_bad = 0
-for p in sorted(glob.glob(f"{D}/*.findings.json")):
-    if p.endswith(".proposed.findings.json"): continue   # defensive: never adjudicate a raw/intermediate file
-    try: arr = json.load(open(p, encoding="utf-8"))
-    except Exception: print(f"BAD JSON  {os.path.basename(p)}"); continue
-    bad = sum(1 for f in arr if f.get("severity") in ABOVE and not any(
-        ev.get("claim_id") in claims and nw(ev.get("span")) and nw(ev["span"]) in claims[ev["claim_id"]]
-        for ev in (f.get("evidence") or [])))
-    total_bad += bad
-    print(f"{os.path.basename(p):<46} findings={len(arr):<3} above-info-unanchored={bad}")
-if missing: print("MISSING/BAD mandatory:", ", ".join(missing), "-> re-run those auditors")
-print(f"TOTAL unanchored above-info (adjudicator will demote to info): {total_bad}")
-PY
-```
+Run the anchor-sweep script in `reference/step-scripts.md` (section "Step 2 — anchor sweep").
 
 **Failure handling.** A *missing* mandatory file → re-invoke that skill. A codex *stall*
 inside a sub-skill → it re-invokes the identical prompt in a fresh thread (never
@@ -633,48 +360,11 @@ python3 "$ROOT/tools/adjudicate_findings.py" \
 # prints e.g.: verdict=SOFT_FLAGS crit=0 maj=0 min=1 -> .../report.json, .../REPORT.md
 ```
 
-- **`--observability-level "$L"`** is the run level: it auto-demotes any finding whose
-  `observability_level_required` exceeds `L` (e.g. an L2 code-fraud pattern on an L0 run
-  → `info`, counted under `downgraded_for_observability`).
-- The adjudicator **auto-writes level-derived limitations** at L0/L1 (and an anchoring
-  note if `--ledger` anchoring ever fails); Step 4 **also always passes an explicit
-  `--limitation`** (above), so the report's `limitations` is never empty on this path —
-  honesty is part of the contract. Each extra `--limitation` (repeatable) is added
-  alongside the auto-written ones. For a byte-reproducible eval run add
-  `--generated-at "<fixed ISO8601>"`; omit it normally (a harmless `utcnow`
-  DeprecationWarning may print to stderr; exit 0).
-
-It applies, in order (each gate fail-closed and logged per finding): **ANCHOR**
-(above-info without a verbatim ledger span → `info`; counted under `unanchored_demoted`) →
-**OBSERVABILITY** (`observability_level_required` missing/invalid or > run `L` → `info`;
-counted under `downgraded_for_observability`) → **FP-RISK** (`high` caps at `minor`,
-`medium` caps at `major`) → **MEMO** (`adversarial-case-builder` + `novelty-duplication-advisory` → `info`) → **SURFACE**
-(`presentation-signals` skill OR a `SURFACE_PATTERNS` `pattern_id` → `minor`). Then, over
-the **surviving** severities:
-
-```
-any surviving critical          → HARD_FLAGS
-else any surviving major/minor  → SOFT_FLAGS
-else                            → CLEAN_GIVEN_EVIDENCE   (= "nothing checkable at L is broken", NOT "honest")
-```
+Read `reference/adjudicator-gates.md` for what `--observability-level` / `--limitation` do, the gate order (ANCHOR → OBSERVABILITY → FP-RISK → MEMO → SURFACE) and the verdict rule; read it when interpreting counts or a demotion.
 
 **Validation gate.** Confirm the report is well-formed:
 
-```bash
-PAPER_DIR="<from Step 0>"
-python3 - "$PAPER_DIR/report.json" <<'PY'
-import json, sys
-r = json.load(open(sys.argv[1], encoding="utf-8"))
-assert r["overall_verdict"] in {"CLEAN_GIVEN_EVIDENCE", "SOFT_FLAGS", "HARD_FLAGS"}, r["overall_verdict"]
-assert r["adjudicator"] == "deterministic-rules-v0" and r["human_review_required"] is True
-assert r["anchoring_verified"] is True, "ledger anchoring did not run — --ledger missing?"
-assert r["limitations"], "limitations must always be populated (the honesty contract)"
-c = r["counts"]
-print(f"verdict={r['overall_verdict']}  L={r['observability_level']}  taxonomy=v{r['taxonomy_version']}")
-print(f"counts: crit={c['critical']} maj={c['major']} min={c['minor']} info={c['info']} "
-      f"obs-demoted={c['downgraded_for_observability']} unanchored-demoted={c.get('unanchored_demoted',0)}")
-PY
-```
+Run the report check in `reference/step-scripts.md` (section "Step 4 — report check").
 
 **The verdict is reproducible: same findings + same `L` → same verdict, with no model in
 the final decision.**
@@ -711,42 +401,11 @@ honest." `human_review_required` is always `true`.
 
 `— human checkpoint: true` → pause here for the user before treating the run as closed.
 
+Then write the orchestrator's run trace with the script in `reference/review-tracing.md`.
+
 ## Deterministic-only fallback (no model in the loop)
 
-When no cross-model reviewer is available (offline / no codex), you can still produce a
-real, reproducible report from the deterministic core alone — the load-bearing,
-eval-gated part of the repo (**100% recall on the three deterministic patterns
-`HP-DELTA-ERROR` / `HP-NUM-INFLATE` / `HP-DUP-TABLE`, zero clean false-positives**;
-`README.md` Status). All real tools, exact flags:
-
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"; PAPER_DIR="<from Step 0>"
-TXT=(); [ -f "$PAPER_DIR/paper.txt" ] && TXT=(--pdf-text "$PAPER_DIR/paper.txt")
-python3 "$ROOT/tools/build_manifest.py"      --paper-id mypaper --dir "$PAPER_DIR" "${TXT[@]}" --out "$PAPER_DIR/artifact_manifest.json"
-L=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["observability_level"])' "$PAPER_DIR/artifact_manifest.json")
-if ls "$PAPER_DIR"/*.tex >/dev/null 2>&1; then            # L1/L2 source path
-  python3 "$ROOT/tools/build_claim_ledger.py"  --paper-id mypaper --latex "$PAPER_DIR"/*.tex \
-      --observability-level "$L" --out "$PAPER_DIR/claims.json"
-else                                                       # L0 text path (no *.tex)
-  python3 "$ROOT/tools/build_claim_ledger.py"  --paper-id mypaper --pdf-text "$PAPER_DIR/paper.txt" \
-      --observability-level "$L" --out "$PAPER_DIR/claims.json"
-fi
-python3 "$ROOT/tools/check_numeric_consistency.py" --ledger "$PAPER_DIR/claims.json" \
-    --out "$PAPER_DIR/consistency-audit.deterministic.findings.json"
-python3 "$ROOT/tools/check_presentation.py"        --ledger "$PAPER_DIR/claims.json" \
-    --out "$PAPER_DIR/presentation-signals.deterministic.findings.json"
-python3 "$ROOT/tools/adjudicate_findings.py" \
-    --findings "$PAPER_DIR"/*.deterministic.findings.json \
-    --ledger "$PAPER_DIR/claims.json" --paper-id mypaper --observability-level "$L" \
-    --taxonomy-version 0.5 \
-    --limitation "Deterministic-only run (no cross-model reviewer): semantic + code-level dimensions were NOT run." \
-    --out "$PAPER_DIR/report.json" --md "$PAPER_DIR/REPORT.md"
-```
-
-The verdict reflects only the deterministic patterns; the report's limitations must say
-the semantic / code-level dimensions were not run. Run `python3 "$ROOT/eval/run_eval.py"`
-any time to prove this core still catches the bundled injected defects and stays clean
-on the clean fixture (the CI gate).
+When no cross-model reviewer is available (offline / no codex), follow `reference/fallbacks.md` (section "Deterministic-only fallback"): with `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}"` exported first; deterministic tools only, and the report's limitations must say the semantic / code-level dimensions were not run.
 
 ## Output contract
 
@@ -822,76 +481,11 @@ deterministic adjudicator, and presents.
 
 ## When NOT to use (and routing to standalone skills)
 
-- **You only want one dimension** → call the auditor directly (`/consistency-audit`,
-  `/citation-forensics`, `/baseline-comparison-audit`, `/experiment-forensics`,
-  `/presentation-signals`, `/proof-derivation-forensics`); each can adjudicate itself with
-  `--ledger` when run alone.
-- **You only want the prior-work overlap** (trivial-combination / duplicate-publication
-  signals) → `/novelty-duplication-advisory` (memo-only; it surfaces overlap but never rules
-  novelty, and the absence of a match is not evidence of originality).
-- **You only need the ledger** (extract claims, no verdict) → `/evidence-ledger`.
-- **You want an AI-text / "looks machine-written" verdict** → out of scope by design;
-  this tool audits *integrity under limited evidence*, not authorship (`DESIGN.md` §1).
-- **You want the paper auto-fixed** → out of scope; this is a third-party forensics tool,
-  not a co-author. (ARIS `citation-audit` etc. are the co-author-mode tools.)
-- **You want reproduction (re-run the code, L3)** → out of scope in v0; we never claim
-  reproduction. L2 verifies paper-number ↔ result-file match, not a re-run.
-- **On a timer** → never `/loop` / `/schedule` / `CronCreate` the verdict; re-run only
-  when the paper / repo / ledger changes (see the cadence fence at the top).
+One dimension only → call that auditor directly; ledger only → `/evidence-ledger`; prior-work overlap only → `/novelty-duplication-advisory`.
+Out of scope: AI-text / authorship verdicts, auto-fixing the paper, reproduction (L3), and running the verdict on a timer.
+Read `reference/routing.md` for the full routing list.
 
-## Typical run profile
+## Run profile and review tracing
 
-Forensics is fast — the budget is reviewer calls, not GPU. Use this to set expectations
-and to choose `— effort: max` (more fresh threads per dimension) vs the
-deterministic-only fallback (zero reviewer calls).
-
-| Stage | Reviewer calls | Reads | Writes | Notes |
-|-------|----------------|-------|--------|-------|
-| 0 ingest | 0 | `$ARGUMENTS` (dir/pdf/arxiv) | `paper.txt` / extracted `*.tex` | network only for arXiv |
-| 1 ledger | 0–1 (enrich) | sources | `artifact_manifest.json`, `claims.json` | deterministic backbone + 1 optional additive pass |
-| 2 auditors | 1+ per applicable dimension (serial; `— effort: max` → more) | `claims.json` (+ sources, +L2 code) | `<skill>.findings.json` (+ deterministic) | the bulk of the wall-clock; never parallel; `/proof-derivation-forensics` runs iff theorems/proofs are present |
-| 3 memos | 1 (adversarial) + 2 per-axis fresh threads (novelty, optional) + DBLP/web retrieval | ledger + findings (+ external corpus) | `adversarial-case-builder.memo.md`, `novelty-duplication-advisory.memo.md` | non-blocking; no verdict weight; novelty is the only step that hits the network |
-| 4 adjudicate | 0 | findings + ledger | `report.json`, `REPORT.md` | deterministic; the only verdict source |
-| 5 present | 0 | `REPORT.md` | — | verdict + level first |
-
-A heartbeat may **wait** on the only external steps (Stage 0 download, Stage 2 citation
-web lookups, Stage 3 novelty prior-work retrieval) — it may **never** re-fire Stage 4 or
-"decide the paper is fine."
-
-## Review tracing
-
-Each auditor saves its own raw reviewer calls under `.aris/traces/<skill>/<date>_run<NN>/`
-(forensic policy — never silently dropped: `run.meta.json` + per-call `request.json` /
-`response.md` / `meta.json`, where `request.json` shows the executor sent only paths + the
-ledger + the checklist — the reviewer-independence audit trail). The orchestrator
-additionally writes a top-level run trace so the whole sweep is reproducible:
-
-```bash
-PAPER_DIR="<from Step 0>"; ARG="<original input arg, from Step 0>"; DATE=$(date +%Y-%m-%d); N=1
-while [ -d "$PAPER_DIR/.aris/traces/anti-autoresearch/${DATE}_run$(printf %02d $N)" ]; do N=$((N+1)); done
-RUNDIR="$PAPER_DIR/.aris/traces/anti-autoresearch/${DATE}_run$(printf %02d $N)"; mkdir -p "$RUNDIR"
-python3 - "$PAPER_DIR" "$RUNDIR" "$ARG" <<'PY'
-import json, glob, os, sys, hashlib, datetime
-D, RUN, ARG = sys.argv[1], sys.argv[2], sys.argv[3]
-def sha(p):
-    try: return hashlib.sha256(open(p, "rb").read()).hexdigest()
-    except Exception: return None
-rep = json.load(open(f"{D}/report.json", encoding="utf-8")) if os.path.exists(f"{D}/report.json") else {}
-meta = {
-    "skill": "anti-autoresearch", "input_arg": ARG, "paper_dir": D,
-    "paper_id": rep.get("paper_id"), "observability_level": rep.get("observability_level"),
-    "ledger_sha256": sha(f"{D}/claims.json"),
-    "findings_files": [os.path.basename(p) for p in sorted(glob.glob(f"{D}/*.findings.json"))
-                       if not p.endswith(".proposed.findings.json")],
-    "overall_verdict": rep.get("overall_verdict"), "counts": rep.get("counts"),
-    "adjudicator": rep.get("adjudicator"), "taxonomy_version": rep.get("taxonomy_version"),
-    "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
-}
-json.dump(meta, open(f"{RUN}/run.meta.json", "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-print("wrote", f"{RUN}/run.meta.json", "->", meta["overall_verdict"])
-PY
-```
-
-Traces are the reproducibility + independence audit trail: they prove the executor sent
-the reviewer only structured inputs and that the verdict came from the deterministic
-adjudicator, not a model.
+Read `reference/run-profile.md` for the per-stage reviewer-call budget when choosing `— effort: max` vs the deterministic-only fallback.
+Read `reference/review-tracing.md` for the trace layout and the script that writes the orchestrator's `run.meta.json`.

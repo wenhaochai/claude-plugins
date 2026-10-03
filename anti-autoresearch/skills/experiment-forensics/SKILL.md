@@ -13,87 +13,14 @@ ABSOLUTE path — it is referred to as `TARGET` below). Emit span-anchored
 
 > 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the observability level rises (a repo or result files arrive → L2).
 
-> Adapted from ARIS `experiment-audit` (#57/#131), reframed for the reviewer side.
-> The original audits *your own* experiment before you claim results; this audits a
-> *third party's* submission. The crucial reframe: at **L0/L1 (no code)** these
-> patterns are **not decidable** — they appear only as info-level "could-not-verify"
-> signals. **Code-level fraud requires L2.** A PDF can never produce a fraud verdict.
-
-## Why this exists
-
-LLM-driven research pipelines (and rushed human work) produce results that *look*
-computed but are not what the paper claims. The repeatable failure modes — ported
-from ARIS's experiment-integrity audit — are:
-
-1. **Fake ground truth** — the eval "reference/target" is *derived from model
-   outputs* and reported as performance, not as a labeled proxy. `HP-FAKE-GT`
-2. **Score self-normalization** — a metric divided by the model's **own** max/min/
-   mean to approach 1.0; no raw score shown. `HP-SELF-NORM`
-3. **Phantom results** — a paper number maps to a result file or metric key that
-   does not exist (or a function never called). `HP-PHANTOM-RESULT`
-4. **Dead metric code** — a metric defined in eval code, discussed in the paper,
-   but never called / never present in any result file. `HP-DEAD-METRIC`
-5. **Scope inflation (verified)** — "comprehensive/robust/SOTA" while the repo
-   actually ran 1–2 datasets/seeds/configs. `HP-SCOPE-INFLATE`
-6. **Method drift (confirmed)** — the method *described* differs from the method
-   *evaluated* (A-lite, A+oracle, extra data, different backbone, test-time labels
-   the method claims not to use). `HP-METHOD-DRIFT`
-7. **Synthesized-looking results** — numbers across configs related by a too-clean
-   arithmetic pattern ("不像跑出来的"). `HP-SUSPICIOUS-REGULARITY`
-8. **Placeholder / fake data in released code** — the released code still ships
-   placeholder/dummy/fake data (e.g. a `# fake data for plotting` annotation, a
-   `TODO: replace with real data`, a hard-coded `np.random.*` array) and a *reported*
-   figure/number is drawn from it rather than from a real run. `HP-PLACEHOLDER-DATA`
-   (flag the checkable code marker; do not infer who wrote it)
-9. **Result ≠ artifact** — the code / result artifacts, read or run as released, produce
-   numbers *different* from the paper's reported values for the same experiment.
-   `HP-RESULT-ARTIFACT-MISMATCH` (an implementation that computes a different
-   loss/normalization/architecture than the equations state is `HP-METHOD-DRIFT`, not this)
-10. **Missing reproducibility artifacts** — an empirical / agent / LLM paper ships
-    neither code nor the prompts/configs/hyperparameters its results depend on, so the
-    claim cannot be reproduced even in principle (the *absence* is L0-stated; *what its
-    results specifically need* is L2-verified). `HP-MISSING-REPRO-ARTIFACT`
-
-These are NOT inherently misconduct — they are failure modes of optimizing agents
-that lack an integrity constraint. This skill is that constraint, pointed outward,
-and it stays honest about what it can and cannot see.
-
-## Core principle (two independence axes)
-
-**The executor (Claude) collects paths + the ledger and passes them through; a
-fresh, different-family reviewer (codex) reads the code and proposes findings; a
-deterministic tool decides the verdict.** Both axes from
-`references/reviewer-independence.md` hold:
-
-- **Layer 1 — cross-model (executor ≠ reviewer).** The executor never summarizes,
-  pre-judges, or leaks a hunch into the prompt — it ships only paths + `claims.json`
-  + the checklist + the observability level. The reviewer is a different model family.
-- **Layer 2 — reviewer ≠ adjudicator.** The reviewer is demoted from *judge* to
-  *evidence-extractor*: it emits span-anchored findings; `tools/adjudicate_findings.py`
-  computes `overall_verdict` by fixed rules. Same ledger + same findings → same
-  verdict, with no model in the final decision.
+Read `reference/rationale.md` for the ARIS lineage, the ten failure modes this skill targets (why it exists) and the two independence axes (executor ≠ reviewer, reviewer ≠ adjudicator); it is background, not procedure.
 
 ## How this differs from the other auditors (route correctly)
 
-| Auditor | Question it answers | Level |
-|---------|---------------------|------|
-| **`experiment-forensics`** (this) | **Are the reported numbers what the eval code actually computes?** (fake/derived GT, self-norm, phantom result, dead metric, verified scope, method drift, placeholder/fake data, code↔paper mismatch, missing repro artifacts) | **L2** (L0/L1 → info-only; missing-repro absence is L0-stated, surfaced info here) |
-| `consistency-audit` | Does the paper contradict ITSELF / does described method = evaluated method? | L0 |
-| `baseline-comparison-audit` | Are the right baselines present, tuned, and is "SOTA" earned? | L0 stated / L2 verified |
-| `citation-forensics` | Do the cited papers exist and support the claim made? | L0 |
-| `presentation-signals` | Surface "AI-flavor" hints (auxiliary, capped at minor) | L0 |
-| `adversarial-case-builder` | Strongest evidence-bound rejection memo (no verdict weight) | any |
-
-**Do NOT raise here** (hand off instead): pure text-vs-text contradiction or
-scope-vs-evidence-in-text → `consistency-audit`; "first / SOTA / beats prior work"
-external truth → `baseline-comparison-audit` + `citation-forensics` (emit
-`needs_external_check`); citation existence/context → `citation-forensics`;
-surface/AI-flavor → `presentation-signals`; **evaluation-design validity** (train/test
-leakage, a conflicted/unvalidated LLM judge, declared-but-unreported conditions) →
-`eval-design-forensics` (family H, L0/L1 stated-tells — distinct from this skill's L2
-code/result-integrity); the rejection memo → `adversarial-case-builder`. (Note:
-an LLM that produces the GROUND-TRUTH labels stays here as `HP-FAKE-GT`, L2 — only the
-LLM-as-*judge* validity question hands off to `eval-design-forensics`.)
+This skill asks one question: are the reported numbers what the eval code computes (L2)? Text-only contradiction and text scope go to `consistency-audit`;
+"first / SOTA" external truth to `baseline-comparison-audit` + `citation-forensics` (`needs_external_check`); evaluation-design validity (leakage, LLM-as-judge)
+to `eval-design-forensics`; surface tells to `presentation-signals`. An LLM that produces ground-truth labels stays here as `HP-FAKE-GT`.
+Read `reference/routing.md` for the full auditor table and hand-off list when a finding might belong elsewhere.
 
 ## Pipeline role + the anchoring model (read before running)
 
@@ -212,89 +139,13 @@ L0 text-scope check — `consistency-audit` owns scope from the manuscript. This
 only job here is to mark, for the human, which numbers become checkable **if a repo is
 released**. Generate the signals deterministically from the ledger:
 
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"; TARGET="$ARGUMENTS"
-python3 - "$TARGET" <<'PY'
-import json, re, sys
-t = sys.argv[1]
-claims = json.load(open(f"{t}/claims.json"))["claims"]
-out, n = [], 1
-def add(pat, title, desc, ev, act):
-    global n
-    out.append({"finding_id": f"EF{n:03d}", "skill": "experiment-forensics",
-                "pattern_id": pat, "title": title, "description": desc,
-                "severity": "info", "observability_level_required": 2,
-                "evidence": ev, "verdict_local": "needs_external_check",
-                "requires_external_check": True, "false_positive_risk": "high",
-                "recommended_reviewer_action": act}); n += 1
-def anc(c): return [{"claim_id": c["claim_id"], "span": c["text_span"], "location": c.get("location", {})}]
-
-GT   = re.compile(r"reference|ground.?truth|\bgt\b|gold|agreement|target", re.I)
-SCOPE= re.compile(r"comprehensive|extensive|robust|general|thorough|state[- ]of[- ]the[- ]art|\bSOTA\b", re.I)
-nums = [c for c in claims if c.get("type") in ("number", "comparison")]
-
-for c in nums:                                   # GT-provenance pointer
-    if GT.search(c.get("text_span", "")):
-        add("HP-FAKE-GT", "Ground-truth provenance not verifiable without the repo (L0 could-not-check)",
-            "This number is reported against a 'reference/target/GT'. At this level it cannot be determined whether that reference is dataset-provided or derived from model outputs. NOT an allegation — verifiable only at L2 (eval code + result files).",
-            anc(c), "Request the eval code + result files; verify GT provenance at L2 (HP-FAKE-GT).")
-for c in nums:                                   # near-ceiling -> normalization pointer
-    v = (c.get("value") or {}).get("normalized")
-    if isinstance(v, (int, float)) and ((0.99 <= v <= 1.0) or (99.0 <= v <= 100.0)):
-        add("HP-SELF-NORM", "Near-perfect score — normalization not verifiable from text",
-            "A near-ceiling score with no raw value shown cannot be checked for self-normalization from a PDF.",
-            anc(c), "At L2, check whether the metric is divided by the model's own output statistics (HP-SELF-NORM).")
-for c in claims:                                 # verified-run-count pointer (defer text scope to consistency-audit)
-    if SCOPE.search(c.get("text_span", "")):
-        add("HP-SCOPE-INFLATE", "Scope language — actual run count not verifiable without the repo",
-            "consistency-audit owns the L0 scope-vs-evidence-in-text check; experiment-forensics can only verify how many datasets/seeds/configs ACTUALLY ran at L2.",
-            anc(c), "At L2, count the configs/seeds actually executed in the result files vs this wording.")
-        break
-add("HP-PHANTOM-RESULT", "Result existence not verifiable without backing files",
-    "Whether each reported number maps to a real key in a real result file cannot be decided from a PDF.",
-    (anc(nums[0]) if nums else []), "At L2, map each headline number to a result-file key (HP-PHANTOM-RESULT).")
-add("HP-DEAD-METRIC", "Metric-code liveness not verifiable without the repo",
-    "Whether any discussed metric is actually computed/called cannot be decided from a PDF.",
-    [], "At L2, confirm each discussed metric is called and appears in a result file (HP-DEAD-METRIC).")
-add("HP-PLACEHOLDER-DATA", "Placeholder / fake data in released code not verifiable without the repo",
-    "Whether the released code still contains placeholder/dummy/fake data (e.g. a '# fake data for plotting' annotation or a hard-coded random array) feeding a reported figure/number cannot be decided from a PDF — flag the code marker, not who wrote it.",
-    (anc(nums[0]) if nums else []), "At L2, grep the code for placeholder/dummy/fake markers and trace whether any reported figure/number is drawn from them (HP-PLACEHOLDER-DATA).")
-add("HP-RESULT-ARTIFACT-MISMATCH", "Code-output vs paper-number agreement not verifiable without the repo",
-    "Whether the released code / result artifacts actually produce the paper's reported numbers cannot be decided from a PDF. (A code-vs-equation implementation divergence is HP-METHOD-DRIFT, not this.)",
-    (anc(nums[0]) if nums else []), "At L2, read the code's computation + result files and check each reported number against the code-produced value (HP-RESULT-ARTIFACT-MISMATCH).")
-if nums:                                          # repro-artifact inventory pointer (absence is L0-observable)
-    add("HP-MISSING-REPRO-ARTIFACT", "Reproducibility artifacts absent — empirical claims not checkable even in principle (absence noticeable at L0; verdict-bearing only at L2)",
-        "This paper reports empirical/number results but the submission ships no eval code and no prompts/configs the results depend on. The ABSENCE is observable now (L0 'stated'); whether the SPECIFIC prompts/configs/hyperparameters its results need are present is verifiable only if a repo is released (L2). NOT a misconduct claim — a reproducibility gap. FP: a genuinely theoretical paper; double-blind submission norms (treat as a camera-ready expectation, lower severity).",
-        anc(nums[0]), "Ask for the code + the exact prompts/configs/hyperparameters the reported numbers depend on; at L2 verify they are present and complete (HP-MISSING-REPRO-ARTIFACT).")
-
-json.dump(out, open(f"{t}/experiment-forensics.findings.json", "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-print(f"L<2: wrote {len(out)} info 'could-not-verify' signals (severity=info, req:2 — the adjudicator keeps them at info).")
-PY
-```
+Run the L0/L1 signal script in `reference/l0-signals.md` verbatim (it writes `experiment-forensics.findings.json`). Export `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" ARGUMENTS="$ARGUMENTS"` first: variables are substituted in SKILL.md only, not in reference files.
 
 Each emitted finding has the shape below (info-only, `observability_level_required:2`,
 empty `evidence` permitted **only** for info). Then go to **Step 6** (no reviewer call
 needed at L<2 — these are deterministic pointers, not judgments):
 
-```json
-{
-  "finding_id": "EF001",
-  "skill": "experiment-forensics",
-  "pattern_id": "HP-FAKE-GT",
-  "title": "Ground-truth provenance not verifiable without the repo (L0 could-not-check)",
-  "description": "Claim C014 reports agreement against a 'reference'. At L0 (PDF only) it cannot be determined whether that reference is dataset-provided or derived from model outputs. This is NOT an allegation — verifiable only once the eval code + result files are available (L2).",
-  "severity": "info",
-  "observability_level_required": 2,
-  "evidence": [
-    {"claim_id": "C014", "span": "98% agreement with the reference",
-     "location": {"file": "paper.txt", "section": "experiments"}}
-  ],
-  "verdict_local": "needs_external_check",
-  "requires_external_check": true,
-  "false_positive_risk": "high",
-  "recommended_reviewer_action": "Request the evaluation code and result files; verify GT provenance at L2. Do not treat as a flag at this observability level."
-}
-```
+The example shape is in `reference/l0-signals.md` ("Example L0 signal").
 
 ## Step 3 — L2: collect artifacts (executor — paths + mechanical FACTS only)
 
@@ -395,111 +246,12 @@ block below. Assemble that `prompt:` by inlining the Step 3 `.aris/` files at th
 `[inline …]` markers (read each, paste its literal contents — paths + raw facts + the
 claim subset, never a summary). **One fresh thread; never `codex-reply`.**
 
-```
-You are an experiment-integrity forensics reviewer. Your working directory is the
-audited repo. Read the evidence ledger yourself at ./claims.json, then read EVERY
-eval script line by line, plus the result files. Observability level = L2 (repo +
-results present). For each check, PROPOSE findings — do NOT grade the paper, and
-describe a DISCREPANCY to verify, never an accusation of misconduct.
-
-Inputs (paths relative to your cwd; the executor inlines the Step 3 files verbatim):
-- Ledger: ./claims.json   (anchor targets — use real claim_id + verbatim text_span)
-- Ledger claim subset: [inline .aris/claim_subset.json]
-- Eval / metric / test / runner scripts + configs: [inline .aris/eval_paths.txt]
-- Result files: [inline .aris/result_paths.txt]
-- Mechanical facts already gathered (raw, uninterpreted — GT greps, per-number result
-  greps, placeholder/dummy/fake-marker greps, the repro-artifact inventory, file hashes):
-  [inline .aris/gt_grep.txt + .aris/number_grep.txt + .aris/placeholder_grep.txt +
-  .aris/repro_inventory.txt + .aris/hashes.txt]
-
-## Checklist (map each finding to a pattern_id)
-A. Ground-truth provenance  [HP-FAKE-GT, critical] — Where does "reference/target/
-   GT/gold" come from in each eval? Loaded from the DATASET, or derived/generated
-   from MODEL OUTPUTS and reported as performance? FP: explicitly labeled proxy;
-   self-supervised by design.
-B. Score normalization      [HP-SELF-NORM, critical] — Is any metric divided by
-   max/min/mean of the model's OWN outputs to approach 1.0? Are raw scores shown?
-   FP: standard min–max across ALL methods incl. baselines; raw+normalized both shown.
-C. Result existence         [HP-PHANTOM-RESULT, critical] — Does each paper number
-   map to a real key in a real result file, with a matching value? Any function
-   referenced but never called? FP: file renamed/moved but present; number from a
-   cited external reference.
-D. Dead metric code         [HP-DEAD-METRIC, major] — A metric defined in eval code
-   and DISCUSSED in the paper but never called / never in any result file. FP:
-   utility kept for future use and not discussed as a result.
-E. Scope (verified)         [HP-SCOPE-INFLATE, major] — How many datasets/seeds/
-   configs ACTUALLY ran (count from result files/logs) vs the paper's scope
-   language? FP: scope genuinely broad; qualifiers present.
-F. Eval-type classification — For each eval, classify: real_gt | synthetic_proxy |
-   self_supervised_proxy | simulation_only | human_eval. (A LABELED synthetic_proxy
-   or self_supervised_proxy is legitimate — NOT HP-FAKE-GT.)
-
-## Output (one JSON array, schemas/finding.schema.json) — output ONLY the array
-For each finding:
-{ "finding_id", "skill":"experiment-forensics", "pattern_id",
-  "title", "description"  // name the exact file:line of the eval/result smoking gun,
-  "severity", "observability_level_required": 2,
-  "evidence": [ { "claim_id": <a ledger claim this undermines>,
-                  "span": <VERBATIM substring of that claim's text_span>,
-                  "location": {...} } ],
-  "verdict_local": "fail|warn|clean|needs_external_check",
-  "false_positive_risk": "low|medium|high",
-  "recommended_reviewer_action": <what a human should ASK/CHECK> }
-
-ANCHOR RULE: every finding above "info" MUST cite a ledger claim_id and quote a
-verbatim span of THAT claim. The code path:line is forensic detail for the
-description — it is NOT a valid anchor on its own. If no paper claim is undermined,
-emit at most "info". Set false_positive_risk honestly. For "first/SOTA" claims you
-cannot settle from the code, set verdict_local "needs_external_check". Do NOT output
-an overall PASS/WARN/FAIL verdict — only the findings array. If nothing is wrong,
-output [].
-```
+Read the "Step 4 — A–F checklist prompt" block in `reference/reviewer-prompts.md` and send it verbatim, with the Step 3 files inlined at its `[inline …]` markers.
 
 **Additional focused passes** (each a NEW fresh thread — never `codex-reply`), run
 only when the relevant ledger claims exist:
 
-- **G. Method identity** `[HP-METHOD-DRIFT, critical]` — when a `method` claim exists
-  (or `consistency-audit` raised an L0 suspicion): does the evaluated pipeline match
-  the described method, or quietly run A-lite / A+oracle / extra data / a different
-  backbone / test-time labels the method claims not to use — **and** does the code, as
-  written, implement the described equations (same loss / normalization / architecture)
-  rather than compute a different formula than the paper states? Both are method-identity
-  drift (a code-vs-equation divergence belongs here, not in pass J). FP: a deliberately
-  labeled ablation. Anchor to the method-description claim.
-- **H. Suspicious regularity** `[HP-SUSPICIOUS-REGULARITY, major]` — when result
-  tables show a too-clean arithmetic pattern (constant offset across rows, implausibly
-  smooth monotonicity, identical decimals across unrelated settings): confirm against
-  the actual result files/code. FP is **high** (deterministic metrics, integer
-  scores, rounding, a real linear trend) — keep severity honest; never a "fabricated"
-  grade.
-- **I. Placeholder / fake data** `[HP-PLACEHOLDER-DATA, critical]` — when figure/number
-  claims exist and the placeholder-marker grep (`.aris/placeholder_grep.txt`) is non-empty:
-  does the released code still contain placeholder / dummy / fake data — stub annotations
-  (`# fake data for plotting`, `dummy`, `TODO: replace with real data`), hard-coded arrays,
-  or `np.random.*` feeding a plot (flag the marker, don't infer who wrote it) — and does a REPORTED
-  figure/number derive from it rather than from a real run? Trace each flagged line to the
-  figure/table it produces. FP: a clearly-labeled toy example or unit-test fixture that
-  feeds NO reported result. Anchor to the figure/number claim the placeholder data produces.
-- **J. Result/artifact fidelity** `[HP-RESULT-ARTIFACT-MISMATCH, critical]` — when number
-  claims exist: does the code / result artifacts, run as written, actually produce the
-  paper's reported numbers? Read the metric computation + the result files and compare each
-  headline number to the code-produced value (`.aris/number_grep.txt` is the starting map).
-  **Strictly artifact-number vs paper-number.** FP: seed / version / hardware variance within
-  a *stated* tolerance; a documented post-hoc correction. Anchor to the number claim that
-  diverges. **An implementation that computes a different formula than the paper's equations
-  is HP-METHOD-DRIFT (pass G), not this** — route a code-vs-equation divergence there; THIS
-  pass only asks whether the reported numbers reproduce.
-- **K. Reproducibility artifacts** `[HP-MISSING-REPRO-ARTIFACT, major]` — when the paper is
-  empirical / agent / LLM-driven (number or agent/LLM-pipeline claims exist): consult the
-  repro-artifact inventory (`.aris/repro_inventory.txt`) and judge whether the prompts /
-  configs / hyperparameters / seeds the REPORTED results depend on are actually present and
-  complete enough to reproduce them — e.g. an agent/LLM paper that ships code but omits the
-  prompt templates or the model/config settings its numbers depend on. FP: a genuinely
-  theoretical paper (no empirical claim to reproduce); double-blind submission norms (treat
-  as a camera-ready expectation → lower severity / `needs_external_check`). Anchor to the
-  empirical claim whose artifacts are missing. (At L0/L1 the bare *absence* is already
-  surfaced as an info pointer in Step 2; this pass is the L2 verification of *what the
-  results specifically need*.)
+Read `reference/reviewer-prompts.md` ("Additional focused passes G–K") for each pass's trigger, pattern, question, FP cases and anchor; send each as its own fresh thread.
 
 **Save the handoff + failure handling.** Write the reviewer's full raw reply to
 `"$TARGET/.aris/last_reviewer_response.txt"` (use `Write`) before validating, and
@@ -636,29 +388,7 @@ Severity is never hand-edited up or down.
 **An empty array is a valid, honest output** — if every proposed finding was demoted
 or none was proposed, `experiment-forensics.findings.json` may be `[]`.
 
-**Worked L2 finding** (the full, copyable shape):
-
-```json
-{
-  "finding_id": "EF002",
-  "skill": "experiment-forensics",
-  "pattern_id": "HP-SELF-NORM",
-  "title": "Headline score is normalized by the model's own output maximum",
-  "description": "The abstract headline metric (claim C014) is reported as 0.98. In the pipeline, results/main.json stores score_norm=0.98 computed at src/eval.py:88 (sha256 a1b2c3…) as raw_score / max(model_outputs) — the divisor is the model's OWN output max, not a fixed scale or a cross-method min–max. The raw score at the same key is 0.41, and no raw column appears in the paper. Discrepancy to verify: a metric approaching 1.0 via self-referential normalization is not comparable to baselines.",
-  "severity": "critical",
-  "observability_level_required": 2,
-  "evidence": [
-    {"claim_id": "C014", "span": "achieves a score of 0.98",
-     "location": {"file": "main.tex", "section": "abstract"},
-     "artifact_hash": "<sha256 of main.tex from the ledger's evidence_anchor>"}
-  ],
-  "verdict_local": "fail",
-  "reviewer": {"model": "gpt-5.5", "reasoning": "xhigh", "thread_id": "<codex thread>", "deterministic": false},
-  "false_positive_risk": "low",
-  "requires_external_check": false,
-  "recommended_reviewer_action": "Ask the authors for the raw (un-normalized) score and the exact normalization denominator; confirm the same normalization is applied identically to all baselines. If the divisor is the model's own output statistics, the 0.98 headline is not a valid cross-method comparison."
-}
-```
+Read `reference/worked-examples.md` for a worked L2 finding (the full, copyable shape) when you check the output.
 
 ## Step 6 — Emit, cross-reference, trace
 
@@ -747,23 +477,7 @@ python3 "$ROOT/tools/adjudicate_findings.py" --findings "$TARGET"/*.findings.jso
 
 ## When NOT to use this skill
 
-- **As the verdict.** It proposes findings; `tools/adjudicate_findings.py` renders
-  `CLEAN_GIVEN_EVIDENCE` / `SOFT_FLAGS` / `HARD_FLAGS`. Do not read this skill's
-  output as a ruling.
-- **At L0/L1 to assert fraud.** With no repo you get info-level "could-not-verify"
-  signals, full stop — never a fraud claim from a PDF.
-- **Without `claims.json`.** No ledger ⇒ nothing can be anchored ⇒ everything fails
-  closed to `info`. Run `/evidence-ledger` first; this skill never invents structure
-  from the raw PDF.
-- **For text-only contradictions / scope-in-text** → `/consistency-audit`; for
-  baseline integrity or "SOTA / first" → `/baseline-comparison-audit` (+
-  `/citation-forensics`), handed off via `needs_external_check`.
-- **For authorship / "is this AI-written".** Out of scope — surface "AI-flavor" lives
-  in `/presentation-signals` (auxiliary, capped at minor); this repo is **not** an
-  AI-text classifier.
-- **On a timer.** Re-firing adds no signal — only a higher observability level does;
-  schedule the *wait for artifacts*, then run once at the new level (see the cadence
-  fence at the top).
+Read `reference/routing.md` ("When NOT to use this skill") before running if the request is a verdict, a fraud claim at L0/L1, a run without `claims.json`, a text-only or baseline question, or authorship; it lists where each goes.
 
 ## Review tracing
 
@@ -773,10 +487,3 @@ level into `$TARGET/.aris/traces/experiment-forensics/<date>_run<NN>/`, as set u
 Step 6. Traces are the audit trail for a reproducible, defensible report and the
 evidence that reviewer-independence held (the executor passed only paths + the ledger,
 not summaries).
-
-## Acknowledgements
-
-Ports the A–F integrity checks from ARIS `experiment-audit`, motivated by
-community-reported issues (#57, #131) where executor agents fabricated ground truth
-and self-normalized scores. Reframed for third-party forensics: ledger-anchored
-findings, observability tiers, and reviewer ≠ adjudicator.

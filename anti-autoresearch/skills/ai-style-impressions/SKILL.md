@@ -27,36 +27,7 @@ proposes **no integrity finding** and computes **no verdict**.
 
 > 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper or the ledger changes.
 
-## Why this exists
-
-Real reviewers say the quiet part out loud about *style*: *"这一看就是大模型写的味儿"* (this
-reads like an LLM wrote it), *"满篇 'it is worth noting' / '值得注意的是'"* (every
-paragraph hedges with "it is worth noting"), *"通篇 not only…but also、一堆 however/
-therefore"* (chains of however/therefore/moreover), *"堆术语，论证是空的"* (term-stuffing with
-no argument under it), *"实验叫 'Experiment Set Gamma'，从没定义"* (an undefined internal
-codename used as if defined), *"图都是一个味儿的 AI 生成图"* (the figures share one generated
-visual grammar), *"附录像把跑的 trace 一股脑倒进去"* (the appendix reads like a dumped run
-trace). An autoresearch pipeline (or a rushed human leaning on an assistant) produces
-exactly these *style* artifacts.
-
-These signals are **real** in the sense that reviewers react to them — but they are
-**not evidence of misconduct, and not evidence of authorship.** Honest LLM-assisted
-writing produces phrase tics; non-native English produces awkward transitions; a house
-style produces bold module names and consistent figures; a careful author hedges in the
-Limitations. So this skill's contract is narrow and permanent:
-
-- it emits **only** the 13 `AIS-*` style patterns, each as an **impression**;
-- it tags **every** finding `not_integrity_finding: true` + `false_positive_risk: high`
-  and attaches an `fp_case` (the legitimate, not-necessarily-AI explanation);
-- it **never** says a paper is "AI-generated", never assigns a probability or a score,
-  and **never** moves the verdict;
-- **silence is the common, correct output** — most papers should produce few or zero
-  AIS impressions.
-
-It exists so a reviewer's *style* reactions become **named, located, checkable
-impressions** instead of an unfalsifiable "vibe" — and so that whenever a style tell is
-actually a **substantive** problem, this skill **hands it to the right integrity
-auditor** rather than smuggling it in under a style label.
+Read `reference/rationale.md` for why this skill exists (the reviewer reactions it names, and why they are not misconduct or authorship evidence); it is background, not procedure.
 
 ## Core doctrine (the non-negotiables)
 
@@ -86,44 +57,10 @@ Layer 2). This skill computes **no verdict** and proposes **no integrity finding
 
 ## How this differs from the other auditors (route correctly)
 
-| Auditor | Question it answers | Verdict weight |
-|---------|---------------------|----------------|
-| **`ai-style-impressions`** (this) | **What AI writing-STYLE tells does a reviewer notice? Named, located, itemized impressions — NOT integrity** | **ZERO (forced to `info`, separate report section, excluded from `overall_verdict`)** |
-| `presentation-signals` | Checkable *surface* tells (dup tables, thin/LLM figures, page padding, leftover pipeline strings) | capped at `minor` (`SOFT_FLAGS` at most) |
-| `consistency-audit` | Does the paper contradict ITSELF / described method = evaluated method? | full |
-| `experiment-forensics` | Are the reported numbers what the code computes? (fake GT, self-norm, phantom — L2) | full |
-| `baseline-comparison-audit` | Right baselines present, tuned, "SOTA" earned? | full |
-| `citation-forensics` | Do the cited papers exist + support the claim they are used for? | full |
-| `eval-design-forensics` | Evaluation validity (leakage / judge bias / selective reporting)? | full |
-| `proof-derivation-forensics` | Proof gaps / circularity / invalid steps / undefined notation? | full |
-| `adversarial-case-builder` | Strongest evidence-bound rejection memo | ZERO (advisory memo) |
-
-**Stay in lane.** This skill emits **only** the 13 `AIS-*` style patterns — nothing
-else. An `AIS-*` impression is the *lowest-stakes* thing in the report by construction
-(it carries no verdict weight at all); **never** use it to carry a substantive
-accusation. When a style tell is actually a substantive integrity problem, **hand it
-off** (do not encode it as an AIS impression):
-
-| Pattern (`AIS-*`) | The style impression (gross cases only) | Not-necessarily-AI (high FP — the `fp_case`) | If it is actually SUBSTANTIVE → route to |
-|-------------------|------------------------------------------|----------------------------------------------|------------------------------------------|
-| `AIS-NARRATIVE-ARC-BREAK` | abrupt 1–2¶ intro / dump-like or vague abstract; no background→contribution→evidence arc | terse-but-clear abstract; non-native phrasing; field conventions | argument chain truly breaks → `HP-ARGUMENT-CHAIN-BREAK` (`consistency-audit`) |
-| `AIS-LLM-PHRASE-TICS` | generic LLM tics overused ("it is worth noting" / "值得注意的是" / "意义在于", "not only…but also", chains of however/therefore/moreover, "therefore" mid-sentence, clichéd em-dash/semicolon, flowery empty adverbs like *elegantly* / *theoretically*) | honest LLM-assisted writing; non-native English; house style (**HUGE FP** — gross cases only) | **never routes** (pure style) |
-| `AIS-DEFENSIVE-HEDGE` *(also Step 1)* | pervasive "we do not claim…" / "not X but rather Y" defensive framing instead of stating what was done | one scoping sentence; Limitations hedges are expected; **some venues penalize the ABSENCE of caveats** | a hedge reveals a real scope/eval limitation → `HP-SCOPE-INFLATE` (B) / `eval-design-forensics` (H) |
-| `AIS-JARGON-STUFF` | dense term-stuffing where the surrounding argument carries no content | genuinely dense, correct technical writing (**very high FP**) | **never routes** |
-| `AIS-INVENTED-CODENAME` | undefined internal-project-flavored run/experiment codename used as if defined (e.g. "Experiment Set Gamma") | legitimate named methods / benchmarks / release tags | points to a missing results file → `HP-MISSING-REPRO-ARTIFACT` / `HP-PHANTOM-RESULT` (D) |
-| `AIS-CLAUSE-FORMULA-WALL` | fragmented "short clause then a wall of formulas"; formulas dumped without prose connective | dense-but-correct theory; field norms | a load-bearing symbol is actually UNDEFINED → `HP-UNDEFINED-NOTATION` (G) |
-| `AIS-GRATUITOUS-PSEUDOCODE` | pseudocode/algorithm blocks that merely restate the prose / add no operational content | genuinely helpful algorithm listings | the algorithm CONTRADICTS the described method → `HP-METHOD-DRIFT` (`consistency-audit`) |
-| `AIS-BULLET-LIST-OVERUSE` | prose organized as many bullets; sequential/progressive logic flattened into parallel-looking bullets | legitimate enumerations; checklists | **never routes** |
-| `AIS-BOLD-MODULE-SPAM` | verbose module names with excessive bolding / acronym staging | reasonable emphasis; defined acronyms | the SAME module gets incompatible abbreviations → `HP-ACRONYM-DRIFT` (B, `consistency-audit`) |
-| `AIS-RESTATE-OVERCLAIM` | rhetorical restatement loop — repeatedly re-asserting "we propose an X / we do an X" | legitimate signposting | the claim EXCEEDS the evidence → `HP-SCOPE-INFLATE` (B) / family H |
-| `AIS-FOCUS-DRIFT` | high-level motivation suddenly pivots to a minor implementation detail / over-emphasizes an unnecessary requirement | modular paper with explicit cross-refs | the motivation→method→experiment chain substantively breaks → `HP-ARGUMENT-CHAIN-BREAK` (B) |
-| `AIS-SINGLE-STYLE-FIGURES` | figures share a generic generated visual grammar / single-style AI illustrations | legitimate consistent house figure style; conceptual teasers | checkable figure-vs-content thinness stays `HP-LLM-FIGURE` / `HP-THIN-FLOAT` (family F, `presentation-signals`) |
-| `AIS-APPENDIX-DUMPING-GROUND` | appendix reads like unintegrated trace / dumping; AI-trace heavy | legitimately long supplementary detail | CONTRADICTS the main text → `HP-APPENDIX-CONTRA` (B); exact assistant/template artifact → `HP-PIPELINE-ARTIFACT` (F); affects reported data → family D |
-
-(The pure-style ids above migrated **out of** taxonomy §F into this zero-weight AIS
-track in **v0.5**; see `DEPRECATED_STYLE_PATTERNS` in `tools/adjudicate_findings.py`,
-which keeps the old §F ids as deprecated aliases forced to zero weight so a stale
-`findings.json` can never push them to `SOFT_FLAGS`.)
+This skill emits only the 13 `AIS-*` style impressions, at ZERO verdict weight. Every integrity question goes to its own auditor
+(`consistency-audit`, `experiment-forensics`, `baseline-comparison-audit`, `citation-forensics`, `eval-design-forensics`,
+`proof-derivation-forensics`); checkable surface tells go to `presentation-signals`. Never use an AIS impression to carry a substantive accusation.
+Read `reference/routing.md` for the auditor table and the 13-pattern table (impression, `fp_case`, substantive route) before Step 2 and whenever a tell may be substantive.
 
 ## What this skill REFUSES to emit (even as an impression)
 
@@ -317,152 +254,7 @@ Replace the bracketed placeholders below with the real values from Step 0, send 
 this, and save the **verbatim** reviewer reply to the `PROPOSED` path above (the Step 3
 input) **before** parsing:
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are recording AI writing-STYLE impressions only — the kind of style tell a
-    reviewer notices at a glance. You are explicitly NOT deciding whether the paper is
-    AI-written, NOT assigning any probability or score, and NOT deciding whether it is
-    fraudulent. You are NOT an AI-text classifier. Your output is a list of transparent,
-    LOCATED style IMPRESSIONS that a deterministic adjudicator will give ZERO verdict
-    weight (forced to info, excluded from the verdict, shown in a separate
-    non-integrity section). It can NEVER raise a verdict. Default to SILENCE: an empty
-    array [] is the expected, correct output for most papers.
-
-    INPUTS (in your working directory, read them directly):
-      - claims.json        — the evidence ledger: the authoritative, span-anchored list
-        of every checkable claim {claim_id, type, text_span (VERBATIM source text),
-        location, value?}. This is the ONLY thing you may anchor a finding to.
-      - <PDF_TEXT_FILE from Step 0>   — extracted PDF text (for prose / phrasing / structure).
-      - <PDF_FILE from Step 0, if any> — the rendered PDF (for figure-style inspection).
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-
-    HARD RULES (a finding that breaks any of these is worthless):
-    1. GROSS ONLY. Flag only BLATANT, RECURRING cases. If you are unsure, do NOT flag.
-       This is especially binding for AIS-LLM-PHRASE-TICS and AIS-JARGON-STUFF (the most
-       FP-prone). A single instance is NEVER the pattern.
-    2. ANCHOR. Every finding above severity "info" MUST carry >=1 evidence entry
-       {claim_id, span}, where claim_id EXISTS in claims.json and span is a VERBATIM
-       substring of THAT claim's text_span (no paraphrase, no added words). If you
-       cannot quote a verbatim ledger span, emit it at severity "info" (a note) or drop
-       it. The ledger holds numbers, scope, captions, citations, and table cells;
-       generic prose is usually NOT in it, so most style impressions will correctly
-       remain "info".
-    3. IMPRESSION FIELDS. Set severity = "minor" for an ANCHORED impression and "info"
-       for an unanchored one. Set false_positive_risk = "high",
-       observability_level_required = 0, and "not_integrity_finding": true for EVERY
-       finding. Provide an "fp_case": the concrete legitimate (not-necessarily-AI)
-       explanation for THIS tell. NEVER use "major"/"critical" (these are impressions,
-       not flags).
-    4. NO ACCUSATION, NO AUTHORSHIP VERDICT, NO SCORE. description and
-       recommended_reviewer_action say what a human should GLANCE AT as a readability
-       impression. NEVER write "AI-generated", "AI-written", "likely AI", a probability,
-       a score, "fabricated", or "reject". A style tell is a prompt to look, nothing more.
-    5. STAY IN LANE. pattern_id MUST be exactly one of the 13 AIS-* below. If you notice
-       a SUBSTANTIVE problem (numbers contradict, a citation looks fake, a symbol is
-       undefined, the method drifts, a codename points to a missing result), do NOT
-       encode it here — it belongs to the integrity auditor named in the checklist.
-       Ignore it; this track is style-only and carries zero weight.
-    6. NEVER EMIT (not even as info): any standalone single-punctuation tell (one
-       em-dash / one semicolon / one adverb); generic non-native English / awkward prose;
-       "this is AI-written" or any authorship probability/score; pure aesthetics
-       ("ugly" / "too polished"); presence-only flags ("has bullets" / "has an appendix"
-       / "short intro") with nothing located, repeated, and named.
-
-    CHECKLIST (the 13 AIS-* style tells; one finding per concrete, blatant, RECURRING case.
-    "ROUTE" = where it goes IF it is actually substantive — then it is NOT an AIS finding):
-      AIS-NARRATIVE-ARC-BREAK  — abrupt 1-2 paragraph intro, or a dump-like / vague
-                        abstract with no background -> contribution -> evidence arc.
-                        fp_case: terse-but-clear abstract; non-native phrasing; field
-                        conventions. ROUTE: argument chain truly breaks ->
-                        HP-ARGUMENT-CHAIN-BREAK (consistency-audit).
-      AIS-LLM-PHRASE-TICS — generic LLM phrasing tics OVERUSED: "it is worth noting" /
-                        "值得注意的是" / "意义在于", "not only ... but also", chains of
-                        however/therefore/moreover, "therefore" mid-sentence, clichéd
-                        em-dash/semicolon habits, flowery empty adverbs (elegantly,
-                        theoretically). fp_case: honest LLM-assisted writing; non-native
-                        English; house style (HUGE FP — gross cases only). ROUTE: never
-                        (pure style).
-      AIS-DEFENSIVE-HEDGE — pervasive "we do not claim ..." / "not X but rather Y"
-                        defensive framing instead of stating what was done. NOTE: Step 1
-                        already emits this DETERMINISTICALLY for the clearly pervasive
-                        case; here flag only a sub-threshold/qualitative posture it misses
-                        (e.g. a self-incriminating limitation volunteered in the
-                        contribution paragraph). Anchor >=2 representative hedge spans.
-                        fp_case: one scoping sentence is legitimate; Limitations hedges are
-                        expected; some venues penalize the ABSENCE of caveats. ROUTE: a
-                        hedge reveals a real scope/eval limitation -> HP-SCOPE-INFLATE (B)
-                        / eval-design-forensics (H).
-      AIS-JARGON-STUFF — dense term-stuffing where the surrounding argument carries no
-                        content. fp_case: genuinely dense, correct technical writing (very
-                        high FP). ROUTE: never.
-      AIS-INVENTED-CODENAME — an undefined internal-project-flavored run/experiment
-                        codename used AS IF defined (e.g. "Experiment Set Gamma"),
-                        appearing in a table/caption/heading/results sentence and never
-                        defined — and not the paper's formal method name, a standard
-                        dataset/split, an ablation label, or a config id. fp_case:
-                        legitimate named methods / benchmarks / defined release tags.
-                        ROUTE: it points to a MISSING results file / unreproducible run ->
-                        HP-MISSING-REPRO-ARTIFACT / HP-PHANTOM-RESULT (family D).
-      AIS-CLAUSE-FORMULA-WALL — fragmented "short clause then a wall of formulas"; formulas
-                        dumped without prose connective tissue. fp_case: dense-but-correct
-                        theory; field norms. ROUTE: a load-bearing symbol is actually
-                        UNDEFINED -> HP-UNDEFINED-NOTATION (G).
-      AIS-GRATUITOUS-PSEUDOCODE — pseudocode/algorithm blocks that merely restate the prose
-                        or add no operational content. fp_case: genuinely helpful algorithm
-                        listings. ROUTE: the algorithm CONTRADICTS the described method ->
-                        HP-METHOD-DRIFT (consistency-audit).
-      AIS-BULLET-LIST-OVERUSE — prose organized as many bullets, incl. sequential /
-                        progressive logic flattened into parallel-looking bullets. fp_case:
-                        legitimate enumerations; checklists. ROUTE: never.
-      AIS-BOLD-MODULE-SPAM — verbose module names with excessive bolding / acronym staging.
-                        fp_case: reasonable emphasis; defined acronyms. ROUTE: the SAME
-                        module gets incompatible abbreviations -> HP-ACRONYM-DRIFT (B,
-                        consistency-audit).
-      AIS-RESTATE-OVERCLAIM — a rhetorical restatement loop: repeatedly re-asserting "we
-                        propose an X / we do an X". fp_case: legitimate signposting. ROUTE:
-                        the claim EXCEEDS the evidence -> HP-SCOPE-INFLATE (B) / family H.
-      AIS-FOCUS-DRIFT — high-level motivation suddenly pivots to a minor implementation
-                        detail, or over-emphasizes an unnecessary requirement. fp_case: a
-                        modular paper with explicit cross-refs. ROUTE: the
-                        motivation->method->experiment chain substantively breaks ->
-                        HP-ARGUMENT-CHAIN-BREAK (B).
-      AIS-SINGLE-STYLE-FIGURES — figures share a generic generated visual grammar /
-                        single-style AI illustrations. If you cannot VISUALLY inspect the
-                        PDF, judge only from the caption text and otherwise leave it at
-                        "info". fp_case: legitimate consistent house figure style;
-                        conceptual teasers. ROUTE: checkable figure-vs-content thinness
-                        stays HP-LLM-FIGURE / HP-THIN-FLOAT (family F, presentation-signals).
-      AIS-APPENDIX-DUMPING-GROUND — the appendix reads like unintegrated trace / dumping;
-                        AI-trace heavy. fp_case: legitimately long supplementary detail.
-                        ROUTE: it CONTRADICTS the main text -> HP-APPENDIX-CONTRA (B); it
-                        contains an exact assistant/template artifact -> HP-PIPELINE-ARTIFACT
-                        (F); it affects reported data -> family D.
-
-    OUTPUT: a single JSON array, and NOTHING ELSE (no prose, no code fence). Each
-    element conforms to schemas/finding.schema.json plus the AIS fields:
-      {
-        "finding_id": "F001",
-        "skill": "ai-style-impressions",
-        "pattern_id": "<one of the 13 AIS-* ids>",
-        "title": "short, neutral",
-        "description": "the located style impression, plus the explicit note that it is an impression with ZERO verdict weight — not a factual/integrity inconsistency, not evidence of AI authorship, no probability implied",
-        "severity": "minor",
-        "observability_level_required": 0,
-        "evidence": [{"claim_id": "C0xx", "span": "verbatim substring of that claim",
-                      "location": {"file": "...", "section": "..."}}],
-        "verdict_local": "warn",
-        "false_positive_risk": "high",
-        "not_integrity_finding": true,
-        "fp_case": "the concrete legitimate (not-necessarily-AI) explanation for THIS tell",
-        "recommended_reviewer_action": "what to GLANCE AT as a readability impression — never 'reject', never 'AI-generated', never a score"
-      }
-    If nothing is blatant, return []. That is the expected output for most papers.
-```
+Read the "Step 2 — reviewer prompt" block in `reference/reviewer-prompt.md` and send it verbatim, every placeholder filled.
 
 **Failure handling.**
 - *MCP stall / hang* (common in long sessions): re-invoke the **identical** prompt as a
@@ -570,53 +362,9 @@ print(f"validated {len(kept)} AI-style impressions "
 PY
 ```
 
-Scope of this gate: **AIS allow-list + anchoring + AIS field-forcing** (it does **not**
-run `schemas/finding.schema.json`, just like `presentation-signals`) — drop everything
-that is not an `AIS-*` pattern, verbatim-span anchoring (unanchored above-info →
-`info`), `skill` forced to `ai-style-impressions`, `not_integrity_finding` forced
-`true`, FP-risk forced `high`, observability fixed to `0`, `fp_case` /
-`recommended_reviewer_action` defaulted if missing, enum coercion, and cross-model
-provenance. **No severity cap** — capping is unnecessary because
-`tools/adjudicate_findings.py` independently forces every AIS finding to `info` (by
-`skill`, by the `AIS-` prefix, AND by the deprecated-style-id set) and assigns it
-`_verdict_weight = 0`, so it is excluded from `overall_verdict` no matter what severity
-it carries here.
+Read `reference/rationale.md` ("Step 3 gate scope") for exactly what this gate enforces and why it does not cap severity.
 
-**Worked impression — `AIS-LLM-PHRASE-TICS` (anchored → kept, but ZERO verdict weight):**
-
-```json
-{
-  "finding_id": "F001",
-  "skill": "ai-style-impressions",
-  "pattern_id": "AIS-LLM-PHRASE-TICS",
-  "title": "Recurrent 'it is worth noting' / however-therefore phrasing",
-  "description": "The cited scope sentence opens with 'It is worth noting that' and the surrounding text repeatedly chains 'however … therefore … moreover' — a common LLM phrasing tic that lowers information density. This is a STYLE IMPRESSION with ZERO verdict weight: not a factual/integrity inconsistency, not evidence of AI authorship, and no probability is implied.",
-  "severity": "minor",
-  "observability_level_required": 0,
-  "evidence": [{"claim_id": "C012",
-                "span": "It is worth noting that our method generalizes across settings",
-                "location": {"file": "paper.txt", "section": "introduction"}}],
-  "verdict_local": "warn",
-  "false_positive_risk": "high",
-  "not_integrity_finding": true,
-  "fp_case": "Honest LLM-assisted drafting, non-native English, and many house styles use exactly these transitions; this is not a tell of AI authorship.",
-  "recommended_reviewer_action": "Glance at whether the phrasing tics make the section read padded; an impression only — not misconduct, not an authorship judgment."
-}
-```
-
-**Worked non-finding — single em-dash (REFUSED, not emitted):** the reviewer is tempted
-to flag one em-dash in a sentence. This is on the **refuse-list** (a standalone
-single-punctuation tell is never a pattern) — it is **not** emitted, not even as `info`.
-A style impression is about a *located, repeated, named* observation; one character is
-not one. **We are not an AI-text classifier.**
-
-**Worked routing — `AIS-INVENTED-CODENAME` vs `HP-PHANTOM-RESULT`:** the reviewer sees
-"Experiment Set Gamma" in a results table with no definition. If it is merely an
-undefined, generation-flavored label, it is an `AIS-INVENTED-CODENAME` impression (zero
-weight). But if that codename's row reports a number with **no backing results file**,
-that is a substantive integrity problem — **drop the AIS impression and route it** to
-`experiment-forensics` (`HP-PHANTOM-RESULT` / `HP-MISSING-REPRO-ARTIFACT`, family D, at
-L2). The style track never carries the substantive accusation.
+Read `reference/worked-examples.md` for a kept impression, a refused non-finding and a routing case before you judge borderline output.
 
 **Failure handling.** A `KeyError` / `JSONDecodeError` means the reviewer output was
 malformed → re-run Step 2 once with the strict-JSON reminder. If it is **still**
@@ -738,24 +486,7 @@ AIS findings in the separate zero-weight section. They **never** move `overall_v
 
 ## When NOT to use this skill
 
-- **No `claims.json` yet** → run `/evidence-ledger` first; this skill never invents
-  structure from the raw PDF.
-- **You want an AI-text / "looks machine-written" / authorship verdict or score** → out
-  of scope **by design**. AIS records style impressions, never provenance; for
-  authorship detection use a dedicated tool (Pangram / GPTZero / Binoculars).
-- **You found a real integrity problem** → route it to the owning auditor, not here:
-  numeric/method self-contradiction → `/consistency-audit`; citation existence /
-  wrong-context → `/citation-forensics`; "SOTA" / baseline integrity →
-  `/baseline-comparison-audit`; code/result fraud (fake GT, self-norm, phantom) →
-  `/experiment-forensics` at L2; proof gaps / undefined notation →
-  `/proof-derivation-forensics`; evaluation validity → `/eval-design-forensics`;
-  checkable surface tells (dup tables, thin/LLM figures, padding, pipeline strings) →
-  `/presentation-signals`.
-- **As the basis for a reject / accusation** → never. An AIS impression carries zero
-  verdict weight; the strongest thing it can do is say "here is a located style tell a
-  reviewer might react to — look closer, and route it if it is actually substantive."
-- **On a timer** → never `/loop` / `/schedule` / `CronCreate` this skill; re-fire only
-  when the paper or ledger changes (see the fence at the top).
+Read `reference/routing.md` ("When NOT to use this skill") before running if the request is an authorship verdict, a real integrity problem, or a reject basis; it lists where each goes.
 
 ## Review tracing
 

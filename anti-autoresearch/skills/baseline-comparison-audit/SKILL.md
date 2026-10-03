@@ -13,45 +13,7 @@ This skill computes **no verdict**.
 
 > 🔒 **Run once per input change; never wrap in `/loop`, `/schedule` or `CronCreate`** (`${CLAUDE_PLUGIN_ROOT}/support/references/run-cadence.md`). Re-run only when the paper, the ledger or the live leaderboard it cross-checks changes.
 
-> Adapted from ARIS `paper-claim-audit` — its **scope-overclaim** and
-> **delta-arithmetic** checks, reframed from "paper vs result files" to **"is the
-> SOTA claim earned, and is the comparison a fair fight?"** — plus a per-domain
-> baseline profile and a completeness / fairness / significance split. A favourite
-> autoresearch shortcut is to claim SOTA while omitting the obvious recent baseline,
-> to beat an undertuned one, or to write "outperforms" over error bars that overlap.
-> This skill is the constraint that asks for the fair fight, pointed at a third
-> party's submission, and it stays honest about what it cannot settle from a PDF.
-
-## Why this exists
-
-An autoresearch pipeline (or rushed human) optimises for the *headline* and treats
-the comparison table as scaffolding to fill, not a fair experiment to run. The
-repeatable failure modes:
-
-- **Completeness** — "achieves state-of-the-art on GSM8K" while the obvious recent
-  baseline a 2024–2026 reviewer expects is simply absent from the table, or the
-  strong classical **floor** (BM25 for retrieval, GBDT for tabular, a linear/naive
-  forecaster for time-series) is skipped while only weak neural baselines are beaten.
-  `HP-MISSING-BASELINE`
-- **Fairness** — the proposed method is tuned for 100 epochs / 5 seeds / extra data,
-  the baseline is run at default settings for 10; or the compared rows use different
-  backbones, splits, or eval protocols; or the single most informative baseline —
-  the method's **own backbone with the new component removed, at an identical
-  budget** — is missing. `HP-WEAK-BASELINE`
-- **Significance** — "consistently outperforms" on a 0.3-point gap with overlapping
-  error bars, with no variance / no seed count reported at all, or resting on a single
-  dataset too thin for the "consistent / across-the-board" wording. `HP-SIG-OVERLAP`
-- **Delta arithmetic** — "improves over the strongest baseline by 16%" when the
-  baseline row is 73.1 and the proposed row is 78.0 (+6.7% relative / +4.9 points),
-  the two operands sitting in *different* cells so the single-sentence deterministic
-  pass cannot pair them. `HP-DELTA-ERROR` (cross-row form)
-
-None of these is inherently misconduct — they are what an optimizing agent does when
-nothing forces a fair comparison. The *stated* version is decidable at **L0** from
-the manuscript; the *verified* version (real configs, real seeds) deepens at **L2**.
-What this skill will **not** do is *guess*: where no domain profile exists and the
-leaderboard search is inconclusive, the completeness question is handed off as
-`needs_external_check`, not invented.
+Read `reference/rationale.md` for the ARIS lineage and the failure modes this audit targets (why it exists); it is background, not procedure.
 
 ## Core principle
 
@@ -83,48 +45,14 @@ settle.** Four properties:
 
 ## How this differs from the other auditors (route correctly)
 
-| Auditor | Question it answers | Level |
-|---------|---------------------|------|
-| `consistency-audit` | Does the paper contradict ITSELF / described method = evaluated method? (owns text-only `HP-SCOPE-INFLATE` + single-sentence `HP-DELTA-ERROR`) | L0 |
-| `experiment-forensics` | Are the reported numbers what the code actually computes? (fake GT, self-norm, phantom) | L2 |
-| **`baseline-comparison-audit`** (this) | **Are the right baselines present (completeness), fairly tuned/configured (fairness), and is "outperforms/SOTA" statistically earned (significance)?** | **L0 stated / L2 verified** |
-| `citation-forensics` | Do the cited baseline papers exist and support the claim? | L0 |
-| `presentation-signals` | Surface "AI-flavor" hints (auxiliary, capped at minor) | L0 |
-| `adversarial-case-builder` | Strongest evidence-bound rejection memo (no verdict weight) | any |
-
-**Do NOT raise here** (hand off instead): generic in-text scope inflation
-("comprehensive / extensive / robust" decoupled from a SOTA/comparison claim) →
-`consistency-audit` owns `HP-SCOPE-INFLATE`; a single-sentence "from A to B, X%"
-delta whose operands and stated value sit in **one** sentence → already caught
-deterministically by `consistency-audit` (do **not** re-emit — Step 5 dedups);
-whether a baseline *number* matches the repo/code → `experiment-forensics` (L2);
-whether a *cited* baseline paper exists / is used in-context → `citation-forensics`;
-surface / AI-flavor → `presentation-signals`. This skill **never** emits an
-F-pattern.
+This skill owns completeness, fairness, significance and cross-row delta of baseline comparisons (L0 stated / L2 verified).
+Text-only scope inflation and single-sentence deltas belong to `consistency-audit`; baseline-number-vs-code to `experiment-forensics` (L2);
+cited-paper existence to `citation-forensics`; surface tells to `presentation-signals`. This skill never emits an F-pattern.
+Read `reference/routing.md` for the full auditor table and the hand-off list when a finding might belong to another auditor.
 
 ## Per-domain baseline profile (`PROFILE_VERSION = 0.1` — a SEED prior, always verified live)
 
-The expected baseline set a competent 2024–2026 reviewer carries into the table. It
-is **advisory** and deliberately at the level of *families / floors* (not pinned
-method names that go stale); the **live `WebSearch`/`WebFetch` leaderboard check
-(Step 2) is the authoritative cross-check** — the profile only seeds the question.
-The **Fairness control** column names the matched-budget axis a `HP-WEAK-BASELINE`
-finding turns on; the **Variance norm** column is what `HP-SIG-OVERLAP` turns on.
-
-| Domain / benchmark | Expected baseline families (**bold = the easy-to-skip floor**) | Fairness control (matched-budget axis) | Variance norm (significance) |
-|---|---|---|---|
-| LLM reasoning / QA — GSM8K, MATH, MMLU, BBH, GPQA | a current frontier model (Llama-3.x, Qwen2.5, DeepSeek) + the prior method on the same benchmark; **strong CoT / self-consistency on the same base** | same base model; identical #shots, decoding (temp / SC samples), tool access, finetune data | variance over prompts/seeds for small gaps |
-| Image classification — ImageNet-1k | a recent strong backbone at matched params/FLOPs (ConvNeXt-V2, DeiT-III, Swin-V2, MAE-ViT); **a well-tuned modern CNN** | params, FLOPs, input res, epochs, augmentation, pretrain data | single run common; ±std if pretraining differs |
-| Detection / segmentation — COCO, ADE20K | a recent strong detector/segmenter at the same backbone & schedule (DINO, Co-DETR, ViTDet, Mask2Former); **a strong one-stage baseline** | backbone, schedule (1×/3×), input scale, extra data | single run common; ±std on mIoU if available |
-| Machine translation — WMT | tuned Transformer-big + a recent NMT/LLM-MT system; **report COMET, not only BLEU** | data, model size, beam, vocab; same test split + (de)tok protocol | bootstrap CI on BLEU/COMET |
-| Generation — FID on ImageNet/COCO, GenEval | a recent strong generator at matched sampling budget (DiT, EDM2, U-ViT, LDM); **report precision/recall, not only FID** | NFE/sampler, params, guidance; identical FID protocol (#samples, ref stats) | FID over a fixed sample size; seed/sample noise |
-| Retrieval / RAG — BEIR, MTEB, NQ | a strong dense retriever + prior SOTA; **BM25 (the lexical floor)** | same corpus, index, eval protocol (full vs sampled negatives) | per-query bootstrap CI |
-| Tabular learning | a strong recent DL-tab model + prior SOTA; **a well-tuned GBDT (XGBoost/LightGBM/CatBoost) — it MUST be tuned** | HPO-budget parity, features, splits | std over folds/seeds |
-| Time-series forecasting | a strong recent forecaster + prior SOTA; **a linear / naive-seasonal baseline** | lookback, horizon, normalization, splits | std over windows/seeds |
-| RL — control (MuJoCo/DMC), offline (D4RL), Atari | tuned SAC/TD3/PPO (online), CQL/IQL/Decision-Transformer (offline), Rainbow/IQN/DrQ/SPR (Atari); **a well-tuned standard algorithm** | env steps / frames / dataset, net size, #eval seeds & episodes | ≥5 seeds + std/IQM (rliable CI) |
-| Code generation — HumanEval, MBPP, LiveCodeBench | a current frontier code LLM + prior SOTA + a same-size open base; **the base model w/o the proposed scaffold** | model size, #shots, decoding, contamination window | variance over samples (pass@k seeds) |
-| Speech ASR — LibriSpeech | a Whisper-class / Conformer system + prior SOTA | training data, decoding / LM | WER ±CI if available |
-| Graph — OGB | a strong GNN family + the prior OGB-leaderboard entry | features, splits | std over seeds |
+The per-domain table (expected baseline families, fairness control, variance norm) is in `reference/domain-profiles.md`. Read it at Step 2 item 1.
 
 **Cross-domain control (always applicable, even off-profile):** the single most
 informative baseline is the proposed method's **own backbone / base model with the
@@ -279,6 +207,8 @@ build a **candidate expected set with sources** — structured *evidence*, not a
 verdict. The recency guard is what stops you from naming a hallucinated or concurrent
 baseline as "missing":
 
+Read `reference/domain-profiles.md` now; item 1 looks the task up in its table.
+
 1. **Profile lookup.** If the task is in the per-domain profile above, take its
    expected baseline families (incl. the **floor**) and the matched-budget axis. If
    no row matches → mark the domain `NO_PROFILE`; completeness defaults to
@@ -335,91 +265,7 @@ reviewer reads `claims.json` from its `cwd` for the *present* baselines and comp
 against your *external* expected-set facts; every finding anchors to a ledger
 `claim_id`. Send EXACTLY (fill every `[ ... ]`):
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are a baseline-COMPLETENESS forensics reviewer. You judge ONE thing: given
-    what this paper claims ("state-of-the-art / best / first / outperforms prior
-    work") on a benchmark, is an OBVIOUS, RECENT, RELEVANT baseline absent from the
-    comparison? You do NOT judge whether numbers are real and you do NOT grade the
-    paper. Describe a discrepancy to CHECK, never an accusation; hand off what you
-    cannot ground.
-
-    INPUTS (in your working directory — read them directly):
-      - claims.json — the evidence ledger. The SOTA/comparison LANGUAGE lives in
-        type:"comparison" and type:"scope" claims; the PRESENT baseline set in
-        type:"baseline" claims; reported values + table rows in type:"number" /
-        type:"table_cell"; figure/table labels in type:"caption". This is the ONLY
-        structure you reason over; each claim = {claim_id, type, text_span (VERBATIM),
-        location, value?}. You MAY re-open a source file to confirm a span is real,
-        but you may NOT introduce a claim that is not in the ledger.
-    REFERENCE (external facts gathered by the executor — cite the source in your
-    finding; treat as GIVEN data, NOT a verdict, do not second-guess):
-      - Profile row (PROFILE_VERSION 0.1): expected baseline FAMILIES = [...];
-        matched-budget axis = [...].
-      - Live leaderboard (<URL>, accessed <DATE>): top current systems + their
-        dates/venues = [...].
-      - Candidate expected set (name · same_benchmark? · published_before_paper? ·
-        source): [paste expected_baseline_set.json from Step 2, or "NO_PROFILE /
-        search unavailable"].
-    ANCHOR TARGETS (the SOTA/comparison claims — claim_id + verbatim):
-      [paste the anchor claims from Step 1]
-    BASELINES THE PAPER REPORTS (mechanical extraction — may be incomplete):
-      [paste the baseline-list claims + the grep names from Step 1]
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-
-    HARD RULES (a finding that breaks any of these is worthless):
-    1. ANCHOR. Every finding above "info" MUST carry >=1 evidence {claim_id, span}
-       where claim_id EXISTS in claims.json and span is a VERBATIM whitespace-
-       normalized SUBSTRING of THAT claim's text_span (no paraphrase). The primary
-       anchor is the SOTA/outperforms claim (a comparison/scope claim); the named
-       missing baseline goes in `description`, never as the anchor. ALWAYS anchor —
-       even a needs_external_check finding — so it stays navigable.
-    2. DISCREPANCY, NOT ACCUSATION. Never "reject", "fabricated", "the authors hid X".
-    3. OBSERVABILITY. A missing-baseline-as-STATED is decidable from the manuscript
-       => observability_level_required = 0.
-    4. HAND OFF WHAT YOU CANNOT SETTLE (the core rule of this step). Emit
-       HP-MISSING-BASELINE above info ONLY when ALL hold: (a) a SOTA/best/outperforms
-       claim is anchored; (b) a SPECIFIC, NAMED baseline is absent from the present
-       set; (c) per the supplied sources that baseline is an ESTABLISHED, publicly-
-       available, PRE-DATING standard for THIS exact benchmark (not concurrent, not
-       post-dating, not unavailable, not justified-as-omitted in the paper). If ANY of
-       (b)/(c) is uncertain — concurrent/post-dating per the dates, no code, niche
-       benchmark, NO_PROFILE, the paper justifies the omission — DO NOT flag: set
-       verdict_local "needs_external_check", requires_external_check true, severity
-       "info", false_positive_risk "high", and name what a human should verify.
-    5. HONEST FP. Concurrency/post-dating, unavailability, and a stated justification
-       are the common false positives here — say so. If the expected set is empty/
-       inconclusive, do NOT manufacture a missing baseline.
-    6. pattern_id MUST be HP-MISSING-BASELINE.
-
-    SEVERITY DECISION (HP-MISSING-BASELINE):
-      - unambiguous, sourced, same-benchmark, clearly PRE-DATING omission AND the
-        paper's HEADLINE is the SOTA/best claim -> "critical", FP "low",
-        requires_external_check false.
-      - clearly relevant + likely prior but contestable, OR a skipped strong FLOOR
-        (BM25/GBDT/linear) while only weak baselines are beaten -> "major", FP
-        "medium", requires_external_check true.
-      - uncertain / NO_PROFILE / cannot confirm recency or relevance -> "info",
-        verdict_local "needs_external_check", requires_external_check true.
-
-    OUTPUT: a single JSON array and NOTHING ELSE (no prose, no code fence). Each
-    element conforms to schemas/finding.schema.json:
-      {"finding_id":"BC001","skill":"baseline-comparison-audit",
-       "pattern_id":"HP-MISSING-BASELINE","title":"short, neutral",
-       "description":"which expected baseline is absent + the SOTA claim it undermines + the source",
-       "severity":"critical|major|minor|info","observability_level_required":0,
-       "evidence":[{"claim_id":"C0xx","span":"verbatim substring",
-                    "location":{"file":"...","section":"..."}}],
-       "verdict_local":"fail|warn|clean|needs_external_check",
-       "requires_external_check":true|false,"false_positive_risk":"low|medium|high",
-       "recommended_reviewer_action":"what to CHECK or ASK — never 'reject'"}
-    An empty array [] is a valid, honest result (the expected baselines are all present).
-```
+Read the "Step 3 — completeness prompt" block in `reference/reviewer-prompts.md` and send it verbatim, every `[ ... ]` filled.
 
 Persist the raw response to the trace dir (Step 7) **before** parsing. **Failure
 handling:** MCP stall → re-invoke the **identical** prompt as a fresh
@@ -453,124 +299,7 @@ fi
 
 Then send EXACTLY (fill every `[ ... ]`):
 
-```
-mcp__codex__codex:
-  model: gpt-5.5
-  config: {"model_reasoning_effort": "xhigh"}
-  sandbox: read-only
-  cwd: <absolute PAPER_DIR from Step 0>
-  prompt: |
-    You are a baseline-FAIRNESS-and-SIGNIFICANCE forensics reviewer. For each head-
-    to-head comparison the paper draws ("we outperform / are better than / achieve X
-    vs baseline Y"), check whether it is FAIR (matched budget/tuning/config),
-    SIGNIFICANT (the gap exceeds reported noise), and whether the stated cross-row
-    improvement matches its operands. PROPOSE findings only — do NOT grade the paper;
-    describe a discrepancy to CHECK, never an accusation. You do NOT judge whether the
-    numbers are real (that needs the code) — only what the paper's OWN comparison shows.
-
-    INPUTS (read directly in your working directory):
-      - claims.json — comparison LANGUAGE in type:"comparison" / type:"scope"; the
-        baseline set in type:"baseline"; values + table rows in type:"number" /
-        type:"table_cell"; labels in type:"caption". The ONLY structure you navigate
-        by; each claim = {claim_id, type, text_span (VERBATIM), location, value?}. You
-        MAY re-open a source file (and, at L2, the config/result files) to confirm a span.
-    RUN OBSERVABILITY LEVEL L = <L from Step 0>.
-    HEAD-TO-HEAD comparison claims (anchor targets — claim_id + verbatim text_span):
-      [paste the comparison/scope anchor claims + the relevant number/table_cell claims]
-    REPORTED VARIANCE / SEEDS (if any, with claim_id):
-      [paste any "+/-", "std", "over N seeds", "n=" spans, or write "NONE REPORTED"]
-    L2 CONFIG FACTS (raw grep/hash hits + config paths — uninterpreted; empty if L<2):
-      [paste the grep/find/shasum output above, or "L<2: no repo/configs available"]
-
-    HARD RULES:
-    1. ANCHOR every finding above "info" to a real claim_id + a VERBATIM substring of
-       that claim. Anchor to the comparison claim (and the row's number/table_cell as
-       extra evidence). A config file:line is forensic detail for the description —
-       NOT a valid anchor. No verbatim span ⇒ keep at "info".
-    2. DISCREPANCY, NOT ACCUSATION. Say what to CHECK/ASK. Never "reject"/"faked".
-    3. OBSERVABILITY — set observability_level_required to the LOWEST tier at which the
-       discrepancy is DECIDABLE: 0 when the asymmetry/variance/delta is VISIBLE IN THE
-       PAPER TEXT/TABLES (e.g. "we train ours 300 epochs" vs a cited 90-epoch baseline
-       number); 2 when CONFIRMING it needs the repo's config/result files (it auto-
-       demotes on an L0/L1 run — that is correct, not a loss).
-    4. HONEST FP. A documented identical budget, standard reference numbers cited from
-       a baseline's own paper, a large gap, a reported significance test, and
-       genuinely deterministic metrics are COMMON false positives — say so.
-    5. pattern_id MUST be one of: HP-WEAK-BASELINE, HP-SIG-OVERLAP, HP-DELTA-ERROR,
-       HP-RESOURCE-IDENTITY-MISMATCH.
-
-    CHECKLIST (one finding per concrete discrepancy):
-     1. FAIRNESS / WEAK BASELINE [HP-WEAK-BASELINE] — the proposed method gets more
-        compute / tuning / data, or runs at more favorable settings, than the baseline;
-        the compared rows use non-matching configs (backbone / data / split /
-        decoding); a baseline is left at defaults while the method is tuned; a baseline
-        number is copied from an old paper at a different budget. The strongest single
-        check: is the method's OWN backbone-without-the-new-component (the ablation-as-
-        baseline) reported at an IDENTICAL budget? severity major. observability 0 if
-        the asymmetry is STATED in text; 2 if only the configs reveal it. FP: identical
-        budget documented; a standard reference number quoted from the baseline's own
-        paper (citing a published number is legitimate — note any config delta, do not
-        allege).
-     2. SIGNIFICANCE / OVERLAP [HP-SIG-OVERLAP] — "outperforms / better / consistently"
-        claimed where reported error bars OVERLAP, or where NO variance / seed count is
-        reported for a SMALL gap (within the field's typical noise for this metric).
-        severity: major if error bars are reported AND overlap; minor if merely absent
-        variance for a small gap (rise to major only if the headline rests on it).
-        observability 0. FP (high → say so): a large gap; a significance test reported;
-        a genuinely deterministic metric (exact match on a fixed test set). Two further
-        thin-evidence signals — each a recurring real-review tell — to flag EXPLICITLY
-        (SAME pattern_id HP-SIG-OVERLAP, SAME anchor = the comparison/SOTA claim):
-        (a) NO VARIANCE / SEEDS REPORTED — the comparison rests on bare point estimates
-            with NO ±/std/CI and NO seed/run count reported AT ALL (one number per cell,
-            no "over N seeds"), so the gap cannot be told from run-to-run noise. severity
-            minor for a small gap; major when the headline rests on it OR the profile's
-            "Variance norm" column expects >=N seeds for this domain (e.g. RL >=5 seeds,
-            retrieval per-query CI) and none are reported. observability 0. FP (high →
-            say so): a large clearly-separated gap; a reported significance test; a
-            genuinely deterministic / single-pass metric where seeds are moot.
-        (b) SINGLE-DATASET-ONLY — a "consistently / robustly / across-the-board /
-            general" comparison claim that rests on ONE dataset/benchmark (or a single
-            split/domain), too thin for the breadth the wording asserts. severity minor;
-            major only when that breadth IS the headline. observability 0. FP (high →
-            say so): the claim is explicitly SCOPED to that one benchmark ("on GSM8K we
-            …"); the dataset is the field-standard SOLE benchmark for the task; or broad
-            scope genuinely exists elsewhere in the paper. LANE: this fires ONLY when
-            anchored to a comparison/SOTA claim — generic scope-language inflation with
-            NO comparison claim ("a comprehensive study") is consistency-audit's
-            HP-SCOPE-INFLATE, not this; do NOT double-emit.
-     3. CROSS-ROW DELTA ARITHMETIC [HP-DELTA-ERROR] — recompute a stated "improves over
-        <baseline> by X%" as (proposed-baseline)/baseline AND absolute points; flag if
-        X disagrees beyond rounding, or relative/absolute are conflated to inflate.
-        severity major; critical if the corrected delta deflates a "large/significant"
-        framing. observability 0. FP: abs-vs-rel stated explicitly; rounding. DELTA
-        SCOPE (critical to avoid double-counting): flag ONLY when the two operands are
-        a BASELINE row value and the PROPOSED row value living in DIFFERENT
-        sentences/cells — the cross-row case a single-sentence regex cannot pair. Do
-        NOT re-flag a delta whose operands AND stated value sit in ONE sentence — the
-        deterministic consistency pass already owns those.
-     4. RESOURCE IDENTITY [HP-RESOURCE-IDENTITY-MISMATCH] — a named dataset / benchmark /
-        model is described with a checkable PUBLIC-RECORD property its registry contradicts
-        (ImageNet-1k stated with the wrong #classes/size; a model's parameter count off from
-        its card; a "SOTA 91.2 on <benchmark>" disagreeing with that benchmark's public
-        leaderboard). RESOLVE each named resource against its HuggingFace dataset/model card
-        or Papers-with-Code record (WebFetch/WebSearch — FACTS only; put the URL + access
-        date in `description`); the reviewer judges the discrepancy. Anchor to the paper
-        claim NAMING the resource (never the registry URL). severity major; critical if the
-        mis-described resource IS the headline (the SOTA number that is the contribution).
-        observability 0 (public-record contradiction) / 2 (the repo loads a different
-        resource than named). FP (→ needs_external_check, never a guessed "wrong"): a
-        declared subset/variant (ImageNet-100, a 10% split, a distilled/quantized model); a
-        version difference (-21k vs -1k, v1 vs v2); an explicit redefinition; a stale /
-        ambiguous registry or a leaderboard updated after submission. LANE: method
-        described ≠ method evaluated is HP-METHOD-DRIFT (consistency-audit); a fabricated
-        citation identity is HP-CITE-HALLUC — this is the named RESOURCE's identity vs its
-        public record.
-
-    OUTPUT: a single JSON array and NOTHING ELSE (schemas/finding.schema.json), same
-    shape as the completeness prompt; set finding_id "BC0xx",
-    skill "baseline-comparison-audit". An empty array [] is valid and honest. Set
-    requires_external_check only when you genuinely cannot settle a point at this level.
-```
+Read the "Step 4 — fairness + significance + cross-row delta prompt" block in `reference/reviewer-prompts.md` and send it verbatim, every `[ ... ]` filled.
 
 **Deepen at L2.** When `L == 2`, the L2 config facts let the reviewer promote a
 text-only suspicion to a confirmed `HP-WEAK-BASELINE` (keep `observability_level_required:
@@ -592,100 +321,7 @@ hallucinated text to a real claim must fail). Pass **every** saved raw reviewer
 response (completeness + fairness + any per-entry fan-out files); they merge into one
 findings file with one `BC###` namespace:
 
-```bash
-ROOT="${CLAUDE_PLUGIN_ROOT}/support"
-LEDGER="<abs path to claims.json>"
-OUT="$(dirname "$LEDGER")/baseline-comparison-audit.findings.json"
-# args: LEDGER OUT then each saved raw reviewer response file from Steps 3–4:
-python3 - "$LEDGER" "$OUT" "<resp_completeness.md>" "<resp_fairness.md>" <<'PY'
-import json, re, sys, os
-ledger_path, out_path = sys.argv[1], sys.argv[2]
-resp_paths = [p for p in sys.argv[3:] if p and os.path.isfile(p)]
-
-def nw(s):                                   # mirror adjudicator _norm_ws (whitespace only)
-    return " ".join((s or "").split())
-
-OWNED = {"HP-MISSING-BASELINE", "HP-WEAK-BASELINE", "HP-SIG-OVERLAP", "HP-DELTA-ERROR",
-         "HP-RESOURCE-IDENTITY-MISMATCH"}
-ABOVE = {"critical", "major", "minor"}
-
-ledger = json.load(open(ledger_path, encoding="utf-8"))
-base = {c["claim_id"]: nw(c.get("text_span", "")) for c in ledger.get("claims", [])
-        if c.get("claim_id")}
-
-# best-effort dedup target: claim_ids the DETERMINISTIC consistency delta pass already
-# flagged (consistency-audit.deterministic.findings.json, if it exists in this dir).
-det_path = os.path.join(os.path.dirname(os.path.abspath(ledger_path)),
-                        "consistency-audit.deterministic.findings.json")
-det_delta = set()
-if os.path.isfile(det_path):
-    try:
-        for f in json.load(open(det_path, encoding="utf-8")):
-            if f.get("pattern_id") == "HP-DELTA-ERROR":
-                for ev in f.get("evidence") or []:
-                    if ev.get("claim_id"): det_delta.add(ev["claim_id"])
-    except Exception:
-        pass
-
-proposed = []
-for p in resp_paths:
-    raw = open(p, encoding="utf-8").read()
-    m = re.search(r"\[.*\]", raw, re.S)      # tolerate prose / code-fence wrapping
-    try:
-        chunk = json.loads(m.group(0) if m else raw)
-        proposed += chunk.get("findings", []) if isinstance(chunk, dict) else chunk
-    except Exception as e:
-        print(f"WARN: could not parse {p}: {e}", file=sys.stderr)
-
-kept, demoted, deduped, not_owned = [], 0, 0, 0
-for f in proposed:
-    if not isinstance(f, dict):
-        continue
-    f["skill"] = "baseline-comparison-audit"
-    # ANCHOR: keep only evidence whose span is a verbatim ws-normalized substring of its claim
-    anchored = [ev for ev in (f.get("evidence") or [])
-                if ev.get("claim_id") in base and nw(ev.get("span", "")) and
-                nw(ev["span"]) in base[ev["claim_id"]]]                 # span IN claim, not claim IN span
-    f["evidence"] = anchored
-    # owned-pattern gate: a non-owned pattern cannot rise above info here
-    if f.get("pattern_id") and f["pattern_id"] not in OWNED and f.get("severity") in ABOVE:
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("pattern-not-owned"); not_owned += 1
-    # best-effort delta dedup vs the deterministic single-sentence pass
-    if f.get("pattern_id") == "HP-DELTA-ERROR" and f.get("severity") in ABOVE \
-       and any(ev.get("claim_id") in det_delta for ev in anchored):
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("dup-of-deterministic-delta"); deduped += 1
-    # ANCHOR gate: above-info needs >=1 anchored span
-    if f.get("severity") in ABOVE and not anchored:
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("unanchored"); demoted += 1
-    # OBSERVABILITY hygiene — MIRROR the adjudicator, fail-closed: an above-info finding whose
-    # observability_level_required is missing/invalid demotes to info. NEVER silently default to 0
-    # (that would let a forgotten level-2 config-only asymmetry survive an L0 run). type() not
-    # isinstance() so JSON booleans (True==1) are rejected, exactly as adjudicate_findings.py does.
-    olr = f.get("observability_level_required")
-    if f.get("severity") in ABOVE and (type(olr) is not int or not (0 <= olr <= 3)):
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("undeclared-observability"); demoted += 1
-    # FP-RISK hygiene — false_positive_risk is the REVIEWER's self-assessment (it drives the
-    # adjudicator's cap); the executor never guesses it. Missing/invalid demotes to info, never a default.
-    if f.get("severity") in ABOVE and f.get("false_positive_risk") not in ("low", "medium", "high"):
-        f["severity"] = "info"; f.setdefault("_demotions", []).append("undeclared-fp-risk"); demoted += 1
-    f.setdefault("reviewer", {"model": "gpt-5.5", "reasoning": "xhigh", "deterministic": False})
-    # honest hand-off: needs_external_check carries no severity weight (adjudicate_findings.py has
-    # no such gate, so the validator makes the claim true) — pin it to info, never drop it.
-    if f.get("verdict_local") == "needs_external_check":
-        f["requires_external_check"] = True
-        if f.get("severity") in ABOVE:
-            f["severity"] = "info"; f.setdefault("_demotions", []).append("needs-external-check-no-weight")
-    kept.append(f)
-
-for k, f in enumerate(kept, 1):                                        # one namespace, sequential
-    f["finding_id"] = f"BC{k:03d}"
-
-json.dump(kept, open(out_path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-above = sum(1 for x in kept if x.get("severity") in ABOVE)
-print(f"validated {len(kept)} baseline findings (above_info={above}; {demoted} demoted->info "
-      f"(unanchored/undeclared); {not_owned} not-owned->info; {deduped} delta deduped) -> {out_path}")
-PY
-```
+Run the validator script in `reference/validator.md` verbatim (fill `LEDGER` and pass every saved raw response file). Export `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}"` first: variables are substituted in SKILL.md only, not in reference files.
 
 Scope of this gate: **anchoring + owned-pattern + delta-dedup + schema hygiene only**
 (schema hygiene = the *presence/validity* of the reviewer's required fields — a
@@ -704,72 +340,7 @@ empty array for a step means that reviewer reply was malformed → re-run that s
 the strict-JSON reminder. A finding that loses all evidence is **kept as info** (never
 silently dropped — the forensic record stays).
 
-**Worked HP-MISSING-BASELINE (headline SOTA, critical):**
-
-```json
-{
-  "finding_id": "BC001",
-  "skill": "baseline-comparison-audit",
-  "pattern_id": "HP-MISSING-BASELINE",
-  "title": "Headline SOTA claim omits an expected, pre-dating same-benchmark baseline",
-  "description": "Claim C007 asserts 'state-of-the-art on GSM8K'. The expected-set facts list Self-Consistency CoT (2023; same benchmark; predates this submission per paperswithcode <url>, accessed <date>) as a standard strong baseline, but it appears in no comparison/baseline claim in the ledger. Discrepancy to verify: a 'state-of-the-art' headline that omits an obvious pre-dating baseline — confirm the claim survives once it is included, or whether the omission is justified.",
-  "severity": "critical",
-  "observability_level_required": 0,
-  "evidence": [
-    {"claim_id": "C007", "span": "achieves state-of-the-art accuracy on GSM8K",
-     "location": {"file": "main.tex", "section": "abstract"}}
-  ],
-  "verdict_local": "fail",
-  "requires_external_check": false,
-  "false_positive_risk": "low",
-  "recommended_reviewer_action": "Ask the authors to add Self-Consistency CoT (and any other pre-dating leaderboard baseline) or to justify its omission as concurrent/unavailable; confirm the SOTA claim survives the comparison."
-}
-```
-
-**Worked needs_external_check (off-profile — hand off, do NOT guess):**
-
-```json
-{
-  "finding_id": "BC002",
-  "skill": "baseline-comparison-audit",
-  "pattern_id": "HP-MISSING-BASELINE",
-  "title": "Baseline completeness not settleable internally (off-profile benchmark)",
-  "description": "Claim C011 claims to 'outperform all prior methods' on a niche benchmark not covered by the baseline profile, and the leaderboard search was inconclusive. Completeness cannot be decided from the available inputs — NOT an allegation of an omission, only a hand-off for a domain expert to confirm the expected baseline set.",
-  "severity": "info",
-  "observability_level_required": 0,
-  "evidence": [
-    {"claim_id": "C011", "span": "outperform all prior methods",
-     "location": {"file": "main.tex", "section": "experiments"}}
-  ],
-  "verdict_local": "needs_external_check",
-  "requires_external_check": true,
-  "false_positive_risk": "high",
-  "recommended_reviewer_action": "Have a domain expert enumerate the expected baseline set for this benchmark and check it against the paper's comparison table."
-}
-```
-
-**Worked HP-WEAK-BASELINE (L2, config-confirmed budget gap):**
-
-```json
-{
-  "finding_id": "BC003",
-  "skill": "baseline-comparison-audit",
-  "pattern_id": "HP-WEAK-BASELINE",
-  "title": "Compared rows use an unequal training budget",
-  "description": "Claim C019 reports the proposed method (78.0) 'outperforms the baseline' (73.1) in Table 2. configs/ours.yaml sets epochs=100, n_seeds=5 (sha256 a1b2c3…) while configs/baseline.yaml sets epochs=10, n_seeds=1 — a 10x budget asymmetry in the compared rows, with no matched-budget / equal-budget ablation-as-baseline run reported. Discrepancy to verify: the 4.9-point gap may reflect compute, not method.",
-  "severity": "major",
-  "observability_level_required": 2,
-  "evidence": [
-    {"claim_id": "C019", "span": "our method (78.0) outperforms the baseline (73.1)",
-     "location": {"file": "main.tex", "section": "table:2"}}
-  ],
-  "verdict_local": "warn",
-  "reviewer": {"model": "gpt-5.5", "reasoning": "xhigh", "thread_id": "<codex thread>", "deterministic": false},
-  "requires_external_check": false,
-  "false_positive_risk": "low",
-  "recommended_reviewer_action": "Ask the authors for the baseline under the same epochs/seeds/backbone budget as the proposed method (the config delta is at configs/{ours,baseline}.yaml), or to document why the budgets differ."
-}
-```
+Read `reference/worked-examples.md` for three worked findings (a critical HP-MISSING-BASELINE, a needs_external_check hand-off, an L2 HP-WEAK-BASELINE) when you shape the output.
 
 ## Step 6 — Emit (one file)
 
@@ -909,23 +480,7 @@ second deterministic file** and never edits the audited paper.
 
 ## When NOT to use this skill
 
-- **No `claims.json` yet** → run `/evidence-ledger` first; this skill never invents
-  structure from the raw PDF.
-- **The paper makes no comparison / SOTA / baseline claim** (`APPLICABLE = no` in
-  Step 1) → write `[]` and stop; there is nothing to audit.
-- **Generic in-text scope inflation with no comparison** ("a *comprehensive* study")
-  → `/consistency-audit` (`HP-SCOPE-INFLATE`).
-- **A single-sentence "from A to B, X%" delta** → already caught deterministically by
-  `/consistency-audit`; do not re-emit.
-- **Whether a baseline NUMBER matches the repo / code** (fake GT, self-norm, phantom)
-  → `/experiment-forensics` at **L2**.
-- **Whether a *cited* baseline paper EXISTS / is used in-context** →
-  `/citation-forensics`.
-- **An AI-text / "looks machine-written" verdict** → out of scope; surface hints live
-  in `/presentation-signals` (auxiliary, capped at minor). This repo is **not** an
-  AI-text classifier.
-- **On a timer** → never `/loop` / `/schedule` / `CronCreate` this skill; re-fire only
-  when the paper, ledger, or live leaderboard changes (see the fence at the top).
+Read `reference/routing.md` ("When NOT to use this skill") before running if the request is outside baseline comparisons; it lists where each such request goes.
 
 ## Review tracing
 
