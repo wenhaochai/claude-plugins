@@ -52,8 +52,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    on an axis.
 3. **The words are the owner's or the data's.** The title names what is plotted and never states a
    conclusion: `Vals Index cost-accuracy frontier`, not `Six models set the Vals Index cost-accuracy
-   frontier`; `Throughput by setting`, not `Model A is fastest`. Nor does it name an axis: no `against compute`, `by training tokens`, `over training`; the
-   axis labels already say it (the owner: "by training tokens 这种描述 ... 是冗余的"). No count of winners, no verb of
+   frontier`; `Throughput by setting`, not `Model A is fastest`. Nor does it name an axis or the comparison the y axis already states: no `against compute`, `by training tokens`,
+   `over training`, `against the baseline during training`, `X minus Y`; the axis labels already say it (the owner:
+   "by training tokens 这种描述 ... 是冗余的"; "against the baseline during training 这种描述 ... 冗余"). No count of winners, no verb of
    outcome, no comparative: what to take away goes in the caption. It is a plain noun phrase, the
    caption's bold lead: `The judge boundary`, never a roundabout sentence such as `What crosses the
    boundary and what stops at it` (the owner: "not how a person writes"). The wording is the owner's; until
