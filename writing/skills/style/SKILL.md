@@ -59,7 +59,7 @@ Additions for page-constrained conference papers (NeurIPS/ICML/ICLR 9-page caps 
 
 - **RULE-P12** Lead with the simplest example that captures the crux of the problem, then generalize. Generality without a grounded toy case is the enemy of understanding. For every parameter or feature in the toy, check whether removing it keeps the problem interesting; if so, remove it before generalizing.
 
-- **RULE-P13** A figure caption must stand alone: state what is plotted, what the axes are, and what the reader is meant to take away. A reader who skims only figures and captions should still get the main empirical claim.
+- **RULE-P13** A figure caption must stand alone: state what is plotted, what the axes are, and what the reader is meant to take away. A reader who skims only figures and captions should still get the main empirical claim. Never pad a caption with sentences that describe the figure or table itself: what it is for, how its rows or columns are laid out, what a dash or a link means ("Each row gives the task's short name, ... and links to ...", "A dash marks a link the task does not have"). The header and the cells already say that. A table that only lists items takes its bold title alone (the owner, 2026-10-03: hates filler captions).
 
 - **RULE-P14** Treat theorems as the paper's public API. State at most 2–3 main theorems up front, informally if needed; a reader applying the result should not need to read the proof. Push technical lemmas and proof details into the appendix or encapsulated lemmas.
 
