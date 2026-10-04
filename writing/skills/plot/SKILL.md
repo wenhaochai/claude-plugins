@@ -82,7 +82,9 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    不用说，也不用注明"). The curve describes the points, it is not a scaling claim: fit E freely and check the
    residual signs before showing it. Forcing an outside asymptote onto a form the points do not follow
    (residuals + at both ends, − in the middle) gives a line that misses them; the owner tried an
-   anchored E, rejected the result and went back to the free fit. The endpoint dots all take that curve's one colour: a colour per dot repeats what the
+   anchored E, rejected the result and went back to the free fit. A fit holds when its largest residual is within the measurement's noise (the owner's pages: 0.005 nats on final losses)
+   and the residuals carry no sign pattern; otherwise draw a monotone PCHIP (log-log) through the points (the owner: "这个fit的
+   好像不好啊" on a power law whose residuals ran -,+,+,-,-,...,+,+). The endpoint dots all take that curve's one colour: a colour per dot repeats what the
    x position already says, so the ramp stays on the faint trajectories only (the owner: changing dot
    colours carry no information), and the legend names that line, not its
    members (the owner: "final loss by layer" is the entry; listing L1, L6 beside it adds nothing). A
@@ -190,6 +192,4 @@ to take away. The prose side is RULE-P13 of the `style` skill.
 
 ## Dependencies
 
-`matplotlib >= 3.6`, `numpy >= 1.20`. The font ships in `fonts/`; nothing else to install. A fit holds when its largest residual is within the measurement's noise (the owner's pages: 0.005 nats on final losses)
-   and the residuals carry no sign pattern; otherwise draw a monotone PCHIP (log-log) through the points (the owner: "这个fit的
-   好像不好啊" on a power law whose residuals ran -,+,+,-,-,...,+,+).
+`matplotlib >= 3.6`, `numpy >= 1.20`. The font ships in `fonts/`; nothing else to install.
