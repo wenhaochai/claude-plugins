@@ -190,4 +190,6 @@ to take away. The prose side is RULE-P13 of the `style` skill.
 
 ## Dependencies
 
-`matplotlib >= 3.6`, `numpy >= 1.20`. The font ships in `fonts/`; nothing else to install.
+`matplotlib >= 3.6`, `numpy >= 1.20`. The font ships in `fonts/`; nothing else to install. A fit holds when its largest residual is within the measurement's noise (the owner's pages: 0.005 nats on final losses)
+   and the residuals carry no sign pattern; otherwise draw a monotone PCHIP (log-log) through the points (the owner: "这个fit的
+   好像不好啊" on a power law whose residuals ran -,+,+,-,-,...,+,+).
