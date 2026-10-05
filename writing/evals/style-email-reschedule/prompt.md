@@ -3,7 +3,7 @@ tags: [style]
 max_turns: 4
 timeout_seconds: 180
 allowed_tools: [Read, Glob, Grep, Skill]
-description: Email draft; tests no em-dashes, no prefab openers/closers or LLM-tell words, concrete and short.
+description: Email draft; tests the rules a baseline breaks here, namely no prose parentheses (RULE-13) and no hedge on the known two-day slip (RULE-08), plus no em-dashes, no prefab phrases, concrete and short.
 ---
 
 Can you draft an email to my advisor, Prof. Lin, moving our Thursday 1:1? My notes:

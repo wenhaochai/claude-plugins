@@ -3,7 +3,7 @@ tags: [style]
 max_turns: 4
 timeout_seconds: 180
 allowed_tools: [Read, Glob, Grep, Skill]
-description: Chinese request for an English launch tweet; tests no em-dash, no hype vocabulary, claims sized to a small mixed gain.
+description: Chinese request for an English launch tweet; tests no prose parentheses such as "(averaged over 3 seeds)" (RULE-13), the rule a baseline breaks here, plus no em-dash, no hype vocabulary, claims sized to a small mixed gain.
 ---
 
 我们的新论文刚挂 arXiv，帮我写一条英文推特宣传一下。
