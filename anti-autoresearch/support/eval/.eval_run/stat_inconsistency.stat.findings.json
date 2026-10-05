@@ -1,0 +1,31 @@
+[
+  {
+    "finding_id": "STAT001",
+    "skill": "consistency-audit",
+    "pattern_id": "HP-STAT-INCONSISTENCY",
+    "title": "Reported p-value is inconsistent with its test statistic",
+    "description": "Reported z=1.1, p=0.036; recomputed two-tailed p in [0.2692,0.2735] (one-tailed [0.1346,0.1368], backend stdlib-normaldist). reported p claims significance the statistic does not support. May reflect a one-tailed test, adjusted/Welch df, or a typo.",
+    "severity": "major",
+    "observability_level_required": 0,
+    "evidence": [
+      {
+        "claim_id": "C019",
+        "span": "The gain over the baseline is statistically significant (z = 1.10, p = 0.036).",
+        "location": {
+          "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/stat_inconsistency.tex",
+          "line": 46,
+          "section": "body"
+        },
+        "artifact_hash": "71a7f2be3ac5972551802654ad92ab8353dc460dd3d1510d2791bee5d39e9d10"
+      }
+    ],
+    "verdict_local": "fail",
+    "reviewer": {
+      "deterministic": true,
+      "method": "statcheck",
+      "backend": "stdlib-normaldist"
+    },
+    "false_positive_risk": "medium",
+    "recommended_reviewer_action": "Ask whether the test was one- or two-tailed, whether p was multiplicity-adjusted, and whether the df/statistic are correct."
+  }
+]

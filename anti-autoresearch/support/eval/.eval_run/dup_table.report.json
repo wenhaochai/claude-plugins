@@ -1,0 +1,79 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "dup_table",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "SOFT_FLAGS",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {
+    "presentation": "SOFT_FLAGS"
+  },
+  "findings": [
+    {
+      "finding_id": "PRES001",
+      "skill": "presentation-signals",
+      "pattern_id": "HP-DUP-TABLE",
+      "title": "Two tables have identical numeric content",
+      "description": "table:1 and table:2 contain the same ordered cell values ([73.1, 78.0]); may be padding or an un-updated copy-paste.",
+      "severity": "minor",
+      "observability_level_required": 0,
+      "evidence": [
+        {
+          "claim_id": "C001",
+          "span": "Baseline \\cite{smith2024bar} & 73.1 \\\\",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/dup_table.tex",
+            "line": 36,
+            "section": "table:1"
+          },
+          "artifact_hash": "0396cc89487b7871273b47e43b1c3252294cb92dac06bf10c520f2d78c39d114"
+        },
+        {
+          "claim_id": "C003",
+          "span": "Baseline \\cite{smith2024bar} & 73.1 \\\\",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/dup_table.tex",
+            "line": 57,
+            "section": "table:2"
+          },
+          "artifact_hash": "0396cc89487b7871273b47e43b1c3252294cb92dac06bf10c520f2d78c39d114"
+        }
+      ],
+      "verdict_local": "warn",
+      "reviewer": {
+        "deterministic": true
+      },
+      "false_positive_risk": "high",
+      "recommended_reviewer_action": "Check whether the two tables are meant to differ; if identical, ask why both are present.",
+      "_source_file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/.eval_run/dup_table.pres.findings.json",
+      "_severity_original": "minor",
+      "_severity_final": "minor",
+      "_verdict_weight": 1,
+      "_adjudication": []
+    }
+  ],
+  "adversarial_memo": "",
+  "taxonomy_matches": [
+    {
+      "pattern_id": "HP-DUP-TABLE",
+      "finding_ids": [
+        "PRES001"
+      ]
+    }
+  ],
+  "counts": {
+    "critical": 0,
+    "major": 0,
+    "minor": 1,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 0
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

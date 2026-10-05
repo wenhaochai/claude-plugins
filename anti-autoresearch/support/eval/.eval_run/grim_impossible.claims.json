@@ -1,0 +1,425 @@
+{
+  "ledger_version": "0.1",
+  "paper_id": "grim_impossible",
+  "observability_level": 1,
+  "generated_at": "",
+  "source_files": [
+    {
+      "path": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+      "sha256": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "kind": "latex"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "C001",
+      "type": "table_cell",
+      "text_span": "Baseline \\cite{smith2024bar} & 73.1 \\\\",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 36,
+        "section": "table:1"
+      },
+      "value": {
+        "raw": "73.1",
+        "normalized": 73.1,
+        "unit": null,
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "table_parser",
+      "confidence": "medium"
+    },
+    {
+      "claim_id": "C002",
+      "type": "table_cell",
+      "text_span": "FooNet (ours) & 78.0 \\\\",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 37,
+        "section": "table:1"
+      },
+      "value": {
+        "raw": "78.0",
+        "normalized": 78.0,
+        "unit": null,
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "table_parser",
+      "confidence": "medium"
+    },
+    {
+      "claim_id": "C003",
+      "type": "number",
+      "text_span": "FooNet reaches 78.0\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 6.7\\% relative improvement.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 9,
+        "section": "abstract"
+      },
+      "value": {
+        "raw": "78.0",
+        "normalized": 78.0,
+        "unit": "%",
+        "metric": "accuracy",
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C004",
+      "type": "number",
+      "text_span": "FooNet reaches 78.0\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 6.7\\% relative improvement.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 9,
+        "section": "abstract"
+      },
+      "value": {
+        "raw": "73.1",
+        "normalized": 73.1,
+        "unit": "%",
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C005",
+      "type": "number",
+      "text_span": "FooNet reaches 78.0\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 6.7\\% relative improvement.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 9,
+        "section": "abstract"
+      },
+      "value": {
+        "raw": "78.0",
+        "normalized": 78.0,
+        "unit": "%",
+        "metric": "accuracy",
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C006",
+      "type": "number",
+      "text_span": "FooNet reaches 78.0\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 6.7\\% relative improvement.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 9,
+        "section": "abstract"
+      },
+      "value": {
+        "raw": "6.7",
+        "normalized": 6.7,
+        "unit": "%",
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C007",
+      "type": "citation",
+      "text_span": "\\section{Introduction} Prior work established strong baselines on BarBench \\cite{smith2024bar}.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 16,
+        "section": "introduction"
+      },
+      "refs": [
+        "smith2024bar"
+      ],
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C008",
+      "type": "citation",
+      "text_span": "We build on the architecture of \\cite{lee2023foundations} and add a lightweight routing module.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 16,
+        "section": "introduction"
+      },
+      "refs": [
+        "lee2023foundations"
+      ],
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C009",
+      "type": "citation",
+      "text_span": "\\section{Method} FooNet adds a routing module on top of the backbone of \\cite{lee2023foundations}.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 22,
+        "section": "method"
+      },
+      "refs": [
+        "lee2023foundations"
+      ],
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C010",
+      "type": "caption",
+      "text_span": "\\caption{Main results on BarBench (accuracy, \\%, mean of 5 seeds).} \\begin{tabular}{lc} \\toprule Method & Accuracy \\\\ \\midrule Baseline \\cite{smith2024bar} & 73.1 \\\\ FooNet (ours) & 78.0 \\\\ \\bottomrule \\end{tabular} \\end{table}",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 30,
+        "section": "table:1"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "medium"
+    },
+    {
+      "claim_id": "C011",
+      "type": "number",
+      "text_span": "On BarBench, FooNet improves accuracy from 73.1\\% to 78.0\\%.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 42,
+        "section": "body"
+      },
+      "value": {
+        "raw": "73.1",
+        "normalized": 73.1,
+        "unit": "%",
+        "metric": "accuracy",
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C012",
+      "type": "number",
+      "text_span": "On BarBench, FooNet improves accuracy from 73.1\\% to 78.0\\%.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 42,
+        "section": "body"
+      },
+      "value": {
+        "raw": "78.0",
+        "normalized": 78.0,
+        "unit": "%",
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C013",
+      "type": "scope",
+      "text_span": "The gain is modest and we make no claim of broad generality: results are limited to a single benchmark with five seeds.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 42,
+        "section": "body"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C014",
+      "type": "number",
+      "text_span": "On a held-out test set of 500 examples, FooNet's accuracy is 84.7\\%.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 46,
+        "section": "body"
+      },
+      "value": {
+        "raw": "500",
+        "normalized": 500.0,
+        "unit": null,
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C015",
+      "type": "number",
+      "text_span": "On a held-out test set of 500 examples, FooNet's accuracy is 84.7\\%.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 46,
+        "section": "body"
+      },
+      "value": {
+        "raw": "84.7",
+        "normalized": 84.7,
+        "unit": "%",
+        "metric": "accuracy",
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C016",
+      "type": "number",
+      "text_span": "Averaged over 5 seeds, FooNet's accuracy is 98.0\\% with a standard deviation of 12.0\\%.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 46,
+        "section": "body"
+      },
+      "value": {
+        "raw": "5",
+        "normalized": 5.0,
+        "unit": null,
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C017",
+      "type": "number",
+      "text_span": "Averaged over 5 seeds, FooNet's accuracy is 98.0\\% with a standard deviation of 12.0\\%.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 46,
+        "section": "body"
+      },
+      "value": {
+        "raw": "98.0",
+        "normalized": 98.0,
+        "unit": "%",
+        "metric": "accuracy",
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C018",
+      "type": "number",
+      "text_span": "Averaged over 5 seeds, FooNet's accuracy is 98.0\\% with a standard deviation of 12.0\\%.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 46,
+        "section": "body"
+      },
+      "value": {
+        "raw": "12.0",
+        "normalized": 12.0,
+        "unit": "%",
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C019",
+      "type": "number",
+      "text_span": "The gain over the baseline is statistically significant (z = 2.10, p = 0.036).",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 46,
+        "section": "body"
+      },
+      "value": {
+        "raw": "2.10",
+        "normalized": 2.1,
+        "unit": null,
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C020",
+      "type": "number",
+      "text_span": "The gain over the baseline is statistically significant (z = 2.10, p = 0.036).",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 46,
+        "section": "body"
+      },
+      "value": {
+        "raw": "0.036",
+        "normalized": 0.036,
+        "unit": null,
+        "metric": null,
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C021",
+      "type": "number",
+      "text_span": "\\section{Conclusion} FooNet yields a 78.0\\% accuracy on BarBench.",
+      "location": {
+        "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+        "line": 51,
+        "section": "conclusion"
+      },
+      "value": {
+        "raw": "78.0",
+        "normalized": 78.0,
+        "unit": "%",
+        "metric": "accuracy",
+        "direction": "unknown",
+        "aggregation": "unspecified"
+      },
+      "evidence_anchor": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf",
+      "extractor": "latex_regex",
+      "confidence": "high"
+    }
+  ]
+}

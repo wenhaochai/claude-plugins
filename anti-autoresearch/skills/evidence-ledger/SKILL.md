@@ -97,7 +97,7 @@ else
 fi
 
 # No LaTeX? Extract PDF text now (best spans available at L0). -layout preserves table columns.
-if ! find "$PAPER_DIR" -name '*.tex' -not -path '*/.aris/*' | grep -q .; then
+if ! find "$PAPER_DIR" -name '*.tex' -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | grep -q .; then
     PDF=$(find "$PAPER_DIR" -maxdepth 2 -name '*.pdf' | head -n1)
     [ -n "$PDF" ] && { pdftotext -layout "$PDF" "$PAPER_DIR/paper.txt" 2>/dev/null \
       || mutool draw -F txt -o "$PAPER_DIR/paper.txt" "$PDF" 2>/dev/null \
@@ -116,7 +116,7 @@ PAPER_DIR="$PAPER_DIR"
 PAPER_ID="$PAPER_ID"
 EOF
 echo "PAPER_DIR=$PAPER_DIR  PAPER_ID=$PAPER_ID  ROOT=$ROOT"
-find "$PAPER_DIR" \( -name '*.tex' -o -name '*.pdf' -o -name '*.txt' \) -not -path '*/.aris/*' | sort
+find "$PAPER_DIR" \( -name '*.tex' -o -name '*.pdf' -o -name '*.txt' \) -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | sort
 ```
 
 Every later Bash block begins with `source "<PAPER_DIR>/.aris/evidence-ledger/run.env"`
@@ -185,7 +185,7 @@ Pass the **same `L`** derived in Step 1.
 source "<PAPER_DIR>/.aris/evidence-ledger/run.env"
 TEX=()   # space-safe + deterministic: one path per line, sorted for reproducible order
 while IFS= read -r f; do [ -n "$f" ] && TEX+=("$f"); done \
-  < <(find "$PAPER_DIR" -type f -name '*.tex' -not -path '*/.aris/*' | LC_ALL=C sort)
+  < <(find "$PAPER_DIR" -type f -name '*.tex' -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | LC_ALL=C sort)
 [ ${#TEX[@]} -gt 0 ] || { echo "no .tex found — use Branch B"; exit 1; }
 python3 "$ROOT/tools/build_claim_ledger.py" --paper-id "$PAPER_ID" \
     --latex "${TEX[@]}" \

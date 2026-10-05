@@ -1,0 +1,29 @@
+[
+  {
+    "finding_id": "NUM001",
+    "skill": "consistency-audit",
+    "pattern_id": "HP-DELTA-ERROR",
+    "title": "Stated improvement contradicts its operands",
+    "description": "Text states a 16.7% relative change, but 73.1->78 is 6.7% relative (+4.9 absolute points).",
+    "severity": "major",
+    "observability_level_required": 0,
+    "evidence": [
+      {
+        "claim_id": "C003",
+        "span": "FooNet reaches 78.0\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 16.7\\% relative improvement.",
+        "location": {
+          "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/delta_inflate.tex",
+          "line": 9,
+          "section": "abstract"
+        },
+        "artifact_hash": "bcc71ffc7337043cc3072793f0b9566ce4b11c589a6dcb6e30aee5e86ceaca3f"
+      }
+    ],
+    "verdict_local": "fail",
+    "reviewer": {
+      "deterministic": true
+    },
+    "false_positive_risk": "low",
+    "recommended_reviewer_action": "Ask the authors to reconcile the stated delta with the reported operands; verify relative-vs-absolute convention."
+  }
+]

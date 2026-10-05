@@ -1,0 +1,29 @@
+[
+  {
+    "finding_id": "HL001",
+    "skill": "consistency-audit",
+    "pattern_id": "HP-NUM-INFLATE",
+    "title": "Headline number not found in any results table",
+    "description": "The abstract cites 85.3% accuracy but no extracted table cell reports that value; may be a different setting, a rounding artifact, or an inflated headline.",
+    "severity": "minor",
+    "observability_level_required": 0,
+    "evidence": [
+      {
+        "claim_id": "C003",
+        "span": "FooNet reaches 85.3\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 6.7\\% relative improvement.",
+        "location": {
+          "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/headline_inflate.tex",
+          "line": 9,
+          "section": "abstract"
+        },
+        "artifact_hash": "d66978e776f410a401ef95b95919bb6cad29a13d738e9dc2610053f040450ffe"
+      }
+    ],
+    "verdict_local": "warn",
+    "reviewer": {
+      "deterministic": true
+    },
+    "false_positive_risk": "high",
+    "recommended_reviewer_action": "Locate the headline number's source table/row; confirm the setting it refers to."
+  }
+]

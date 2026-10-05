@@ -1,0 +1,71 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "stat_inconsistency",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "SOFT_FLAGS",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {
+    "consistency": "SOFT_FLAGS"
+  },
+  "findings": [
+    {
+      "finding_id": "STAT001",
+      "skill": "consistency-audit",
+      "pattern_id": "HP-STAT-INCONSISTENCY",
+      "title": "Reported p-value is inconsistent with its test statistic",
+      "description": "Reported z=1.1, p=0.036; recomputed two-tailed p in [0.2692,0.2735] (one-tailed [0.1346,0.1368], backend stdlib-normaldist). reported p claims significance the statistic does not support. May reflect a one-tailed test, adjusted/Welch df, or a typo.",
+      "severity": "major",
+      "observability_level_required": 0,
+      "evidence": [
+        {
+          "claim_id": "C019",
+          "span": "The gain over the baseline is statistically significant (z = 1.10, p = 0.036).",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/stat_inconsistency.tex",
+            "line": 46,
+            "section": "body"
+          },
+          "artifact_hash": "71a7f2be3ac5972551802654ad92ab8353dc460dd3d1510d2791bee5d39e9d10"
+        }
+      ],
+      "verdict_local": "fail",
+      "reviewer": {
+        "deterministic": true,
+        "method": "statcheck",
+        "backend": "stdlib-normaldist"
+      },
+      "false_positive_risk": "medium",
+      "recommended_reviewer_action": "Ask whether the test was one- or two-tailed, whether p was multiplicity-adjusted, and whether the df/statistic are correct.",
+      "_source_file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/.eval_run/stat_inconsistency.stat.findings.json",
+      "_severity_original": "major",
+      "_severity_final": "major",
+      "_verdict_weight": 1,
+      "_adjudication": []
+    }
+  ],
+  "adversarial_memo": "",
+  "taxonomy_matches": [
+    {
+      "pattern_id": "HP-STAT-INCONSISTENCY",
+      "finding_ids": [
+        "STAT001"
+      ]
+    }
+  ],
+  "counts": {
+    "critical": 0,
+    "major": 1,
+    "minor": 0,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 0
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

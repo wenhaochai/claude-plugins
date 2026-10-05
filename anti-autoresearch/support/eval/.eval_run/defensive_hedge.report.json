@@ -1,0 +1,91 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "defensive_hedge",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "CLEAN_GIVEN_EVIDENCE",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {},
+  "findings": [
+    {
+      "finding_id": "AIS001",
+      "skill": "ai-style-impressions",
+      "pattern_id": "AIS-DEFENSIVE-HEDGE",
+      "title": "Pervasive defensive-hedge writing across multiple sections",
+      "description": "5 distinct defensive-hedge constructions (e.g. \"we do not claim …\", \"not X but rather Y\") across 3 non-excluded sections (body, introduction, method). The text repeatedly defends against anticipated objections instead of directly stating what was done — a common AI writing-style tell that lowers information density. This is a STYLE IMPRESSION with ZERO verdict weight, not a factual inconsistency and not an authorship verdict. If a specific hedge instead reveals a real scope/evaluation limitation, that is a separate integrity finding (HP-SCOPE-INFLATE / eval-design-forensics).",
+      "severity": "minor",
+      "observability_level_required": 0,
+      "evidence": [
+        {
+          "claim_id": "C009",
+          "span": "We do not claim that this routing module is optimal.",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/defensive_hedge.tex",
+            "line": 16,
+            "section": "introduction"
+          },
+          "artifact_hash": "5c2595cfe5682a7c4aec38355109e9c6fc89bcaec9e820e2137486056734e0df"
+        },
+        {
+          "claim_id": "C010",
+          "span": "This does not mean that simpler designs cannot work.",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/defensive_hedge.tex",
+            "line": 16,
+            "section": "introduction"
+          },
+          "artifact_hash": "5c2595cfe5682a7c4aec38355109e9c6fc89bcaec9e820e2137486056734e0df"
+        },
+        {
+          "claim_id": "C012",
+          "span": "We are not proposing a fundamentally new architecture.",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/defensive_hedge.tex",
+            "line": 22,
+            "section": "method"
+          },
+          "artifact_hash": "5c2595cfe5682a7c4aec38355109e9c6fc89bcaec9e820e2137486056734e0df"
+        }
+      ],
+      "verdict_local": "warn",
+      "reviewer": {
+        "deterministic": true
+      },
+      "false_positive_risk": "high",
+      "not_integrity_finding": true,
+      "fp_case": "Some venues / AI reviewers penalize the ABSENCE of caveats, so measured hedging is a legitimate strategic choice; a single scoping sentence is not the pattern.",
+      "recommended_reviewer_action": "Skim the cited sentences: if the paper over-hedges in its contribution/body, that lowers readability. Impression only — not misconduct, not an authorship judgment.",
+      "_source_file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/.eval_run/defensive_hedge.ais.findings.json",
+      "_severity_original": "minor",
+      "_severity_final": "info",
+      "_verdict_weight": 0,
+      "_adjudication": [
+        "zero-weight-cap"
+      ]
+    }
+  ],
+  "adversarial_memo": "",
+  "taxonomy_matches": [
+    {
+      "pattern_id": "AIS-DEFENSIVE-HEDGE",
+      "finding_ids": [
+        "AIS001"
+      ]
+    }
+  ],
+  "counts": {
+    "critical": 0,
+    "major": 0,
+    "minor": 0,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 1
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

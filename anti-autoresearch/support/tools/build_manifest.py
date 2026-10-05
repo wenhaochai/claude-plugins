@@ -31,7 +31,9 @@ def sha256_file(path):
 def detect(d):
     def has(pat):
         return sorted(glob.glob(os.path.join(d, pat)))
-    tex = has("*.tex") + has("**/*.tex")
+    skip = {".aris", "build", "_build", ".git"}   # same exclusions as the skills' tex discovery
+    tex = [p for p in sorted(glob.glob(os.path.join(d, "**", "*.tex"), recursive=True))
+           if not skip & set(os.path.relpath(p, d).split(os.sep))]
     pdf = has("*.pdf")
     bib = has("*.bib") + has("**/*.bib")
     # a repo = a code dir or loose source files

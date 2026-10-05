@@ -1,0 +1,30 @@
+[
+  {
+    "finding_id": "GRIM001",
+    "skill": "consistency-audit",
+    "pattern_id": "HP-GRANULARITY-IMPOSSIBLE",
+    "title": "Reported proportion is not achievable for the stated N",
+    "description": "84.7% over N=500 integer items is not round(k/500) at 1 decimal place(s) for any integer k (nearest achievable 84.8%). The value, its precision, or N may be misreported, or trials may have been excluded.",
+    "severity": "minor",
+    "observability_level_required": 0,
+    "evidence": [
+      {
+        "claim_id": "C014",
+        "span": "On a held-out test set of 500 examples, FooNet's accuracy is 84.7\\%.",
+        "location": {
+          "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+          "line": 46,
+          "section": "body"
+        },
+        "artifact_hash": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf"
+      }
+    ],
+    "verdict_local": "warn",
+    "reviewer": {
+      "deterministic": true,
+      "method": "GRIM"
+    },
+    "false_positive_risk": "low",
+    "recommended_reviewer_action": "Ask the authors to reconcile the value, its precision, and the exact denominator N (e.g. excluded/invalid items, or a macro/weighted average rather than a simple proportion)."
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "clean",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "CLEAN_GIVEN_EVIDENCE",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {},
+  "findings": [],
+  "adversarial_memo": "",
+  "taxonomy_matches": [],
+  "counts": {
+    "critical": 0,
+    "major": 0,
+    "minor": 0,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 0
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

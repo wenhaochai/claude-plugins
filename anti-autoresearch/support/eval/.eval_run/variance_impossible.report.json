@@ -1,0 +1,70 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "variance_impossible",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "SOFT_FLAGS",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {
+    "consistency": "SOFT_FLAGS"
+  },
+  "findings": [
+    {
+      "finding_id": "VAR001",
+      "skill": "consistency-audit",
+      "pattern_id": "HP-VARIANCE-IMPOSSIBLE",
+      "title": "Reported SD exceeds the maximum possible for a bounded metric",
+      "description": "SD 18 is reported at mean 98 for a metric bounded in [0,100] (%); the largest attainable SD there is 15.8 (Bhatia-Davis, sample n=5). The SD, the mean, the metric range, or an SD-vs-SEM label may be misreported.",
+      "severity": "major",
+      "observability_level_required": 0,
+      "evidence": [
+        {
+          "claim_id": "C016",
+          "span": "Averaged over 5 seeds, FooNet's accuracy is 98.0\\% with a standard deviation of 18.0\\%.",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/variance_impossible.tex",
+            "line": 46,
+            "section": "body"
+          },
+          "artifact_hash": "d7fbef16ea46105d05d019dad5af8e0cfd389dffa75c0d9da06485714f955b15"
+        }
+      ],
+      "verdict_local": "fail",
+      "reviewer": {
+        "deterministic": true,
+        "method": "Bhatia-Davis/Popoviciu"
+      },
+      "false_positive_risk": "low",
+      "recommended_reviewer_action": "Confirm the dispersion is a standard deviation (not SEM/CI), that mean and SD share a scale, the metric's true range, and the sample size used for the variance.",
+      "_source_file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/.eval_run/variance_impossible.stat.findings.json",
+      "_severity_original": "major",
+      "_severity_final": "major",
+      "_verdict_weight": 1,
+      "_adjudication": []
+    }
+  ],
+  "adversarial_memo": "",
+  "taxonomy_matches": [
+    {
+      "pattern_id": "HP-VARIANCE-IMPOSSIBLE",
+      "finding_ids": [
+        "VAR001"
+      ]
+    }
+  ],
+  "counts": {
+    "critical": 0,
+    "major": 1,
+    "minor": 0,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 0
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

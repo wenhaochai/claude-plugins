@@ -15,8 +15,10 @@ SLUG=$(basename "$PAPER_DIR" | tr -cs 'A-Za-z0-9.' '-')
 TXT=(); [ -f "$PAPER_DIR/paper.txt" ] && TXT=(--pdf-text "$PAPER_DIR/paper.txt")
 python3 "$ROOT/tools/build_manifest.py" --paper-id "$SLUG" --dir "$PAPER_DIR" "${TXT[@]}" --out "$PAPER_DIR/artifact_manifest.json"
 L=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["observability_level"])' "$PAPER_DIR/artifact_manifest.json")
-if ls "$PAPER_DIR"/*.tex >/dev/null 2>&1; then
-  python3 "$ROOT/tools/build_claim_ledger.py" --paper-id "$SLUG" --latex "$PAPER_DIR"/*.tex --observability-level "$L" --out "$PAPER_DIR/claims.json"
+TEX=(); while IFS= read -r f; do [ -n "$f" ] && TEX+=("$f"); done \
+  < <(find "$PAPER_DIR" -type f -name '*.tex' -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | LC_ALL=C sort)   # nested tex/*.tex too
+if [ ${#TEX[@]} -gt 0 ]; then
+  python3 "$ROOT/tools/build_claim_ledger.py" --paper-id "$SLUG" --latex "${TEX[@]}" --observability-level "$L" --out "$PAPER_DIR/claims.json"
 else
   python3 "$ROOT/tools/build_claim_ledger.py" --paper-id "$SLUG" --pdf-text "$PAPER_DIR/paper.txt" --observability-level "$L" --out "$PAPER_DIR/claims.json"
 fi
@@ -35,8 +37,10 @@ ROOT="${CLAUDE_PLUGIN_ROOT}/support"; PAPER_DIR="<from Step 0>"
 TXT=(); [ -f "$PAPER_DIR/paper.txt" ] && TXT=(--pdf-text "$PAPER_DIR/paper.txt")
 python3 "$ROOT/tools/build_manifest.py"      --paper-id mypaper --dir "$PAPER_DIR" "${TXT[@]}" --out "$PAPER_DIR/artifact_manifest.json"
 L=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["observability_level"])' "$PAPER_DIR/artifact_manifest.json")
-if ls "$PAPER_DIR"/*.tex >/dev/null 2>&1; then            # L1/L2 source path
-  python3 "$ROOT/tools/build_claim_ledger.py"  --paper-id mypaper --latex "$PAPER_DIR"/*.tex \
+TEX=(); while IFS= read -r f; do [ -n "$f" ] && TEX+=("$f"); done \
+  < <(find "$PAPER_DIR" -type f -name '*.tex' -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | LC_ALL=C sort)   # nested tex/*.tex too
+if [ ${#TEX[@]} -gt 0 ]; then                              # L1/L2 source path
+  python3 "$ROOT/tools/build_claim_ledger.py"  --paper-id mypaper --latex "${TEX[@]}" \
       --observability-level "$L" --out "$PAPER_DIR/claims.json"
 else                                                       # L0 text path (no *.tex)
   python3 "$ROOT/tools/build_claim_ledger.py"  --paper-id mypaper --pdf-text "$PAPER_DIR/paper.txt" \

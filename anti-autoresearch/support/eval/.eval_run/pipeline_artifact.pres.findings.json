@@ -1,0 +1,29 @@
+[
+  {
+    "finding_id": "PRES001",
+    "skill": "presentation-signals",
+    "pattern_id": "HP-PIPELINE-ARTIFACT",
+    "title": "Leftover pipeline/assistant string in finished text",
+    "description": "The exact phrase \"As an AI language model\" appears in table:1 (claim C010). This is a verbatim pipeline/template leftover that should not survive into a finished paper. The check flags the CHECKABLE STRING only — it does NOT infer who or what produced the text (exact substring match, not stylometry, not an AI-text classifier). If this string instead FEEDS a reported number/figure, it is HP-PLACEHOLDER-DATA (family D, critical), not this surface signal.",
+    "severity": "minor",
+    "observability_level_required": 0,
+    "evidence": [
+      {
+        "claim_id": "C010",
+        "span": "racy, \\%, mean of 5 seeds). As an AI language model, I cannot independently ver",
+        "location": {
+          "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/pipeline_artifact.tex",
+          "line": 30,
+          "section": "table:1"
+        },
+        "artifact_hash": "f9364b89ba4e9d1ed2d60f8a200b9d785084dc666c89709d544b23aae3e11da9"
+      }
+    ],
+    "verdict_local": "warn",
+    "reviewer": {
+      "deterministic": true
+    },
+    "false_positive_risk": "low",
+    "recommended_reviewer_action": "Confirm the string is a genuine leftover and not a deliberate quotation/discussion of such text (e.g. a paper studying LLM outputs / refusal messages); if it is a leftover, the text should be cleaned. This is a surface signal, not an authorship or misconduct finding."
+  }
+]

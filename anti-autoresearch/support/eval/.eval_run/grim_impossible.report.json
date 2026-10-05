@@ -1,0 +1,70 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "grim_impossible",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "SOFT_FLAGS",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {
+    "consistency": "SOFT_FLAGS"
+  },
+  "findings": [
+    {
+      "finding_id": "GRIM001",
+      "skill": "consistency-audit",
+      "pattern_id": "HP-GRANULARITY-IMPOSSIBLE",
+      "title": "Reported proportion is not achievable for the stated N",
+      "description": "84.7% over N=500 integer items is not round(k/500) at 1 decimal place(s) for any integer k (nearest achievable 84.8%). The value, its precision, or N may be misreported, or trials may have been excluded.",
+      "severity": "minor",
+      "observability_level_required": 0,
+      "evidence": [
+        {
+          "claim_id": "C014",
+          "span": "On a held-out test set of 500 examples, FooNet's accuracy is 84.7\\%.",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/grim_impossible.tex",
+            "line": 46,
+            "section": "body"
+          },
+          "artifact_hash": "123862a823ebf6561248bccdf13dbddbf751ce77ddd8a1e33fb992625faebfdf"
+        }
+      ],
+      "verdict_local": "warn",
+      "reviewer": {
+        "deterministic": true,
+        "method": "GRIM"
+      },
+      "false_positive_risk": "low",
+      "recommended_reviewer_action": "Ask the authors to reconcile the value, its precision, and the exact denominator N (e.g. excluded/invalid items, or a macro/weighted average rather than a simple proportion).",
+      "_source_file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/.eval_run/grim_impossible.stat.findings.json",
+      "_severity_original": "minor",
+      "_severity_final": "minor",
+      "_verdict_weight": 1,
+      "_adjudication": []
+    }
+  ],
+  "adversarial_memo": "",
+  "taxonomy_matches": [
+    {
+      "pattern_id": "HP-GRANULARITY-IMPOSSIBLE",
+      "finding_ids": [
+        "GRIM001"
+      ]
+    }
+  ],
+  "counts": {
+    "critical": 0,
+    "major": 0,
+    "minor": 1,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 0
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

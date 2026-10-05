@@ -1,0 +1,69 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "delta_inflate",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "SOFT_FLAGS",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {
+    "consistency": "SOFT_FLAGS"
+  },
+  "findings": [
+    {
+      "finding_id": "NUM001",
+      "skill": "consistency-audit",
+      "pattern_id": "HP-DELTA-ERROR",
+      "title": "Stated improvement contradicts its operands",
+      "description": "Text states a 16.7% relative change, but 73.1->78 is 6.7% relative (+4.9 absolute points).",
+      "severity": "major",
+      "observability_level_required": 0,
+      "evidence": [
+        {
+          "claim_id": "C003",
+          "span": "FooNet reaches 78.0\\% accuracy, improving from a 73.1\\% baseline to 78.0\\% accuracy, a 16.7\\% relative improvement.",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/delta_inflate.tex",
+            "line": 9,
+            "section": "abstract"
+          },
+          "artifact_hash": "bcc71ffc7337043cc3072793f0b9566ce4b11c589a6dcb6e30aee5e86ceaca3f"
+        }
+      ],
+      "verdict_local": "fail",
+      "reviewer": {
+        "deterministic": true
+      },
+      "false_positive_risk": "low",
+      "recommended_reviewer_action": "Ask the authors to reconcile the stated delta with the reported operands; verify relative-vs-absolute convention.",
+      "_source_file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/.eval_run/delta_inflate.findings.json",
+      "_severity_original": "major",
+      "_severity_final": "major",
+      "_verdict_weight": 1,
+      "_adjudication": []
+    }
+  ],
+  "adversarial_memo": "",
+  "taxonomy_matches": [
+    {
+      "pattern_id": "HP-DELTA-ERROR",
+      "finding_ids": [
+        "NUM001"
+      ]
+    }
+  ],
+  "counts": {
+    "critical": 0,
+    "major": 1,
+    "minor": 0,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 0
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

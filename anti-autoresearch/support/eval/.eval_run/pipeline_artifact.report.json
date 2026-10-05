@@ -1,0 +1,69 @@
+{
+  "report_version": "0.1",
+  "taxonomy_version": "0.5",
+  "paper_id": "pipeline_artifact",
+  "observability_level": 1,
+  "generated_at": "2026-01-01T00:00:00Z",
+  "overall_verdict": "SOFT_FLAGS",
+  "adjudicator": "deterministic-rules-v0",
+  "anchoring_verified": true,
+  "dimension_verdicts": {
+    "presentation": "SOFT_FLAGS"
+  },
+  "findings": [
+    {
+      "finding_id": "PRES001",
+      "skill": "presentation-signals",
+      "pattern_id": "HP-PIPELINE-ARTIFACT",
+      "title": "Leftover pipeline/assistant string in finished text",
+      "description": "The exact phrase \"As an AI language model\" appears in table:1 (claim C010). This is a verbatim pipeline/template leftover that should not survive into a finished paper. The check flags the CHECKABLE STRING only — it does NOT infer who or what produced the text (exact substring match, not stylometry, not an AI-text classifier). If this string instead FEEDS a reported number/figure, it is HP-PLACEHOLDER-DATA (family D, critical), not this surface signal.",
+      "severity": "minor",
+      "observability_level_required": 0,
+      "evidence": [
+        {
+          "claim_id": "C010",
+          "span": "racy, \\%, mean of 5 seeds). As an AI language model, I cannot independently ver",
+          "location": {
+            "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/pipeline_artifact.tex",
+            "line": 30,
+            "section": "table:1"
+          },
+          "artifact_hash": "f9364b89ba4e9d1ed2d60f8a200b9d785084dc666c89709d544b23aae3e11da9"
+        }
+      ],
+      "verdict_local": "warn",
+      "reviewer": {
+        "deterministic": true
+      },
+      "false_positive_risk": "low",
+      "recommended_reviewer_action": "Confirm the string is a genuine leftover and not a deliberate quotation/discussion of such text (e.g. a paper studying LLM outputs / refusal messages); if it is a leftover, the text should be cleaned. This is a surface signal, not an authorship or misconduct finding.",
+      "_source_file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/.eval_run/pipeline_artifact.pres.findings.json",
+      "_severity_original": "minor",
+      "_severity_final": "minor",
+      "_verdict_weight": 1,
+      "_adjudication": []
+    }
+  ],
+  "adversarial_memo": "",
+  "taxonomy_matches": [
+    {
+      "pattern_id": "HP-PIPELINE-ARTIFACT",
+      "finding_ids": [
+        "PRES001"
+      ]
+    }
+  ],
+  "counts": {
+    "critical": 0,
+    "major": 0,
+    "minor": 1,
+    "info": 0,
+    "downgraded_for_observability": 0,
+    "unanchored_demoted": 0,
+    "ai_style_impressions": 0
+  },
+  "limitations": [
+    "L1 run: code/result-level patterns (fake GT, self-normalization, phantom results, dead metrics) were NOT verifiable and appear only as info-level 'could-not-check' signals."
+  ],
+  "human_review_required": true
+}

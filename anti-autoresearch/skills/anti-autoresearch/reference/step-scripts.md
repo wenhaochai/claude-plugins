@@ -54,7 +54,7 @@ ARG="$ARGUMENTS"
 if [ -d "$ARG" ]; then                       # ---- DIRECTORY ----
   PAPER_DIR="$(cd "$ARG" && pwd)"
   # if only a PDF is present, extract text so the ledger has an L0 source
-  if ! ls "$PAPER_DIR"/*.tex >/dev/null 2>&1 && ! ls "$PAPER_DIR"/*.txt >/dev/null 2>&1; then
+  if ! find "$PAPER_DIR" -type f -name '*.tex' -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | grep -q . && ! ls "$PAPER_DIR"/*.txt >/dev/null 2>&1; then
     P=$(ls "$PAPER_DIR"/*.pdf 2>/dev/null | head -1)
     [ -n "$P" ] && pdftotext -layout "$P" "$PAPER_DIR/paper.txt"
   fi
@@ -73,14 +73,14 @@ else                                          # ---- ARXIV ID (e.g. 2401.01234) 
     tar -xzf "$PAPER_DIR/src.tgz" -C "$PAPER_DIR" 2>/dev/null \
       || gunzip -c "$PAPER_DIR/src.tgz" > "$PAPER_DIR/main.tex" 2>/dev/null
   fi
-  if ! ls "$PAPER_DIR"/*.tex >/dev/null 2>&1; then     # fallback: PDF → text (L0)
+  if ! find "$PAPER_DIR" -type f -name '*.tex' -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | grep -q .; then     # fallback: PDF → text (L0)
     curl -fsSL "https://arxiv.org/pdf/$ID.pdf" -o "$PAPER_DIR/paper.pdf" \
       && pdftotext -layout "$PAPER_DIR/paper.pdf" "$PAPER_DIR/paper.txt"
   fi
 fi
 
 echo "PAPER_DIR = $PAPER_DIR"
-ls -1 "$PAPER_DIR"/*.tex "$PAPER_DIR"/*.bib "$PAPER_DIR"/*.txt "$PAPER_DIR"/*.pdf 2>/dev/null
+find "$PAPER_DIR" -type f \( -name '*.tex' -o -name '*.bib' -o -name '*.txt' -o -name '*.pdf' \) -not -path '*/.aris/*' -not -path '*/build/*' -not -path '*/_build/*' -not -path '*/.git/*' | LC_ALL=C sort
 ls -d  "$PAPER_DIR"/code "$PAPER_DIR"/src "$PAPER_DIR"/results "$PAPER_DIR"/outputs 2>/dev/null   # L2 candidates
 ```
 

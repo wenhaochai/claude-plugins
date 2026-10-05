@@ -175,11 +175,12 @@ def _pick(kinds, globs):
             if r:
                 return r
     for g in globs:
-        hits = sorted(glob.glob(os.path.join(paper_dir, g)))
+        hits = sorted(h for h in glob.glob(os.path.join(paper_dir, g), recursive=True)
+                      if not {".aris", "build", "_build", ".git"} & set(os.path.relpath(h, paper_dir).split(os.sep)))
         if hits:
             return os.path.abspath(hits[0])
     return ""
-print("PDF_TEXT_FILE=", _pick({"text", "latex"}, ["*.txt", "*.tex"])
+print("PDF_TEXT_FILE=", _pick({"text", "latex"}, ["*.txt", "*.tex", "**/*.tex"])
       or "NONE (prose impressions limited to ledger spans)")
 print("PDF_FILE     =", _pick({"pdf"}, ["*.pdf"])
       or "NONE (AIS-SINGLE-STYLE-FIGURES limited to caption text)")

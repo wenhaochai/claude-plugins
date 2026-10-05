@@ -1,0 +1,39 @@
+[
+  {
+    "finding_id": "PRES001",
+    "skill": "presentation-signals",
+    "pattern_id": "HP-DUP-TABLE",
+    "title": "Two tables have identical numeric content",
+    "description": "table:1 and table:2 contain the same ordered cell values ([73.1, 78.0]); may be padding or an un-updated copy-paste.",
+    "severity": "minor",
+    "observability_level_required": 0,
+    "evidence": [
+      {
+        "claim_id": "C001",
+        "span": "Baseline \\cite{smith2024bar} & 73.1 \\\\",
+        "location": {
+          "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/dup_table.tex",
+          "line": 36,
+          "section": "table:1"
+        },
+        "artifact_hash": "0396cc89487b7871273b47e43b1c3252294cb92dac06bf10c520f2d78c39d114"
+      },
+      {
+        "claim_id": "C003",
+        "span": "Baseline \\cite{smith2024bar} & 73.1 \\\\",
+        "location": {
+          "file": "/scratch/gpfs/KARTHIKN/wc9403/project/claude-plugins/anti-autoresearch/support/eval/fixtures/synthetic_corruptions/dup_table.tex",
+          "line": 57,
+          "section": "table:2"
+        },
+        "artifact_hash": "0396cc89487b7871273b47e43b1c3252294cb92dac06bf10c520f2d78c39d114"
+      }
+    ],
+    "verdict_local": "warn",
+    "reviewer": {
+      "deterministic": true
+    },
+    "false_positive_risk": "high",
+    "recommended_reviewer_action": "Check whether the two tables are meant to differ; if identical, ask why both are present."
+  }
+]
