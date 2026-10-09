@@ -116,9 +116,11 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    Epoch's export form: values left of the panel on short tick marks.
 7. **The y range starts where the data does.** 0 only when 0 is part of the comparison (shares, counts,
    latencies, bars); otherwise a round value just below the data. Round steps (1, 1.5, 2, 2.5, 3, 5 x
-   10^k), 3 or more bands, each tall enough for the panel's name to clear the next value. When the
-   claim is a gap between two conditions (a cost, a gain), plot both values, not only their difference,
-   so the reader sees which end moves (the owner: a panel of differences "不应该画delta吧，应该画两个点").
+   10^k), 3 or more bands, each tall enough for the panel's name to clear the next value. Differences
+   measured from one common baseline (every setup minus the same reference run) are plotted as
+   differences. Differences each taken from their own baseline (each vocabulary's repeated run minus
+   that vocabulary's own full-data run) are plotted as both values, so the reader sees which end moves
+   (the owner: "没有共同baseline的时候需要画，都公共了没必要").
    Small multiples whose data sit at different levels (one panel per model size) take one span for all
    panels, each panel centred on its own data: one shared range leaves each panel's data in a sliver
    (the owner: "坐标轴放缩的有问题"), and free ranges make equal gaps look unequal. Say so in the caption.
