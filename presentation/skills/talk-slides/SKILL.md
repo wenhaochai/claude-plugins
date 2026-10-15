@@ -11,7 +11,7 @@ The Slides artifact type's own instructions cover the file format and the Artifa
 
 1. Agree on the parts first, one idea per slide. Put open choices to the user as short multiple-choice questions, and cite only the sources the user names.
 2. Take every number from a primary source, keep the raw files next to the deck and recompute what you plot. Re-fetch live leaderboards on the day you publish and put the read date in the source line.
-3. `python3 scripts/build_template.py OUT` writes one example slide per layout. Build slides with the builders in `scripts/deckkit.py` and replace every bracketed string and example number.
+3. `python3 scripts/build_template.py OUT` writes one example slide per layout: cover, part divider, figure, numbers. Build slides with `scripts/deckkit.py`, draw charts per deck in its tokens, and replace every bracketed string.
 4. Before each publish, run `python3 scripts/lint.py DECK_DIR` and `python3 scripts/audit_render.py RUNTIME_DIR`; the audit's docstring says how to set up RUNTIME_DIR. Look at every screenshot and check each chart against its source.
 5. Read the live deck before publishing so edits made in the page survive, then send only the changed files.
 6. Report in a few Chinese lines: the version, the link and what changed on which slide.
