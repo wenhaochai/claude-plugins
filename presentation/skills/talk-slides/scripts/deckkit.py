@@ -1,7 +1,7 @@
 """Design tokens and layout builders for talk decks in the claude.ai Slides artifact format.
 
 The look is Google's: a white 1920x1080 canvas with generous margins, Google Sans for display type and
-Google Sans Text for the rest, Material 3 tonal surfaces with large radii and no borders, and the four
+Google Sans Text for the rest, no boxed cards (whitespace and hairlines separate the parts), and the four
 Google colors used to mark the parts of the talk and the one number that matters on a slide, never as
 decoration. Every builder returns an HTML string in the Slides subset: inline styles, px units, text at
 24px or larger, and pinned children only inside a sized `position:relative` host. Under a one-line
@@ -147,13 +147,20 @@ def image(alt, w, h, src='', extra=''):
 # ---------------------------------------------------------------- cards
 
 
-def card(eyebrow_text, big_html, caption, sub_html, width=368, tone=CARD):
-    """A Material 3 filled card: tonal ground, radius 28, no border."""
-    return f'''<div style="width:{width}px; background:{tone}; border-radius:28px; padding:30px 32px; display:flex; flex-direction:column; gap:8px">
-      {label(eyebrow_text)}
-      {big_html}
-      <p style="font-size:24px; line-height:1.35; color:{INK}">{caption}</p>
-      {sub_html}
+def stat(num, text, src='', accent=False):
+    """A big number on the white ground with its sentence and source under it; no box."""
+    s_ = f'<p style="font-size:24px; color:{FAINT}">{src}</p>' if src else ''
+    return f'''<div style="display:flex; flex-direction:column; gap:16px">
+      <p style="{disp(104, 400, ACC if accent else INK, "line-height:0.95; letter-spacing:-3px")}">{num}</p>
+      <p style="font-size:26px; line-height:1.45; color:{SOFT}">{text}</p>{s_}
+    </div>'''
+
+
+def column(head_text, text):
+    """An open column: a hairline above, a heading and a sentence."""
+    return f'''<div style="flex:1; border-top:2px solid {INK}; padding:24px 0 0 0; display:flex; flex-direction:column; gap:12px">
+      <p style="{disp(32, 400, INK)}">{head_text}</p>
+      <p style="font-size:26px; line-height:1.45; color:{SOFT}">{text}</p>
     </div>'''
 
 

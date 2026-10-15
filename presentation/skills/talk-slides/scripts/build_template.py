@@ -27,14 +27,17 @@ S['part1'] = part('part1', 'Part 1', '[Part title]', '[What this part covers, in
                   note='[Script] What this part covers.\n[讲稿] 这一部分讲什么。')
 
 body = f'''{lede('[The one lead line of the slide]')}
-  {image('[What the figure shows]', 1664, 520, extra=f'border-radius:16px; background:{CARD}')}'''
+  {image('[What the figure shows]', 1664, 520)}'''
 S['figure'] = slide('figure', 'Part 1', '[Noun title for what is shown]', body, 'Source: [paper, figure]',
                     note='[Script] What the figure shows.\n[讲稿] 图里是什么。')
 
-cards = ''.join(card(f'[Label {i}]', big(f'[{n}]', ACC if i == 1 else INK), '[What the number counts]', sub('[where it comes from]'), width=530)
-                for i, n in ((1, '98'), (2, '7,471'), (3, '3.6M')))
-S['numbers'] = slide('numbers', 'Part 1', '[Noun title]', f'<div style="display:flex; gap:37px">{cards}</div>', 'Source: [where the numbers come from]',
+stats = ''.join(stat(f'[{n}]', '[What the number counts]', '[where it comes from]', accent=(i == 0)) for i, n in enumerate(('2.05x', '98')))
+S['numbers'] = slide('numbers', 'Part 1', '[Noun title]', f'<div style="display:flex; gap:96px">{stats}</div>', 'Source: [where the numbers come from]',
                      note='[Script] The number that matters, and what it counts.\n[讲稿] 最重要的那个数字，以及它数的是什么。')
+
+cols = ''.join(column(f'[Heading {i}]', '[One sentence on it]') for i in (1, 2, 3))
+S['columns'] = slide('columns', 'Part 1', '[Noun title]', f'<div style="display:flex; gap:64px">{cols}</div>',
+                     note='[Script] One line per column.\n[讲稿] 每栏一句。')
 
 for sid, html in S.items():
     open(os.path.join(SL, f'{sid}.html'), 'w').write(html)
