@@ -10,8 +10,8 @@ Warnings: em dashes, the "X, not Y" pattern, the word campaign, [bracketed] plac
 line breaks in the notes, which the runtime turns into spaces, notes that are not pairs of one
 English line and its Chinese line split by blank lines, English sentences over 18 words,
 a count of [click] marks in the notes that differs from the slide's click builds, and type off
-the scale: sans text at 24, 28 or 36px in regular or 600, serif at 56 or 120px in 400 or 500,
-nothing italic. A verbatim quote or an
+the scale: Google Sans Text at 24 or 26px, Google Sans at 24, 28, 32, 52, 84, 96 or 104px, both in
+400 or 500, nothing italic. A verbatim quote or an
 interval such as [19%, 39%] may trip a warning.
 """
 import html
@@ -21,9 +21,10 @@ import sys
 from html.parser import HTMLParser
 
 VOID = {'br', 'hr', 'img'}
-# the type scale: serif for titles (56, 500), cover and end (120) and big numbers (56, 400); sans for the rest
-SANS_SIZES, SERIF_SIZES = {24, 28, 36}, {56, 120}
-SANS_WEIGHTS, SERIF_WEIGHTS = {'400', '600', 'normal'}, {'400', '500', 'normal'}
+# the type scale: Google Sans (display) for titles, headings, kickers, the lead line and big numbers;
+# Google Sans Text for body, labels, captions and sources
+TEXT_SIZES, DISPLAY_SIZES = {24, 26}, {24, 28, 32, 52, 84, 96, 104}
+WEIGHTS = {'400', '500', 'normal'}
 CJK = re.compile(r'[\u4e00-\u9fff]')
 PAINT = ('background', 'border', 'box-shadow')
 
@@ -82,13 +83,14 @@ class Parser(HTMLParser):
 
     def check_type(self, st):
         fam = re.search(r'font-family:([^;]*)', st)
-        serif = bool(fam) and 'serif' in fam.group(1) and 'sans-serif' not in fam.group(1)
-        face = 'serif' if serif else 'sans'
+        f0 = fam.group(1).split(',')[0].strip("'\" ") if fam else ''
+        display = f0 in ('GoogleSans', 'ProductSans')   # the style arrives with its spaces removed
+        face = 'display' if display else 'text'
         m = re.search(r'font-size:([\d.]+)px', st)
-        if m and float(m.group(1)) not in (SERIF_SIZES if serif else SANS_SIZES):
+        if m and float(m.group(1)) not in (DISPLAY_SIZES if display else TEXT_SIZES):
             self.type_off.add(f'{face} {float(m.group(1)):g}px')
         w = re.search(r'font-weight:(\w+)', st)
-        if w and w.group(1) not in (SERIF_WEIGHTS if serif else SANS_WEIGHTS):
+        if w and w.group(1) not in WEIGHTS:
             self.type_off.add(f'{face} weight {w.group(1)}')
         if 'font-style:italic' in st:
             self.type_off.add('italic')
