@@ -66,6 +66,10 @@ Rates are per 1000 words. "Draft" is the LLM-written paper that prompted this sk
     number for a precise-sounding quantifier chain ("more often than most agents that cost more per run"): give the
     number once, or make a coarser claim.
 15. **Italics once, at a definition.** He sets a new term in \emph where he defines it, and nowhere else.
+16. **No run-in labels in argument prose.** Bold lead-ins such as "The task.", "Two designs.", "Results." over a case
+    study or a results subsection read as LLM scaffolding (the owner, on FrontierCS 2, 2026-10-19). Let the first
+    sentence of each paragraph name its topic. Named groupings that a reader scans (related-work families, numbered
+    appendix steps, setup items like "Agents." and "Cost.") may keep `\paragraph`.
 
 ## Where this overrides writing:style
 
