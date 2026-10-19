@@ -1,6 +1,6 @@
 ---
 name: paper-voice
-description: The prose voice of pre-2023 papers by Kaiming He, Joseph E. Gonzalez and Alex Dimakis, measured on 15 arXiv sources, for drafting or rewriting research-paper prose that reads as LLM-written. Load it with writing:style for any paper; where the two disagree (parentheses, repeated key terms, "In this paper", contribution lists, hedges, italics at a definition), this skill wins. voice_stats.py counts a draft against the corpus.
+description: The prose voice of pre-2023 papers by Kaiming He, Joseph E. Gonzalez and Alex Dimakis, measured on 15 arXiv sources, plus Dimakis's own writing notes ("Ideas for better writing", 2018), for drafting or rewriting research-paper prose that reads as LLM-written. Load it with writing:style for any paper; where the two disagree (parentheses, repeated key terms, "In this paper", contribution lists, hedges, italics at a definition), this skill wins. voice_stats.py counts a draft against the corpus.
 ---
 
 # Paper voice
@@ -46,12 +46,15 @@ Rates are per 1000 words. "Draft" is the LLM-written paper that prompted this sk
 7. **Short paragraphs, one turn each.** Corpus 3.7 sentences and 80 words per paragraph; draft 5.6 and 123. Start a new
    paragraph when the argument turns. A two-sentence paragraph that poses the problem is normal.
 8. **Link back with "This" and repeat the key noun.** Corpus 6.7% of sentences open with This or These; draft 1.0%.
-   Re-use the defined term; do not hunt for synonyms.
+   Re-use the defined term and its notation; do not hunt for synonyms. Ordinary words still follow writing:style
+   RULE-16 (no repeat in the same or the next sentence), as Dimakis's notes also ask.
    - "This enables building a large and consistent dictionary on-the-fly" (1911.05722)
 9. **Vary openings.** Corpus 23.8% of sentences open with a subordinate or prepositional clause ("By restricting ...",
    "Unlike model development, ...", "Despite that potential, ..."); draft 14.7%.
-10. **Parentheses for asides.** Corpus 10.4 per 1000 words, footnotes 0.6; draft 0 and 0. Use them for an example, a
-    gloss or a side fact, never for the main claim. Em-dashes stay rare (corpus 0.8).
+10. **Parentheses for asides, and rarely.** Corpus 10.4 per 1000 words, footnotes 0.6; draft 0 and 0. Use them for an
+    example, a gloss or a side fact, never for the main claim, never nested, and at most one per paragraph: Dimakis
+    (his notes) asks for them "only in very rare situations", and his own papers use 7.2 per 1000 words. Em-dashes
+    stay rare (corpus 0.8).
     - "Inference is the process of using the model to make a prediction given an input (e.g., predict a user's rating
       for a movie)." (1612.03079)
 11. **Drop the contrast tics.** Against the corpus the draft had ", not X" 8 times, "still" 6, "instead" 4, "only" 2 and
@@ -71,12 +74,51 @@ Rates are per 1000 words. "Draft" is the LLM-written paper that prompted this sk
     sentence of each paragraph name its topic. Named groupings that a reader scans (related-work families, numbered
     appendix steps, setup items like "Agents." and "Cost.") may keep `\paragraph`.
 
+## From Dimakis's notes ("Ideas for better writing", 2018)
+
+Alex Dimakis wrote these notes for his students. Several of them are already writing:style rules: one thesis per
+paragraph (RULE-P11), the simplest example first (RULE-P12), captions that stand alone (RULE-P13), theorems as an API
+(RULE-P14), restating a symbol's role (RULE-P15), at most one or two new names (RULE-P16), equation punctuation
+(RULE-P17), no repeated word nearby (RULE-16) and no apologizing (RULE-17). The rest is below.
+
+17. **Run a reader simulator.** Before a pass, name the reader (a first-year graduate student, someone in the general
+    area, an expert on the topic) and read every claim as that reader. Mark what they find obvious, trivial or
+    confusing.
+18. **Answer "who cares" for that reader.** Most readers are made to read the paper. Tie the work to what they already
+    care about (their own work, or something fundamental) rather than to why the authors find it interesting.
+19. **Do not hide the simple idea.** Fear of sounding obvious makes papers bury a simple idea under a general or
+    complicated statement. State the simple idea plainly; that is what readers remember.
+20. **One story.** More results do not make a paper stronger. A side result that does not serve the main narrative
+    (Dimakis's "friend Bob and his car") weakens it: cut it, or move it to an appendix. Before keeping a paragraph,
+    ask what the reader is supposed to get from it.
+21. **Self-contained sections.** A reader should follow the experiments without the theory and any caption without the
+    rest. Avoid definitions on one page that a claim needs ten pages later; an appendix restates what it proves.
+22. **Keep definitions, assumptions and results apart,** and keep theoretical results apart from practical ones. State
+    an assumption once, with its justification, in one place.
+23. **Experiments that teach.** Test outside the assumptions (robustness, not just agreement with the theory). Move one
+    parameter at a time. For every plot and every paragraph, say what the reader should learn. Compare apples to
+    apples: reuse the baseline's data, metric and plot form.
+24. **No conceptual spaghetti.** Not "In this work, requiring A, and similarly to B (even though it required C), we show
+    D." Write: "In this work we show D. We require A. This is similar to B. Note that B required C." One topic per
+    sentence; a sentence that carries two topics is split whatever its length (aim near 20 words; writing:style
+    RULE-12 still splits anything over 30).
+25. **Cut words, then adverbs.** For every word, ask whether it can go. Delete adverbs. Avoid opening a sentence with
+    "Therefore", "However" or "Thus"; if one stays, follow it with a comma.
+26. **A citation is not a noun.** "Bellman et al. [5] introduced dynamic programming", never "[5] introduced dynamic
+    programming", least of all at the start of a sentence (`\citet`, writing:style RULE-P6).
+27. **Small conventions.** No scare quotes. Write eigenvector, semidefinite and bipartite without hyphens. Figures are
+    vector graphics. A title does not repeat a word. When unsure of a convention (et al., a term, an abbreviation),
+    copy how established papers in the field do it.
+28. **Write in drafts.** Dimakis polished his notes over seven drafts and an NSF proposal over 27 versions. Expect
+    several passes, each with one goal (story, then paragraphs, then sentences, then words); `voice_stats.py` reports
+    the mechanical items 24-26 as well.
+
 ## Where this overrides writing:style
 
 | writing:style | Corpus | Here |
 |---|---|---|
-| RULE-13 no prose parentheses or em-dashes | 10.4 parentheses, 0.8 em-dashes | Parentheses allowed for asides; em-dashes rare |
-| RULE-16 no repeated content word in adjacent sentences | key nouns repeated; 6.7% open with This/These | Repeat key terms; link with This |
+| RULE-13 no prose parentheses or em-dashes | 10.4 parentheses, 0.8 em-dashes | Parentheses allowed for asides, at most one per paragraph and never nested; em-dashes rare |
+| RULE-16 no repeated content word in adjacent sentences | key nouns repeated; 6.7% open with This/These | Repeat defined terms and notation; link with This; ordinary words still follow RULE-16 |
 | RULE-08 and "relations over adjectives" | 8.6 hedges, 2.6 intensifiers | Hedges and a stance allowed; no unquantified "significantly" in results |
 | RULE-P1 no overview paragraphs | "In this paper" 0.6; a contribution list in all three authors | One "In this paper" and one contribution list in the introduction |
 | RULE-P2 no emphasis | \emph at definitions | Italics at a term's definition only |

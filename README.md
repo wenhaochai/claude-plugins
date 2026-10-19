@@ -19,13 +19,15 @@ are distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan, sourced fro
 For research-paper prose, loaded with `style`. Fifteen rules measured on the abstract, introduction and first method
 section of 15 pre-2023 papers by Kaiming He, Joseph E. Gonzalez and Alex Dimakis: authors in the text, consequences
 as sentences rather than ", so" tails, hedges and a stance, a scene or question before "In this paper", one
-contribution list, short paragraphs, parentheses for asides. Where it disagrees with `style`, it wins.
+contribution list, short paragraphs, parentheses for asides. Rules 17-28 distil Alex Dimakis's notes "Ideas for better
+writing" (2018): a reader simulator, "who cares", one story, self-contained sections, experiments that teach, no
+conceptual spaghetti, no adverbs, no citation as a noun. Where it disagrees with `style`, it wins.
 
 ```bash
 python3 writing/skills/paper-voice/voice_stats.py <paper-dir or .tex files>
 ```
 
-prints each count beside the corpus and stars the ones far off.
+prints each count beside the corpus and stars the ones far off; `--list` also prints the sentences to look at first.
 
 ### `preflight` — mechanical pre-submission checks
 
