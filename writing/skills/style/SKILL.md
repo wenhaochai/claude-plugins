@@ -7,7 +7,7 @@ description: "Default writing standards. Use whenever producing English prose th
 
 Default standards for English prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
 
-**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P19 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting.
+**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P19 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting. For research-paper prose, also load `writing:paper-voice`; where they disagree (RULE-13 parentheses, RULE-16 repeated key terms, RULE-08 hedges, RULE-P1 one "In this paper" and one contribution list, RULE-P2 italics at a definition, RULE-12 as a soft limit), paper-voice wins.
 
 ## Canonical (RULE-01..17)
 

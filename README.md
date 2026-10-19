@@ -4,7 +4,7 @@ Personal Claude Code plugin marketplace by [Wenhao Chai](https://wenhaochai.com)
 
 ## `writing` — publication-prep tools
 
-Three skills, all auto-loading by context match.
+Four skills, all auto-loading by context match.
 
 ### `style` — default English-prose standards
 
@@ -13,6 +13,19 @@ grant proposals, paper prose. 17 canonical English-prose rules apply everywhere.
 are distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan, sourced from
 [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; RULE-13 to RULE-17 are added.
 20 page-cap additions and 2 final-pass audit rules apply only to a page-capped conference paper.
+
+### `paper-voice` — prose that does not read as LLM-written
+
+For research-paper prose, loaded with `style`. Fifteen rules measured on the abstract, introduction and first method
+section of 15 pre-2023 papers by Kaiming He, Joseph E. Gonzalez and Alex Dimakis: authors in the text, consequences
+as sentences rather than ", so" tails, hedges and a stance, a scene or question before "In this paper", one
+contribution list, short paragraphs, parentheses for asides. Where it disagrees with `style`, it wins.
+
+```bash
+python3 writing/skills/paper-voice/voice_stats.py <paper-dir or .tex files>
+```
+
+prints each count beside the corpus and stars the ones far off.
 
 ### `preflight` — mechanical pre-submission checks
 
