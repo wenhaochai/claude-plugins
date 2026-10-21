@@ -109,6 +109,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
    Charts that Epoch sets on its narrower web canvas take a title near 9.2 pt and ticks at text size.
    On a paper page with 10 pt body text, set the title near 10.5 pt (`title_pt=10.5`): 12.2 reads
    larger than a section heading there and 9.2 smaller than the body (the owner, 2026-10-03).
+   Literal text (a token, a prompt, code) is set in a monospace face (`family='monospace'`), so the
+   reader sees at once that it is quoted, not described.
 6. **Light grid, one axis, nothing touching.** Grid both ways on numeric axes, only the baseline axis,
    no tick marks: values sit just above their grid lines at the left edge, the quantity sits above
    each column, and panel names sit inside, top left, on white. Values are lifted off their lines, the
@@ -166,13 +168,18 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     stay off that order, as on the card (cyan 700 for open models, pink 600 for closed). The larger the inked area, the lighter the tone, as
     FiveThirtyEight and Datawrapper do. Yellow lines and words take 900, the only Google yellow at 3:1
     on white. Context behind a highlight steps down a set or goes grey, and stacked neighbours are split
-    by thin white edges. Hold each series' colour across a piece; the legend names every colour.
+    by thin white edges. Hold each series' colour across a piece: a condition keeps one colour in every figure of a paper, so the reader
+    recognizes it without the legend, and comparable elements take one grade (fills at one grade, their
+    outlines one step darker). The legend names every colour.
     Shades of one hue only separate series that never touch: six blue grades for six layers whose
     curves overlap read as one band (the owner could not tell them apart), so order goes into the
     legend and the hues change. Past six the hues turn into noise instead (the owner, on eleven layers):
     when the reader needs the trend across the set rather than any one member, ramp one hue light to
     dark (`LinearSegmentedColormap` between `tone(hue, 200)` and `tone(hue, 900)`, the one place a tone
-    is interpolated). The legend names what the reader compares (the line joining the members' final
+    is interpolated). A colour that encodes a number is a colormap: sequential (that one-hue ramp) for an
+    ordered quantity such as a probability, diverging (two hues meeting at a light grey) only when the
+    middle means something, such as zero change from a baseline, with the midpoint pinned there
+    (`TwoSlopeNorm`). Either one must change evenly to the eye, so a small difference never looks large. The legend names what the reader compares (the line joining the members' final
     points, the reference), never each member. Never write series names on the chart instead (rule
     1): the owner rejected name labels at curve ends as clutter, twice.
 
@@ -192,6 +199,33 @@ Epoch's other forms are options of the same calls; their docstrings give the det
     `contains no measured results` in its first line.
 12. **A restyle never touches data; look at the output.** Diff the plotted numbers after a styling pass,
     then render and open the file.
+
+## Figures in a paper
+
+From Sophie Wang, "Behind the scenes of paper writing" (2026), on a paper readers praised for its figures.
+
+1. **Storyboard the figures before the results.** Sketch each figure with the result you expect. The
+   sketch turns an intuition into a falsifiable hypothesis and fixes the experiment that tests it. When
+   the result departs from the sketch, the figure changes to show what happened (her edited-data
+   experiment created a new cue but did not remove the old one, so a second edit joined the figure).
+   A sketch can also start vague (a flow from cues to data) and tell you which measurement to invent.
+2. **One chart, one question.** A metric that answers a different question leaves the chart, even when
+   it is cheap to show (she cut pass@16 from a pass@1 comparison).
+3. **Panels follow the explanation,** not the order the experiments ran: what changed, then where, then
+   what it implies.
+4. **The axis of variation is the comparison.** Training curves when the trajectory is the point; grouped
+   bars when the comparison is between conditions at the end (rule 4 for endpoints).
+5. **Space groups.** Gaps are smaller inside the group the reader compares: the same panels read as rows
+   or as columns depending on which gap is tighter.
+6. **Hierarchy is a choice.** Marker size, colour and line weight decide what the eye lands on first
+   (larger points draw it to the samples, a heavier line to the fit). Check that the emphasis is the
+   intended one.
+7. **The PDF goes in the paper,** text kept as text (`save` writes it with TrueType fonts embedded). A
+   compressed paper PDF keeps vectors and fonts; a downsampled figure is a bug.
+8. **The teaser is the paper for a reader who reads nothing else.** Draw it after the first draft holds
+   the main results: close your eyes and picture the chalkboard drawing that explains the finding. One
+   view, a conceptual diagram (Epoch-style SVG, not matplotlib) unifying what the paper shows, with the
+   key measured results underneath.
 
 ## Captions
 

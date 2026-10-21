@@ -113,6 +113,16 @@ paragraph (RULE-P11), the simplest example first (RULE-P12), captions that stand
     several passes, each with one goal (story, then paragraphs, then sentences, then words); `voice_stats.py` reports
     the mechanical items 24-26 as well.
 
+## From Sophie Wang ("Behind the scenes of paper writing", 2026)
+
+29. **Two narratives, each standing alone.** The figures with their captions tell the whole story; the prose
+    tells it too. They do different jobs: the figures let the results speak (writing:plot, "Figures in a
+    paper"); the prose says why the problem is interesting, why these experiments, and what we conclude from
+    them. If a result does not speak for itself in its figure, simplify the experiment or show the result more
+    directly before writing around it.
+30. **Aim at a change in understanding.** The test of the paper is whether the reader leaves understanding
+    something fundamental better and can apply it to a problem they care about (rule 18 names that reader).
+
 ## Where this overrides writing:style
 
 | writing:style | Corpus | Here |
