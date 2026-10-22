@@ -18,6 +18,7 @@ The Slides artifact type's own instructions cover the file format and the Artifa
 
 ## Slides
 
+- No unnecessary secondary labels or descriptions: the layout does the explaining. Cut supporting text, descriptive copy and UI microcopy that repeats what the layout already shows. Think from first principles and add nothing that is not needed (the owner, 2026-10-22: "若无必要勿增实体").
 - Titles, slide and chart alike, are noun labels for what is shown and make no claim; none is a comma-joined list of clipped phrases. A title the user gives stays as given. The eyebrow names the part.
 - The slide holds labels, numbers and at most one short sentence per block; the rest goes into the notes. Wording stays plain, without the "X, not Y" pattern, em dashes or the word campaign.
 - The look is Google's, after the author's general exam deck: a white canvas with generous margins, and the four Google colors used to mark the parts of the talk and the one number that matters on a slide, never as decoration. Each slide's kicker carries a dot in its part's color; a part opens on a tonal divider. Nothing sits in a box: no tinted card tiles, no bordered panels; whitespace and hairlines separate the parts, big numbers stand on the white ground, and flows and comparisons are drawn as lines, timelines and tables. `deckkit.py` holds the tokens.

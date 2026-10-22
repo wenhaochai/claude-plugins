@@ -9,6 +9,7 @@ A video of a piece of work runs about a minute and plays as one piece of motion 
 
 ## Design
 
+- No unnecessary secondary labels or descriptions: the layout does the explaining. Cut supporting text, descriptive copy and UI microcopy that repeats what the layout already shows. Think from first principles and add nothing that is not needed (the owner, 2026-10-22: "若无必要勿增实体").
 - One continuous piece. Objects carry from scene to scene: a node becomes an agent, agents regroup, a chart grows out of what was on screen. No cuts between static cards and no heading-plus-figure layouts.
 - Open on the work itself. The first frame is a cover, the title over the source's key picture, so a feed's thumbnail shows the work. The picture then clears to a blank frame, the mechanism builds in from nothing over the first seconds, and the title stays alone in the clear space above it. Then the title leaves and that picture carries into the first chapter. The opening has no kicker, author or date line, or tagline.
 - The camera stays still: motion comes from the objects themselves, and nothing zooms or pans the whole frame.

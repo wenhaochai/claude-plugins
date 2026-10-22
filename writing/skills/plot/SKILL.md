@@ -42,6 +42,8 @@ Epoch's other forms are options of the same calls; their docstrings give the det
 
 ## Rules
 
+No unnecessary secondary labels or descriptions: the layout does the explaining. Cut supporting text, descriptive copy and chart microcopy that repeats what the layout already shows. Think from first principles and add nothing that is not needed (the owner, 2026-10-22: "若无必要勿增实体"). Rule 1 below is the default that follows.
+
 1. **Start minimal, add on request.** The first version has a title, one legend row, the series, and
    the axes. No value labels, callouts, end-of-line numbers, notes, reference or baseline lines, or
    shading until the owner asks, one at a time.
