@@ -1,6 +1,6 @@
 ---
 name: training-monitor
-description: "Monitoring doctrine for a pretraining run, distilled from Chunyuan Deng, \"Reading a Pretraining Run\" (2026): the nine first-screen signals, the full metric table with cadence and priority (P0 every step, P1 every 100 steps, P2 on demand), the formulas, the cross-rank reduction rules, a robust spike detector, the fixed triage order, and the common mistakes. Use when starting, watching, comparing, or debugging a pretraining or large fine-tuning run, when building a dashboard or an alert set, when a logged curve dips or jumps for no clear reason, when per-rank logs and the dashboard global number disagree or a global loss must be recomputed from per-rank values, or when the user asks 训练监控, 这个 run 健康吗, 这个 run 哪里有问题, loss spike, loss 突然掉了, global loss 对不对, 各 rank 不一致, 梯度爆炸, MFU 掉了, 专家不均衡, 怎么看训练曲线."
+description: "Monitoring doctrine for a pretraining run, distilled from Chunyuan Deng, \"Reading a Pretraining Run\" (2026): the nine first-screen signals, the full metric table with cadence and priority (P0 every step, P1 every 100 steps, P2 on demand), the formulas, the cross-rank reduction rules, a robust spike detector, the fixed triage order, and the common mistakes. Use when starting, watching, comparing, or debugging a pretraining or large fine-tuning run, when building a dashboard or an alert set, when a logged curve dips or jumps for no clear reason, when per-rank logs and the dashboard global number disagree or a global loss must be recomputed from per-rank values, when the final model should re-read the training data (training re-evaluation curve, TREC) to find which part of the data a run fits worse or where to place high-quality data, or when the user asks 训练监控, 这个 run 健康吗, 这个 run 哪里有问题, loss spike, loss 突然掉了, global loss 对不对, 各 rank 不一致, 梯度爆炸, MFU 掉了, 专家不均衡, 怎么看训练曲线, 重新过一遍训练数据, 哪部分数据表现差了."
 ---
 
 # Training monitor
@@ -226,6 +226,17 @@ On the held-out set, let $M$ be the number of valid tokens and $\ell_k$ the loss
 
 **Cost.** "These timings and priorities are starting points. Measure the cost on your model, parallel setup, and hardware before recording anything more often."
 
+## Part VI. After the run: re-read the training data
+
+The training loss scores each batch with the weights of its own step. The training re-evaluation curve (TREC; Bergsma, Dey and Hestness 2025) scores every training batch again with the final weights $\theta_T$, in the order the run read them: $\mathcal{L}_{\mathrm{re}}(t)=\mathcal{L}(\mathcal{B}_t;\theta_T)$, against the training fraction $\hat t=t/T$. It shows how much of each part of the data the final model still fits, and so which data a run does worse on.
+
+- **Rebuild the exact order.** Use the run's own data config: the same caches, shuffle type, data seed and batch size. Check the rebuilt order against something the run recorded, such as a materialized subset, a logged batch hash or the loss of an intermediate checkpoint on its own batch, before reading any curve.
+- **Sample, and add a held-out level.** About 200 evenly spaced steps are enough. Add batches from the same shuffled stream that the run never read: their mean loss is the final model's level on unseen text of the training distribution, and every TREC is read against it.
+- **Average out batch difficulty.** One batch's loss mixes its difficulty with how well the model kept it. Average many batches per point, or take the difference of two models on the same batches, which cancels the difficulty.
+- **Read the shape.** The curve is low where the final weights still carry the batch. Under AdamW the final weights are an average of the updates with coefficients $c_i=\eta_i\lambda\prod_{j>i}(1-\eta_j\lambda)$ and timescale $\tau=1/(\eta\lambda T)$; the paper predicts the normalized curve as $\hat{\mathcal{L}}_{\mathrm{re}}(\hat t)=1-c(\hat t)^{1/2}\,\hat t^{\,m}$ with $m$ fitted, and finds a valley before the learning rate decays: early data is forgotten, and data at the end arrives with small steps. An optimizer without decoupled weight decay, such as one with norm-constrained updates, needs its own coefficients from its update rule before this form is trusted.
+- **Find which data a run does worse on.** For two runs that read the same stream, for example repeated and unique data or two schedules, score both final models on the stream of the run with more data, together with each model's held-out level. Below the held-out level is what a model keeps of data it read; the held-out levels differ by what it generalizes. Split the same arrays by data source and by token frequency to say which data a gap comes from.
+- **Place data by it.** In the paper, high-quality data put at the curve's minimum gave a lower validation loss than any other position, from 111M models to continual pre-training of a 3.9B model on 900B tokens.
+
 ## Escape hatch
 
 The metric set is opinionated by its author's own account. Drop a row that your architecture makes meaningless, add one that your failure history demands, and keep the reduction rules and the triage order, which are the parts that do not depend on the model.
@@ -234,7 +245,7 @@ The metric set is opinionated by its author's own account. Drop a row that your 
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> training-monitor v0.1.3 active: 9 first-screen signals, 39-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order.
+> training-monitor v0.2.0 active: 9 first-screen signals, 39-row metric table (P0 every step / P1 every 100 steps / P2 on demand), reduction rules, robust spike score, triage order, training re-evaluation curve.
 
 ## Credits
 
@@ -249,4 +260,6 @@ Distilled from Chunyuan Deng, "Reading a Pretraining Run", September 2026, https
 }
 ```
 
-The "How to apply this to a project" procedure and the escape hatch are additions by Wenhao Chai.
+Part VI restates Shane Bergsma, Nolan Dey and Joel Hestness, "Predicting Training Re-evaluation Curves Enables Effective Data Curriculums for LLMs", 2025, arXiv:2509.25380 (https://arxiv.org/abs/2509.25380).
+
+The "How to apply this to a project" procedure, Part VI's comparison of runs and the escape hatch are additions by Wenhao Chai.
