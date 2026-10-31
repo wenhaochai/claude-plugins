@@ -1,17 +1,17 @@
 ---
 name: style
-description: "Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 17 canonical rules everywhere; 19 page-capped additions (RULE-P1..P19) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission."
+description: "Default writing standards. Use whenever producing English prose the user will send or publish: emails, message drafts, blog posts, tweets, documentation, grant proposals, and conference/journal paper drafts (NeurIPS, ICML, ICLR, ACL, CVPR, COLM, EMNLP, arxiv). Applies 18 canonical rules everywhere; 19 page-capped additions (RULE-P1..P19) for page-constrained papers; 2 audit-time rules (RULE-A1..A2) only when reviewing a compiled PDF for submission."
 ---
 
 # Writing Style
 
 Default standards for English prose. Apply at generation and edit time. All rules are peers; no group is higher priority than another.
 
-**Scope.** RULE-01..17 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P19 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting. For research-paper prose, also load `writing:paper-voice`; where they disagree (RULE-13 parentheses, RULE-16 repeated key terms, RULE-08 hedges, RULE-P1 one "In this paper" and one contribution list, RULE-P2 italics at a definition, RULE-12 as a soft limit), paper-voice wins.
+**Scope.** RULE-01..18 apply to every writing task: email, message draft, post, doc, paper prose. RULE-P1..P19 apply *only* when the target is a page-capped paper (NeurIPS/ICML/ICLR-style 8-10 page caps and similar); skip them for email and short-form prose where they would over-constrain tone. RULE-A1..A2 are final-pass audit rules: trigger only when reviewing the compiled PDF for submission, not during drafting. For research-paper prose, also load `writing:paper-voice`; where they disagree (RULE-13 parentheses, RULE-16 repeated key terms, RULE-08 hedges, RULE-P1 one "In this paper" and one contribution list, RULE-P2 italics at a definition, RULE-12 as a soft limit), paper-voice wins.
 
-## Canonical (RULE-01..17)
+## Canonical (RULE-01..18)
 
-RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RULE-13..17 added by Wenhao Chai.
+RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RULE-13..18 added by Wenhao Chai.
 
 1. **RULE-01** Do not assume the reader shares your tacit knowledge. (Pinker 2014, Ch. 3)
 2. **RULE-02** Do not use passive voice when the agent matters. (Orwell 1946 Rule 3; S&W §II.14)
@@ -30,6 +30,7 @@ RULE-01..12 distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan. RUL
 15. **RULE-15** Be consistent within a single piece. Define an abbreviation on first use, then never re-expand. Once you pick italic vs roman "e.g.", "GPT-5-thinking" vs "GPT-5 (thinking)", a hyphenation convention, or a math-mode policy, hold it. Inconsistency reads as careless.
 16. **RULE-16** Do not use the same content word twice in one sentence or in adjacent sentences. Restructure, pronominalize, or pick a role-specific alternative. Function words and the piece's named signature concepts are exempt; reusing a defined term is desirable, not a violation.
 17. **RULE-17** Do not apologize in body prose for weak assumptions, narrow scope, or worse-than-baseline results. State each assumption once where it belongs and reserve limitations for a dedicated section. Phrasings like "Although our algorithm does not outperform X" frame weakness without communicating it; cut them.
+18. **RULE-18** Prose is not for listing numbers. A paragraph states its point in words and keeps only the one or two numbers that point rests on; series of values, per-seed or per-setting results, counts of runs, steps or tokens, and numbers in parentheses after a claim go to a figure, a table or the record. Prefer "about half" or "almost nothing" to a fourth decimal place when the size, not the digit, is the point. (Owner, 2026-10-31: "正文不是让你用来列数字的，这点要记住在所有写作里面".)
 
 ## Page-capped paper additions (RULE-P1..P19)
 
@@ -89,7 +90,7 @@ Break any rule sooner than write something awkward (Orwell 1946 Rule 6). Rules s
 
 When an agent loads this skill, a one-line acknowledgment confirms activation:
 
-> style v0.9.2 active: 17 canonical rules (RULE-01..17) + 19 page-capped additions (RULE-P1..P19, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
+> style v0.9.3 active: 18 canonical rules (RULE-01..18) + 19 page-capped additions (RULE-P1..P19, paper-only) + 2 final-pass audit rules (RULE-A1..A2, compiled-PDF-only).
 
 ## Credits
 
