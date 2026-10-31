@@ -229,6 +229,18 @@ From Sophie Wang, "Behind the scenes of paper writing" (2026), on a paper reader
    view, a conceptual diagram (Epoch-style SVG, not matplotlib) unifying what the paper shows, with the
    key measured results underneath.
 
+## Figures in a post
+
+A blog post is not a record (owner, 2026-10-31: "blog的画图要尽可能克制，一张图一个中心意思，而不是和exp page一样只是罗列数字").
+
+1. **One figure, one point.** Each figure carries the one message its paragraph states, and its caption says
+   that message in words. A second message gets a second figure, or goes to the text.
+2. **Draw only what the point needs.** Keep the few series or bars the message compares; every other setup,
+   seed and ablation stays out. A chart that lists every setup with its number is a table for the
+   experiment page, which the post links.
+3. **No number dump on the chart.** Values sit in the text or the tooltip, not on every mark; label at most
+   the one or two values the message rests on.
+
 ## Captions
 
 A caption stands alone: what is plotted, what the axes are, how the numbers were made (rule 2), and what
