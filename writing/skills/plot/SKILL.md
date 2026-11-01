@@ -196,6 +196,14 @@ No unnecessary secondary labels or descriptions: the layout does the explaining.
     so a close neighbour is never hidden. Logos come from vector sources (lobehub
     `@lobehub/icons-static-png`, simple-icons filled with its brand hex), never cropped from a
     screenshot.
+
+    A post's own palette is the other exception (owner, 2026-10-31, a brand duo for one blog post: "用hermes吧
+    就单这篇blog"). The owner picks it from the post's real figures redrawn under each candidate in a switcher, on a
+    white ground. Then every colour keeps a role, not a hue: the two leads mark the two ends of the compared variable,
+    the steps between them the sizes in between, a grey the reference, tints of a lead the schematics. Map the roles
+    when the figures are built, so the source keeps its default tones for every other page. Run a palette validator on
+    each figure's colour set and fix every pair below the floor (ΔE 15 for full colour vision, 8 under colour-vision
+    deficiency) with another step of the system, never with a dash: dashes keep the meaning above.
 11. **The docstring says where the numbers came from:** what the chart shows, the data source by path or
     run id, the formula for any derived quantity, the output. An example without measured data says
     `contains no measured results` in its first line.
@@ -240,6 +248,19 @@ A blog post is not a record (owner, 2026-10-31: "blog的画图要尽可能克制
    experiment page, which the post links.
 3. **No number dump on the chart.** Values sit in the text or the tooltip, not on every mark; label at most
    the one or two values the message rests on.
+4. **The title names, a grey subtitle states, the caption explains.** A short title says what is plotted, a grey
+   subtitle under it states the finding in one sentence, and the caption says how the numbers were made (owner,
+   2026-10-31: "大标题是现在的，然后副标题灰色字说结论").
+5. **Two runs over time: two curves, not their difference** (owner, 2026-10-31: "fig1能换两条线吗 不要做差"). The
+   levels show which run moved and where the two cross; a difference curve hides both. Keep a difference for a
+   quantity the post defines as one and compares across many settings.
+6. **Two values per category: grouped bars from zero** (owner, 2026-10-31: "figure12改成双柱状图吧"), the two colours
+   the same in every category; leave a bar out where it does not apply and say so in the caption. A quantity over a
+   numeric axis, such as a vocabulary or model size, stays a line.
+7. **Small multiples with one series per panel take one colour.** The panel name says what varies; a colour per
+   panel says it twice.
+8. **One unit across a post.** A result borrowed from another study is converted to the post's unit, and its caption
+   says so.
 
 ## Captions
 

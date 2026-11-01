@@ -4,7 +4,7 @@ Personal Claude Code plugin marketplace by [Wenhao Chai](https://wenhaochai.com)
 
 ## `writing` — publication-prep tools
 
-Four skills, all auto-loading by context match.
+Five skills, all auto-loading by context match.
 
 ### `style` — default English-prose standards
 
@@ -13,6 +13,16 @@ grant proposals, paper prose. 17 canonical English-prose rules apply everywhere.
 are distilled from Strunk & White, Orwell, Pinker, and Gopen & Swan, sourced from
 [agent-style](https://github.com/yzhao062/agent-style) under CC BY 4.0; RULE-13 to RULE-17 are added.
 20 page-cap additions and 2 final-pass audit rules apply only to a page-capped conference paper.
+
+### `blog` — a technical blog post on your own experiments
+
+The story from the surprise that started the work, through one section per finding, controls before mechanism, to
+limitations, takeaways, open questions, related work and a read-more card to the full record. A voice that blends Sasha
+Rush (short sentences, a question only where it sets up the next step), Phillip Isola (one thesis, intuition from
+mechanism, never beyond the evidence) and Lilian Weng (terms defined once, related work by theme). Links to the record
+only where it holds what the post does not show; every cited source opened and checked; open questions checked against
+the record first; a bilingual post written natively in each language; and a mechanical before-and-after diff of numbers,
+links, notes and figure references for every rewrite. Loaded with `style` for sentences and `plot` for figures.
 
 ### `paper-voice` — prose that does not read as LLM-written
 
