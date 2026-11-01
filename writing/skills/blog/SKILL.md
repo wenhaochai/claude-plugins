@@ -1,6 +1,6 @@
 ---
 name: blog
-description: "How to write a technical blog post about your own experiments, the kind a strong deep-learning researcher would publish: the story arc from the surprise that started the work to open questions and related work, a voice after Sasha Rush, Phillip Isola and Lilian Weng, how figures and text share the work, links to the full experiment record, fluent Chinese for a bilingual post, and the audit that keeps numbers, links and claims intact through every rewrite. Use with writing:style for sentences and writing:plot for figures."
+description: "How to write a technical blog post about your own experiments, the kind a strong deep-learning researcher would publish: the story arc from the surprise that started the work to open questions and related work, a voice after Sasha Rush, Phillip Isola and Lilian Weng, model posts to learn from (Cartesia's From Tokens to Bytes, anvilarth's RL for diffusion), one running example, how figures and text share the work, links to the full experiment record, fluent Chinese for a bilingual post, and the audit that keeps numbers, links and claims intact through every rewrite. Use with writing:style for sentences and writing:plot for figures."
 ---
 
 # Blog
@@ -29,6 +29,9 @@ post is shorter and sharper than the record; it never tries to be the record. Lo
 6. **Then where the effect sits, what reduces it and by how much, and what is left.**
 7. **Close with limitations (three or four sentences), takeaways (the claim and what a practitioner should do with it),
    open questions, related work, and a read-more card to the record.**
+8. **One running example.** Pick one concrete case early (a word, a prompt, a run) and come back to it where a section
+   ends, so each finding is seen on the same case and the reader knows what is still unexplained (owner, 2026-11-01,
+   holding up anvilarth's posts, whose sections end on "But there is still no fourth cup.").
 
 ## The voice
 
@@ -49,6 +52,22 @@ already says, and keep only the one or two numbers a paragraph rests on (`writin
 No seed talk (owner, 2026-11-01: "把里面所有关于随机种子的描述删除，这很minimal而且不利于阅读"): a post says nothing about
 random seeds or run counts, in the prose or the captions: no "one run", "averaged over runs", "a second seed shifts …",
 "within seed noise". The record carries them; the post states what the runs show.
+
+## Exemplars
+
+Posts the owner holds up as models (owner, 2026-11-01: "写的也很好，非常好，深入浅出，值得学习"). Read one before
+writing, for its moves, not its topic.
+
+- Cartesia, "From Tokens to Bytes", parts I and II (2026; cartesia.ai/blog/from-tokens-to-bytes-part-1 and -part-2): the
+  contributions as a numbered map before the evidence; background after that promise, so the reader knows why it matters;
+  the same input shown under each method side by side; one metric carried through every comparison; experiments staged as
+  questions, with baselines added one at a time; the post's own caveats in their own paragraphs.
+- anvilarth, "RL for diffusion", parts 1 and 2 (anvilarth.github.io/rl-for-diffusion-part-1.html and -part-2.html): one
+  running example, checked again where each section ends; each section ends on the limit that motivates the next; a toy
+  case with real numbers before any formula, and every formula read back in plain words; the reader's doubt as a short
+  question that opens the next step ("Why not just take more steps?"); a "where it breaks" paragraph for each method;
+  advice marked as advice, apart from measured claims; a closing table of what to do in which situation, at what cost.
+- Sasha Rush, Phillip Isola and Lilian Weng: see The voice.
 
 ## Figures and text
 
