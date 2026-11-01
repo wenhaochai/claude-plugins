@@ -11,11 +11,18 @@ post is shorter and sharper than the record; it never tries to be the record. Lo
 
 ## The story
 
-1. **Open with the setup made visible.** One short animation or schematic shows every part of the experiment and the
-   compared variable before the reader meets a sentence (owner, 2026-10-31: "做最前面一个视频来讲这个setup").
+1. **Open with the setup made visible.** One short animation shows every part of the experiment and the compared
+   variable before the reader meets a sentence (owner, 2026-10-31: "做最前面一个视频来讲这个setup"). The compared variable
+   stays on screen for the whole loop, the content is real (real token splits, numbers read from the figure data), the
+   type is large enough for the page width, and the loop ends on the main result; a generic schematic of boxes carries no
+   information (owner, 2026-11-01, on such a video: "我觉得你开局的这个视频就做的不行").
 2. **Motivation: the surprise that started the work.** One paragraph and one figure: what you expected, what happened, and
    the question it raised. End on that question.
-3. **Setup in at most three short paragraphs.** Define every term the post uses later, once, at first use.
+3. **Background, then the setup.** A post about an object outside the reader's daily work first explains what it is and
+   how it is built, in one short section (owner, 2026-11-01: "blog里应该还要包含一个tokenizer的介绍，什么是tokenizer，又是怎么
+   训练的"). Then the setup, in at most three short paragraphs. Define every term the post uses later, once, at first use,
+   with the field's standard name for what you did: "8 epochs on an eighth of the text", not "repeated data", which reads
+   as duplicate documents (owner, 2026-11-01: "数据重复不是一个好词？有点让人误解").
 4. **One section per finding.** The heading states the finding; the first sentence says it again in plain words; the figure
    carries the evidence; the last sentence says what it implies or which question comes next.
 5. **Controls before mechanism.** Right after the main effect, rule out the confounds a skeptical reader thinks of first.
@@ -39,14 +46,20 @@ Blend three writers (owner, 2026-10-31: "仿照 … sasha from cornell，phillip
 Concision (owner, 2026-10-31: "故事更精炼更有表达力"): cut every sentence that a heading, a figure subtitle or a caption
 already says, and keep only the one or two numbers a paragraph rests on (`writing:style` RULE-18).
 
+No seed talk (owner, 2026-11-01: "把里面所有关于随机种子的描述删除，这很minimal而且不利于阅读"): a post says nothing about
+random seeds or run counts, in the prose or the captions: no "one run", "averaged over runs", "a second seed shifts …",
+"within seed noise". The record carries them; the post states what the runs show.
+
 ## Figures and text
 
 - A post figure has a title that names it, a grey subtitle that states its finding, and a caption that says what is
   plotted and how it was measured (`writing:plot`, Figures in a post).
 - The text cites every figure by number, before or where it appears, never repeats a subtitle word for word, and never
   names a colour: it names the series.
-- Fewer, stronger figures; a figure that repeats another one's point goes, and its one result the argument needs stays as
-  a sentence that links to where the figure now lives.
+- Fewer, stronger figures. Every figure carries one step of the argument; one that does not goes, with its paragraph (owner,
+  2026-11-01: "图3及其描述删除，这个不重要"). Two figures that make the same point become one figure with two panels
+  (owner, 2026-11-01: "fig 8和9是不是要merge一下，这表达意思都一样？"). A cut figure's one result that the argument needs
+  stays as a sentence that links to where the figure now lives.
 
 ## Links to the record
 
@@ -84,6 +97,11 @@ already says, and keep only the one or two numbers a paragraph rests on (`writin
 - Same numbers, links and notes in both languages.
 
 ## Rewrites and style passes
+
+- In a draft, every sentence that guards a claim (a scope disclaimer, a compute caveat), hedges it, or announces pending work
+  (queued, running, still being tested) is marked red for the author to check: `<span class="chk">` in prose, ⟦…⟧ in a
+  caption or subtitle. Mark, do not delete; the author keeps or cuts each one, and the marks go before release (owner,
+  2026-11-01: "这种防御性的占位语句你应该用红色标出，方便检查（全文都这样）").
 
 - A rewrite or a style pass changes words, not facts. Before and after, compare mechanically: the numbers of each language
   as multisets, every href, every note marker, every figure reference, and the elements that are not prose (figures,
