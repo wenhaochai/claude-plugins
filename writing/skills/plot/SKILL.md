@@ -59,7 +59,10 @@ No unnecessary secondary labels or descriptions: the layout does the explaining.
    "by training tokens 这种描述 ... 是冗余的"; "against the baseline during training 这种描述 ... 冗余"). No count of winners, no verb of
    outcome, no comparative: what to take away goes in the caption. It is a plain noun phrase, the
    caption's bold lead: `The judge boundary`, never a roundabout sentence such as `What crosses the
-   boundary and what stops at it` (the owner: "not how a person writes"). The wording is the owner's; until
+   boundary and what stops at it` (the owner: "not how a person writes"). It is one piece: no comma or
+   colon splits it into two phrases, in a title, a schematic's heading, a legend entry or a category
+   label: `Six ways cut one sentence`, not `One sentence, cut six ways`; `128K with lookup rows`, not
+   `128K, lookup rows` (the owner, 2026-11-05: 「这个逗号是我严格拒绝的」). The wording is the owner's; until
    there is one, no title, or a draft that is called a draft. Axes use the data's own numbering
    (iterations 2 to 10, schemes 1 to 76, gaps kept). Renumber or relabel only on the owner's decision,
    and say so in the caption.
