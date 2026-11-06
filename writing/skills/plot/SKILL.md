@@ -155,10 +155,11 @@ No unnecessary secondary labels or descriptions: the layout does the explaining.
    the post's text (the owner), and so does every line of grey small text, such as a subtitle, an
    axis note or a key to a mark (the owner, 2026-11-05, on an X image: 「灰色小字都删掉」). The title
    states the finding without terms that only the article defines (the owner: 「each window不直观」).
-   The image that opens a thread is a 16:9 cover: a large title of two or three lines that names the
-   one cause behind the findings, over one simple chart of that cause. Bars of the outcome alone were
-   rejected (the owner, 2026-11-06: 「我要体现他们work的原因」), and so was a worked example with a key
-   (「太复杂了 我需要你直指本质 … 要大字」). Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
+   The image that opens a thread is a 16:9 cover: a large title of two or three lines that states the
+   one cause in the words of what the experiments changed, over bars of setups that differ only in
+   that cause. On 2026-11-06 the owner rejected, in turn, bars of the outcome alone (「我要体现他们work的
+   原因」), a worked example with a key (「太复杂了 我需要你直指本质 … 要大字」), a part of the mechanism
+   named as the cause (「看不懂」) and an axis built from a derived count (「根本看不懂了」). Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
    kind of text on its own, so every size keeps its ratio to the others. At `WIDTH_POST` two columns of
    panels leave under 2 in each: category labels over about ten characters collide there, so stack the
    panels in one column instead.
