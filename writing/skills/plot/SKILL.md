@@ -120,7 +120,9 @@ No unnecessary secondary labels or descriptions: the layout does the explaining.
    no tick marks: values sit just above their grid lines at the left edge, the quantity sits above
    each column, and panel names sit inside, top left, on white. Values are lifted off their lines, the
    x range runs past the last grid line, and headroom above the data holds the name. `ticks='left'` is
-   Epoch's export form: values left of the panel on short tick marks.
+   Epoch's export form: values left of the panel on short tick marks. The grid stays where a chart
+   drops its values (bars that carry their own numbers, a social image): it is part of the look, not
+   only a scale (the owner, 2026-11-06: 「去掉刻度数字后网格线已无意义是错的 因为美观」).
 7. **The y range starts where the data does.** 0 only when 0 is part of the comparison (shares, counts,
    latencies, bars); otherwise a round value just below the data. Round steps (1, 1.5, 2, 2.5, 3, 5 x
    10^k), 3 or more bands, each tall enough for the panel's name to clear the next value. Differences
@@ -150,7 +152,9 @@ No unnecessary secondary labels or descriptions: the layout does the explaining.
    (X, LinkedIn) can take the card: `canvas(card=True)` is Epoch's 1200 x 1500 export measured off
    the source, every size the web canvas's at 3.8 in, 0.30 in clear on all four sides, the legend
    wrapping into rows. The card is the chart alone: Epoch's footnote, sources and logo footer go in
-   the post's text (the owner).
+   the post's text (the owner), and so does every line of grey small text, such as a subtitle, an
+   axis note or a key to a mark (the owner, 2026-11-05, on an X image: 「灰色小字都删掉」). The title
+   states the finding without terms that only the article defines (the owner: 「each window不直观」).
    Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
    kind of text on its own, so every size keeps its ratio to the others. At `WIDTH_POST` two columns of
    panels leave under 2 in each: category labels over about ten characters collide there, so stack the

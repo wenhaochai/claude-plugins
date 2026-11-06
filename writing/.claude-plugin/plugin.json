@@ -1,6 +1,6 @@
 {
   "name": "writing",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "description": "Publication-prep tools for academic and public-facing writing. Five skills: style (18 canonical English-prose rules, 19 page-cap additions, 2 audit-time rules), blog (a technical blog post on your own experiments: the story from the surprise that started the work to open questions and related work, a voice after Sasha Rush, Phillip Isola and Lilian Weng, links to the full experiment record, fluent Chinese for a bilingual post, and the audit that keeps numbers, links and claims intact through rewrites), paper-voice (the prose voice of pre-2023 papers by Kaiming He, Joseph E. Gonzalez and Alex Dimakis, measured on 15 arXiv sources, plus Dimakis's writing notes (reader simulator, one story, no conceptual spaghetti) and Sophie Wang's two parallel narratives; with a counter that compares a draft to them), preflight (deterministic pre-submission checks on a LaTeX tree), and plot (one matplotlib style for posts and papers after Epoch AI's charts: Instrument Sans at Epoch's measured sizes, light grid, baseline axis only, Google GM2 tones by mark size; a 4:5 social card; paper-figure practice after Sophie Wang: storyboard before results, one question per chart, panels in explanation order, spacing and hierarchy, the teaser; style.py plus two examples). The integrity-forensics suite is the separate anti-autoresearch plugin.",
   "author": {
     "name": "Wenhao Chai",
