@@ -156,10 +156,13 @@ No unnecessary secondary labels or descriptions: the layout does the explaining.
    axis note or a key to a mark (the owner, 2026-11-05, on an X image: 「灰色小字都删掉」). The title
    states the finding without terms that only the article defines (the owner: 「each window不直观」).
    The image that opens a thread is a 16:9 cover: a large title of two or three lines that states the
-   one cause in the words of what the experiments changed, over bars of setups that differ only in
-   that cause. On 2026-11-06 the owner rejected, in turn, bars of the outcome alone (「我要体现他们work的
-   原因」), a worked example with a key (「太复杂了 我需要你直指本质 … 要大字」), a part of the mechanism
-   named as the cause (「看不懂」) and an axis built from a derived count (「根本看不懂了」). Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
+   one cause in the words of what the experiments changed, over a picture of that cause rather than a
+   data chart: one real example drawn the same way in each setup, its words inside the marks so that no
+   key is needed, a tag per setup for whether it has the cause, and the setup's number underneath. On
+   2026-11-06 the owner rejected, in turn, bars of the outcome alone (「我要体现他们work的原因」), the
+   example drawn as squares with a key (「太复杂了 我需要你直指本质 … 要大字」), a part of the mechanism
+   named as the cause (「看不懂」), an axis built from a derived count (「根本看不懂了」) and bars that
+   differ only in the cause (「要是一个形象的可视化」). Words or logos that read too small mean the canvas is too wide: narrow the canvas, never enlarge one
    kind of text on its own, so every size keeps its ratio to the others. At `WIDTH_POST` two columns of
    panels leave under 2 in each: category labels over about ten characters collide there, so stack the
    panels in one column instead.
